@@ -30,6 +30,3 @@ release_resources (on corona):
   script:
     - export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
     - ([[ -n "${JOBID}" ]] && scancel ${JOBID})
-
-include:
-  - local: .gitlab/corona-build-and-test-extra.yml

@@ -62,6 +62,3 @@ pgi_20_1:
   variables:
     SPEC: "+fortran %pgi@20.1 cxxflags=-rc=/usr/workspace/umpire/pgi/x86_64/local-gcc-8.3.1-rc cflags=-rc=/usr/workspace/umpire/pgi/x86_64/local-gcc-8.3.1-rc fflags=-rc=/usr/workspace/umpire/pgi/x86_64/local-gcc-8.3.1-rc"
   extends: .build_and_test_on_ruby
-
-include:
-  - local: .gitlab/ruby-build-and-test-extra.yml
