@@ -8,6 +8,26 @@
 stages:
   - build_and_test
 
+##############################################################################
+# LASSEN
+.on_lassen:
+  variables:
+  tags:
+    - shell
+    - lassen
+  rules:
+    - if: '$ON_LASSEN == "OFF"'
+      when: never
+    - if: '$ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH != "main" && $CI_COMMIT_BRANCH != "develop" && $ALL_TARGETS != "ON"'
+      when: never
+    - when: on_success
+
+.build_and_test_on_lassen:
+  extends: [.custom_build_and_test, .on_lassen]
+  stage: build_and_test
+  script:
+    - lalloc ${LASSEN_BUILD_AND_TEST_JOB_ALLOC} scripts/gitlab/build_and_test.sh
+
 # Gitlab jobs for the lassen machine at LLNL.
 
 # CPU only.
