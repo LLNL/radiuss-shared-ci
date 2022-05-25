@@ -33,12 +33,12 @@ stages:
 # CPU only.
 ibm_clang_9:
   variables:
-    SPEC: "+fortran %clang@ibm.9.0.0"
+    SPEC: " %clang@ibm.9.0.0"
   extends: .build_and_test_on_lassen
 
 ibm_clang_9_gcc_8:
   variables:
-    SPEC: "+fortran %clang@ibm.9.0.0 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1"
+    SPEC: " %clang@ibm.9.0.0 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1"
   extends: .build_and_test_on_lassen
 
 clang_10_0_1_mpi:
@@ -48,41 +48,41 @@ clang_10_0_1_mpi:
 
 gcc_8_3_1:
   variables:
-    SPEC: "+fortran%gcc@8.3.1"
+    SPEC: "%gcc@8.3.1"
   extends: .build_and_test_on_lassen
 
 pgi_20_4_gcc_8_3_1:
   variables:
-    SPEC: "+fortran%pgi@20.4 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1"
+    SPEC: "%pgi@20.4 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1"
   extends: .build_and_test_on_lassen
 
 xl_16_1_1_10:
   variables:
-    SPEC: "+fortran%xl@16.1.1.10"
+    SPEC: "%xl@16.1.1.10"
   extends: .build_and_test_on_lassen
 
 xl_16_1_1_10_gcc_8_3_1:
   variables:
-    SPEC: "+fortran%xl@16.1.1.10 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1"
+    SPEC: "%xl@16.1.1.10 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1"
   extends: .build_and_test_on_lassen
 
 # CUDA.
 ibm_clang_9_gcc_8_cuda:
   variables:
-    SPEC: "+fortran+cuda %clang@ibm.9.0.0 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 ^cuda@10.1.168"
+    SPEC: "+cuda %clang@ibm.9.0.0 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 ^cuda@10.1.168"
   extends: .build_and_test_on_lassen
 
 gcc_8_3_1_cuda:
   variables:
-    SPEC: "+fortran+cuda+shared %gcc@8.3.1 ^cuda@10.1.168"
+    SPEC: "+cuda+shared %gcc@8.3.1 ^cuda@10.1.168"
   extends: .build_and_test_on_lassen
 
 xl_16_1_1_10_cuda:
   variables:
-    SPEC: "+fortran+cuda %xl@16.1.1.10 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-7.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-7.3.1 ^cuda@10.1.168 ^cmake@3.14.5"
+    SPEC: "+cuda %xl@16.1.1.10 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-7.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-7.3.1 ^cuda@10.1.168 ^cmake@3.14.5"
   extends: .build_and_test_on_lassen
 
 xl_16_1_1_10_gcc_8_3_1_cuda_11:
   variables:
-    SPEC: "+fortran+cuda tests=none %xl@16.1.1.10 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 ^cuda@11.0.2"
+    SPEC: "+cuda tests=none %xl@16.1.1.10 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 ^cuda@11.0.2"
   extends: .build_and_test_on_lassen
