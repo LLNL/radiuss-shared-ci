@@ -1,0 +1,49 @@
+###############################################################################
+# Copyright (c) 2022, Lawrence Livermore National Security, LLC and RADIUSS
+# project contributors. See the COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: (MIT)
+###############################################################################
+
+# DESCRIPTION:
+###############################################################################
+# General GitLab pipelines configurations for supercomputers and Linux clusters
+# at Lawrence Livermore National Laboratory (LLNL).
+# This entire pipeline is LLNL-specific
+#
+# Important note: This file is a template provided by
+# llnl/radiuss-shared-ci. It should not require any change from the project to
+# get started but could feature project-specific stages.
+#
+# However, each project should provide:
+# - .gitlab/custom-variables.yml
+# - .gitlab/custom-pipelines.yml
+# - .gitlab/custom-jobs.yml
+# - .gitlab/${MACHINE}-build-and-test-extra.yml
+###############################################################################
+
+# We organize the build-and-test stage in sub-pipelines. Each sub-pipeline
+# corresponds to a test batch on a given machine.
+
+# High level stages
+stages:
+  - build-and-test
+
+# Template for jobs triggering a build-and-test sub-pipelines:
+.build-and-test:
+  stage: build-and-test
+  trigger:
+    include:
+      - local: '.gitlab/custom-jobs.yml'
+      - project: 'radiuss/radiuss-shared-ci'
+        ref: main
+        file: '${CI_MACHINE}-build-and-test.yml'
+      - local: '.gitlab/${CI_MACHINE}-build-and-test-extra.yml'
+    strategy: depend
+    forward:
+      pipeline_variables: true
+
+# Import parameters and pipelines defined by the project
+include:
+  - local: .gitlab/custom-variables.yml
+  - local: .gitlab/custom-pipelines.yml
