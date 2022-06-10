@@ -6,16 +6,17 @@
 .. ##
 
 #################
-Radiuss Shared CI
+RADIUSS Shared CI
 #################
 
-A share GitLab CI implementation for Radiuss projects using Spack.
+A shared GitLab CI implementation for RADIUSS projects using Spack.
 
-RADIUSS Shared CI is a sub-project from the RADIUSS initiative providing a
-shareable template of CI implementation designed to run on LC GitLab instance.
-By sharing the CI definition, projects share the burden of maintaining it. In
-addition, with Radiuss Shared CI, they share a core set of toolchains (spack
-specs) to ensure that they keep running tests in similar configurations.
+Radiuss-Shared-CI is a sub-project from the RADIUSS initiative providing a
+shareable template of CI implementation designed to run on the Livermore
+Computing (LC) GitLab instance.  By sharing the CI definition, projects share
+the burden of maintaining it. In addition, with Radiuss-Shared-CI, they share a
+core set of toolchains (spack specs) to ensure that they keep running tests
+with similar configurations.
 
 LLNL's RADIUSS project (Rapid Application Development via an Institutional
 Universal Software Stack) aims to broaden usage across LLNL and the open source
@@ -28,7 +29,7 @@ Background and Motivation
 =========================
 
 Projects belonging to the RADIUSS scope are targeting the same machines and
-use `Spack` as a packaging system. We want them to ensure they build with
+use Spack as a packaging system. We want them to ensure they build with
 similar toolchains.
 
 Sharing the CI framework started with `sharing spack configuration files`_. In
@@ -36,7 +37,7 @@ order to avoid duplication, we now also share most of the CI implementation
 itself.
 
 By externalizing the CI configuration, we create the need for an interface.
-We try to make this interface minimalistic, while allowing customization.
+We try to keep this interface minimalistic, while allowing customization.
 
 .. toctree::
    :hidden:
