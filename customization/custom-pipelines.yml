@@ -20,17 +20,3 @@ lassen-build-and-test:
   variables:
     CI_MACHINE: "lassen"
   extends: [.build-and-test]
-
-## If testing develop branch, trigger CHAI pipeline with this version of Umpire.
-## TODO: Once Spack allows to clone a specific commit on demand, then point to
-## the exact commit. This will prevent from sticking to a branch (here develop).
-# trigger-chai:
-#  stage: multi-project
-#  rules:
-#    - if: '$CI_COMMIT_BRANCH == "develop" || $MULTI_PROJECT == "ON"' #run only if ...
-#  variables:
-#    UPDATE_UMPIRE: develop
-#  trigger:
-#    project: radiuss/chai
-#    branch: develop
-#    strategy: depend

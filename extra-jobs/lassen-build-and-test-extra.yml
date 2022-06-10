@@ -9,8 +9,8 @@
 variables:
   INCLUDED_FILE_CANNOT_BE_EMPTY: "True"
 
-## Template for extra jobs (adds to default ones).
-#<job-name (usually spec id)>:
+## Template for extra jobs defined by the project.
+#<job-name (usually spec or description)>:
 #  variables:
-#    SPEC: "<spack spec to add to package name>"
+#    SPEC: "<spack spec without package name>"
 #  extends: .build_and_test_on_ruby
