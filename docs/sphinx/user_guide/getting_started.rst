@@ -38,9 +38,10 @@ The short version
    # edit extra jobs
    mkdir -p scripts/gitlab
    vim scripts/gitlab/build-and-test
-   # write your CI script
+   # write CI script
 
-Jump to the corresponding section to deal with `customize CI` and `edit extra jobs`.
+Jump to the corresponding section to deal with :ref:`customize-ci`,
+:ref:`edit-extra-jobs` and :ref:`write-ci-script`.
 
 ====================
 The detailed version
@@ -53,7 +54,7 @@ Our CI implementation can be divided in four parts:
 * extra jobs
 * local build-and-test script
 
-Setting up the CI will basically consists in four corresponding phases.
+Setting up the CI will basically consist in four corresponding phases.
 
 Start by cloning the project locally, for example next to the project you intend
 to add CI to.
@@ -67,9 +68,9 @@ to add CI to.
 Core CI implementation
 ======================
 
-By default, GitLab expects a ``.gitlab-ci-yml`` file to intrepret the CI setup.
-We provide one projects can copy-paste in ``customization/gitlab-ci.yml``, just
-be sure to place it at the root of your project, with a dot (``.``) at the
+By default, GitLab expects a ``.gitlab-ci-yml`` file to interpret the CI setup.
+We provide one that projects can copy-paste in ``customization/gitlab-ci.yml``,
+just be sure to place it at the root of your project, with a dot (``.``) at the
 beginning of the name.
 
 .. code-block:: bash
@@ -84,9 +85,10 @@ We now have to complete the interface with the shared CI config. Indeed,
 ``.gitlab-ci.yml`` also expects some files to be present locally. Those are the
 next steps.
 
+.. _customize-ci:
 
-CI Customization
-================
+Customize CI
+============
 
 We provide templates for the required customization files. We need to copy
 them in the ``.gitlab`` directory.
@@ -113,7 +115,7 @@ No change is strictly required to get started here.
 
 In this file, you may add configuration to the ``.custom_build_and_test`` job
 that will then be included to all you CI jobs. This can be used for example to
-export jUnit test reports.
+`export jUnit test reports`_.
 
 ``.gitlab/custom-variables.yml``
 ------------------------
@@ -122,9 +124,9 @@ We should now have a look at ``.gitlab/custom-variables.yml``. Here is a table
 to describe each variable present in the file. Some more details can be found
 in the file itself.
 
- ========================                   ======================================================
+ ========================================== ==========================================================================================================================
   Parameter                                  Description
- ========================                   ======================================================
+ ========================================== ==========================================================================================================================
   ``LLNL_SERVICE_USER``                      Service Account used in CI
   ``CUSTOM_CI_BUILD_DIR``                    Where to locate build directories (prevent overquota)
   ``GIT_SUBMODULES_STRATEGY``                Controls strategy for the clone performed by GitLab. Consider ``recursive`` if you have submodules, otherwise comment it.
@@ -132,7 +134,7 @@ in the file itself.
   ``ALLOC_NAME``                             Name of the shared allocation. Should be unique, our default should be fine.
   ``<MACHINE>_BUILD_AND_TEST_SHARED_ALLOC``  Parameters for the shared allocation. You may extend the resource and time.
   ``<MACHINE>_BUILD_AND_TEST_JOB_ALLOC``     Parameters for the job allocation. You may extend the resource and time within the scope of the shared allocation.
- ========================                    ======================================================
+ ========================================== ==========================================================================================================================
 
 .. note::
    If a variable is blank in the template file, then it does not require a
@@ -141,8 +143,10 @@ in the file itself.
 .. note::
    We strongly recommend that you set your CI to use a service account.
 
-Extra jobs
-==========
+.. _edit-extra-jobs:
+
+Edit extra jobs
+===============
 
 We provide templates for the extra jobs files. Those files are required as soon
 as the associated machine has been activated in ``.gitlab/custom-pipelines``.
@@ -156,30 +160,33 @@ the variable definition, uncomment the template job and complete it with the
 required information:
 
 * A job name, unique, that will appear in CI.
-* A spack spec used by ``build-and-test`` to know what to build.
+* A Spack spec used by ``build-and-test`` to know what to build.
 
 .. note::
-   Gitlab supports long and complex job name. Make sure to pick a unique name
+   Gitlab supports long and complex job names. Make sure to pick a unique name
    not to override a shared job.
 
-CI Script
-=========
+.. _write-ci-script:
+
+Write CI Script
+===============
 
 The last step is to provide a CI script. You may already have one you can
 adapt, the requirements are:
 
-The script should be named ``build-and-test`` and located in
-``scripts/gitlab``, and it should take a spack spec as input through the
-environment variable ``$SPEC``.
+* The script should be named ``build-and-test`` and located in
+  ``scripts/gitlab``, and it should take a Spack spec as input through the
+  environment variable ``$SPEC``.
 
-The script should use that spec to instruct spack to install the dependencies
-and then you can build your project using those. This is the workflow
-documented in `Radiuss CI`_ and we encourage you to use it.
+* The script should use that spec to instruct Spack to install the
+  dependencies. Then you can build your project using those. This is the
+  workflow documented in `Radiuss CI`_ and we encourage you to use it.
 
-Umpire, RAJA, CHAI, MFEM each have their own script you could easily adapt.
-All these projects use Uberenv to drive spack. Umpire, RAJA and CHAI share the
-spack configuration files in `Radiuss-Spack-Configs`_ in order to keep building
-with the same toolchains.
+Umpire, RAJA, CHAI, MFEM each have their own script you could easily adapt. All
+these projects use Uberenv to drive Spack. Umpire, RAJA and CHAI share the
+Spack configuration files in `Radiuss-Spack-Configs`_ in order to keep building
+with the same tool-chains.
 
 .. _Radiuss CI: https://radiuss-ci.readthedocs.io/en/latest/index.html
 .. _Radiuss-Spack-Configs: https://github.com/LLNL/radiuss-spack-configs
+.. _export jUnit test reports: https://github.com/LLNL/Umpire/blob/develop/.gitlab/custom-jobs.yml
