@@ -62,16 +62,26 @@ Then go to ``customization/custom-variables.yml`` and add the variables:
    Use the values we have for lassen as guides, but adapt the partition and
    duration coherently with the machine.
 
+Reference the new sub-pipeline
+==============================
+
+In ``customization/custom-pipelines.yml``, add a new section corresponding to
+the new machine. This is used by ``customization/gitlab-ci.yml`` to control
+which sub-pipelines are effectively generated.
+
+Changelog
+=========
+
+Don’t forget to provide a quick description of your changes in the
+``CHANGELOG.md``.
+
 New tag
 =======
 
-Once the new machine is setup is tested and valid, submit a PR. We will merge
-it and create a new tag.
-
-.. note::
-   Not all project will want to jump into using that machine righ away. This is
-   why we rely on a tag system to control the version of the shared CI we want
-   to use.
-
+Once the new machine is setup is tested and valid, submit a PR. We will review
+it and merge it. We may create a new tag, although it is not required for a new
+machine. Indeed, using a new machine is a voluntary change for project: they
+will have to activate it in ``customization/custom-pipelines.yml`` the same way
+you did above (which is a suggested template).
 
 .. _Radiuss-Spack-Configs: https://github.com/LLNL/radiuss-spack-configs
