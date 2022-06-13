@@ -56,10 +56,14 @@ Extra jobs
 ==========
 
 Extra jobs can be defined by the user appending
-``.gitlab/${CI_MACHINE}-build-and-test-extra.yml``. Since those files are
-always included in the sub-pipelines in ``.gitlab-ci.yml``, they should always
-be provided. They can’t be empty neither, which is why we provide a working
-minimal template.
+``.gitlab/${CI_MACHINE}-build-and-test-extra.yml``. We provide a working
+minimal template that should always be provided.
+
+.. note::
+   Strictly speaking, the extra jobs file is only needed once the associated
+   sub-pipeline is reference to ``.gitlab-ci.yml`` through
+   ``customization/custom-pipelines.yml``. We make it presence mandatory for
+   the sake of simplicity.
 
 Other files
 =============

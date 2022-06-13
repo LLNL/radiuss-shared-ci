@@ -78,10 +78,10 @@ Don’t forget to provide a quick description of your changes in the
 New tag
 =======
 
-Once the new machine is setup is tested and valid, submit a PR. We will review
-it and merge it. We may create a new tag, although it is not required for a new
-machine. Indeed, using a new machine is a voluntary change for project: they
-will have to activate it in ``customization/custom-pipelines.yml`` the same way
-you did above (which is a suggested template).
+Once the new machine setup is tested and valid, submit a PR. We will review it
+and merge it. We may create a new tag although it is not required for a new
+machine. Indeed, using a new machine is a voluntary change for users: they will
+have to activate it in ``customization/custom-pipelines.yml`` the same way you
+did above (which is a suggested template).
 
 .. _Radiuss-Spack-Configs: https://github.com/LLNL/radiuss-spack-configs
