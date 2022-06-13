@@ -7,38 +7,62 @@
 
 .. _ci_setup_explained-label:
 
-**************************************
-Specificities of the CI implementation
-**************************************
+***********************************
+Specificities of the implementation
+***********************************
 
-Radiuss-Clingo-Install is a CI only repo installing Clingo on LC systems for a
-given user. It leverages GitLab capabilities to automate complex actions while
-allowing easy customization and user-friendly visual rendering in the UI.
+Radiuss-Shared-CI is a configuration repo created to help RADIUSS projects
+adopt the Gitlab CI workflow designed for them.
 
 =================
 Project structure
 =================
 
-CI files
-========
+Shared CI files
+===============
 
-The CI core file is ``.gitlab-ci.yml``. We use this file to handle the
-conditional inclusion of a **configuration file** and the **pipeline definiton**.
+This projects hosts the shared CI configuration, which can be found in
+the YAML files at the root of the project: ``<machine>-build-and-test.yml``.
 
-We suggest that the **configuration file** path match
-``configs/<config-name>.yml`` although there is no mechanism to enforce that.
-The ``configs`` directory is intended to *users*.
+Each file contains both the configuration and the jobs for one machine. They
+assume that some entries will be provided by including the customization files.
 
-The ``Pipeline definition`` is described by the file ``.gitlab/pipeline.yml``
-and the associated sub-files, all located in ``.gitlab``. The ``.gitlab``
-directory is intended to *developers*.
+Customization files
+===================
+
+The ``customization`` directory holds all the files allowing to customize the
+pipeline.
+
+The files ``custom-pipelines.yml``, ``custom-variables`` and
+``custom-jobs.yml`` are all included in the configuration in ``gitlab-ci.yml``.
+
+Project must use ``gitlab-ci.yml`` as a base for the ``.gitlab-ci.yml`` at the
+root of their project. This files does not require any change, but can receive
+additional stages if needed by the project.
+
+.. note::
+   We could share ``.gitlab-ci.yml`` directly in Radiuss-Shared-CI. However
+   that would require projects to configure GitLab, through the UI, to use that
+   file. This is not considered a good idea at the moment, and we preffer
+   projects to have the capability to easily add other stages to their CI
+   configuration.
+
+Both ``custom-pipelines.yml`` and ``custom-variablse.yml`` are included
+globally. They will affect all the CI workflow. The file ``custom-jobs.yml`` is
+included in the ``build-and-test`` sub-pipelines and will only affect those
+ones.
+
+Extra jobs
+==========
+
+Extra jobs can be defined by the user appending
+``.gitlab/${CI_MACHINE}-build-and-test-extra.yml``. Since those files are
+always included in the sub-pipelines in ``.gitlab-ci.yml``, they should always
+be provided. They can’t be empty neither, which is why we provide a working
+minimal template.
 
 Other files
 =============
-
-The ``scripts`` directory gathers scripts. ``get-spack`` is used to clone Spack
-using the variables defined in the **configuration file**. ``print-variables`` is
-useful to print the CI variables of interest at the beginning of jobs.
 
 The documentation source code is in the ``docs`` directory, while ``cmake``
 aims at receiving BLT submodule to manage the local build of the docs.
