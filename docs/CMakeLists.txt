@@ -6,7 +6,7 @@
 ################################################################################
 
 if (SPHINX_FOUND)
-  blt_add_sphinx_target(radiuss_clingo_install_docs)
+  blt_add_sphinx_target(radiuss_shared_ci_docs)
 endif ()
 
 if ( NOT SPHINX_FOUND)
