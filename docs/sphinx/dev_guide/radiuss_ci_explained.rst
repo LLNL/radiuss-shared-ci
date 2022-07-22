@@ -5,14 +5,14 @@
 .. ## SPDX-License-Identifier: (MIT)
 .. ##
 
-.. _ci_setup_explained-label:
+.. _radiuss_ci_explained-label:
 
-***********************************
-Specificities of the implementation
-***********************************
+***************************
+RADIUSS Shared CI explained
+***************************
 
-Radiuss-Shared-CI is a configuration repo created to help RADIUSS projects
-adopt the Gitlab CI workflow designed for them.
+Radiuss-Shared-CI is an infrastructure and documentation repository created to
+help RADIUSS projects adopt the Gitlab CI workflow designed for them.
 
 =================
 Project structure
@@ -21,7 +21,7 @@ Project structure
 Shared CI files
 ===============
 
-This projects hosts the shared CI configuration, which can be found in
+This project hosts the shared CI configuration, which can be found in
 the YAML files at the root of the project: ``<machine>-build-and-test.yml``.
 
 Each file contains both the configuration and the jobs for one machine. They
@@ -70,3 +70,12 @@ Other files
 
 The documentation source code is in the ``docs`` directory, while ``cmake``
 aims at receiving BLT submodule to manage the local build of the docs.
+
+==========
+References
+==========
+
+`LC specific documentation for Gitlab <https://gitlab.llnl.gov>`_. In
+particular, the "Getting Started" and "Setup Mirroring" sub-pages.
+
+

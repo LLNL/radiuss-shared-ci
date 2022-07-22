@@ -5,11 +5,11 @@
 .. ## SPDX-License-Identifier: (MIT)
 .. ##
 
-.. _how_to:
+.. _dev_how_to-label:
 
-*********
-How-To...
-*********
+******
+How To
+******
 
 =================
 Add a new machine

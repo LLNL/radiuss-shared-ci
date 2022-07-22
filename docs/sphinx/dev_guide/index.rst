@@ -5,6 +5,8 @@
 .. ## SPDX-License-Identifier: (MIT)
 .. ##
 
+.. _dev_guide-label:
+
 ###############
 Developer Guide
 ###############
@@ -16,11 +18,10 @@ documentation).
 We provide guidance for both in this section, using an HowTo format where we
 describe the set of actions to perform for several practical use-cases.
 
-This section of the documentation also illustrates some of those technical
-details.
+This section of the documentation also explains some technical choice.
 
 .. toctree::
    :maxdepth: 2
 
    how_to
-   ci_setup_explained
+   radiuss_ci_explained
