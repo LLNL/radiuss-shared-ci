@@ -27,7 +27,7 @@ dependencies for the given spec.
 
 Spack provides a single context to express *toolchains*, *machines setup* and
 *build sequence*. Using it will allow us to share configuration files to
-describe the toolchains and machines setup. `Radiuss-Spack-Configs`_ is the
+describe the toolchains and machines setup. `radiuss-spack-configs`_ is the
 repository where RADIUSS projects Spack configuration is shared.
 
 Spack is increasingly used to install the dependency tree of
@@ -80,7 +80,7 @@ Getting Uberenv by clone/fetch/copy
 
 3. Add radiuss-spack-configs submodule.
 
-    * Use ``git submodule add`` to get `Radiuss_Spack_Configs`_.
+    * Use ``git submodule add`` to get `radiuss_spack_configs`_.
 
     * Create a symlink ``uberenv/spack_configs`` that points to
       ``radiuss-spack-configs``.
@@ -112,7 +112,7 @@ Getting Uberenv as a submodule
 
 3. Add radiuss-spack-configs submodule.
 
-    * Use ``git submodule add`` to get `Radiuss-Spack-Configs`_ in a second
+    * Use ``git submodule add`` to get `radiuss-spack-configs`_ in a second
       submodule or custom location.
 
     * In ``.uberenv.json`` set ``spack_configs_path`` to point to
@@ -137,7 +137,7 @@ Getting Uberenv as a submodule
 Get the shared Spack configuration
 ==================================
 
-We share Spack configuration files in `Radiuss_Spack_Configs`_. In this repo
+We share Spack configuration files in `radiuss_spack_configs`_. In this repo
 you will find:
 
 * `config.yaml` for Spack general configuration.
@@ -147,7 +147,7 @@ you will find:
 
 Depending on the machine/system, we may or may not provide a spack
 configuration allowing you to use it right away. Please refer to
-`Radiuss_Spack_Configs`_ documentation about adding a new machine. This will be
+`radiuss_spack_configs`_ documentation about adding a new machine. This will be
 welcome by the RADIUSS teams using it!
 
 .. note:: MacOS (darwin) case
@@ -200,6 +200,6 @@ generating a configuration file that can be used just like a CMake configuraton
 file. We adapted the implementation of the package to mimics the mechanism
 available in CMake-based packages. You may use that as an example.
 
-.. _Radiuss-Spack-Configs: https://github.com/LLNL/radiuss-spack-configs
+.. _radiuss-spack-configs: https://github.com/LLNL/radiuss-spack-configs
 .. _Uberenv: https://github.com/LLNL/uberenv
 .. _Spack: https://github.com/spack/spack

@@ -20,10 +20,11 @@ CI infrastructure is shared* to avoid duplication and ease the maintenance.
 
 .. image:: images/UberenvWorkflow.png
    :scale: 32 %
-   :alt: RADIUSS CI infrastructure in a project repository.
+   :alt: RADIUSS Shared CI infrastructure in a project repository.
    :align: center
 
-We split the design in three steps necessary to adopt RADIUSS CI methodology.
+We split the design in three steps necessary to adopt RADIUSS Shared CI
+methodology.
 
 .. toctree::
    :maxdepth: 2
@@ -40,8 +41,8 @@ We also provide an "How To" section.
    how_to
 
 .. warning::
-   Due to its GitLab CI sharing goal, Radiuss Shared CI is meant to live on LC
+   Due to its GitLab CI sharing goal, radiuss-shared-ci is meant to live on LC
    GitLab instance. The main repo, hosted on GitHub for accessibility and
-   visibility, is mirrored on LC GitLab. To include files from Radiuss-CI, we
-   recommend pointing to the mirror repo on GitLab rather than the GitHub one.
-   We only document that option.
+   visibility, is mirrored on LC GitLab. To include files from
+   radiuss-shared-ci, we recommend pointing to the mirror repo on GitLab rather
+   than the GitHub one. We only document that option.

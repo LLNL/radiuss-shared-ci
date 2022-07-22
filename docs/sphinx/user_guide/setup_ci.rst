@@ -16,7 +16,7 @@ Setup the CI using the shared template
    :alt: Once Spack and the build script setup, adopting the shared CI should be easy.
    :align: center
 
-The third step in adopting RADIUSS CI infrastructure is to setup the CI.
+The third step in adopting RADIUSS Shared CI infrastructure is to setup the CI.
 
 Once you put in the effort to adopt the first two steps, you should be able to
 benefit from the shared CI infrastructure. In very complex scenario, you will
@@ -86,7 +86,7 @@ Write CI Script
 ---------------
 
 The very first step is to provide a CI script. You should already have one
-after completing `write-ci-script`_ at Step 2.
+after completing :ref:`write-ci-script` at Step 2.
 
 Once you have that script, you can move on to the CI setup.
 
@@ -113,7 +113,7 @@ beginning of the name.
 
 
 Your CI is now setup to include remote files from the GitLab mirror of
-Radiuss-Shared-CI.
+radiuss-shared-ci.
 
 We now have to complete the interface with the shared CI config. Indeed,
 ``.gitlab-ci.yml`` also expects some files to be present locally. Those are the
@@ -200,7 +200,6 @@ required information:
    Gitlab supports long and complex job names. Make sure to pick a unique name
    not to override a shared job.
 
-.. _Radiuss CI: https://radiuss-ci.readthedocs.io/en/latest/index.html
-.. _Radiuss-Spack-Configs: https://github.com/LLNL/radiuss-spack-configs
+.. _Radiuss Shared CI: https://radiuss-shared-ci.readthedocs.io/en/latest/index.html
 .. _export jUnit test reports: https://github.com/LLNL/Umpire/blob/develop/.gitlab/custom-jobs.yml
 .. _sharing spack configuration files: https://github.com/LLNL/radiuss-spack-configs

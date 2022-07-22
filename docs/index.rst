@@ -4,15 +4,15 @@
 .. ## SPDX-License-Identifier: (MIT)
 .. ##
 
-##########
-RADIUSS CI
-##########
+#################
+RADIUSS Shared CI
+#################
 
 Documentation of the CI infrastructure developed for RADIUSS projects.
 
-RADIUSS CI is a sub-project from the RADIUSS initiative focusing on sharing
-resource and documentation regarding Continuous Integration among RADIUSS
-projects.
+RADIUSS Shared CI is a sub-project from the RADIUSS initiative focusing on
+sharing resource and documentation regarding Continuous Integration among
+RADIUSS projects.
 
 .. note::
    LLNL's RADIUSS project (Rapid Application Development via an Institutional
@@ -39,8 +39,8 @@ CI infrastructure is shared* to avoid duplication and ease the maintenance.
 Overview
 ========
 
-We split the design in three steps necessary to adopt RADIUSS CI methodology.
-Those actions will be documented in the `user_guide`_.
+We split the design in three steps necessary to adopt RADIUSS Shared CI
+methodology. Those actions will be documented in the `user_guide`_.
 
 1. **Use Spack to configure the project build.**
    Spack provides a single context to express *toolchains*, *machines
@@ -55,12 +55,12 @@ Those actions will be documented in the `user_guide`_.
 3. **Setup the CI using the shared template.**
    Once you have put in the effort to adopt the first two steps, you should be
    able to benefit from the shared CI infrastructure. In very complex scenario,
-   you would still be able to use the RADIUSS CI template as a starting point
-   for a custom implementation.
+   you would still be able to use the RADIUSS Shared CI template as a starting
+   point for a custom implementation.
 
-In the `dev_guide`_, we discuss the layout of the RADIUSS CI infrastructure
-and how the different pieces work with one another. Technical choices are also
-explained there.
+In the `dev_guide`_, we discuss the layout of the RADIUSS Shared CI
+infrastructure and how the different pieces work with one another. Technical
+choices are also explained there.
 
 .. toctree::
    :hidden:

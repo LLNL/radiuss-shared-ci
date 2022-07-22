@@ -17,7 +17,7 @@ Add a new machine
 
 Adding a new machine can be done directly in this project so that the
 configuration is shared with all. However it the associated Spack configuration
-must first be added to `Radiuss-Spack-Configs`_.
+must first be added to `radiuss-spack-configs`_.
 
 The sub-pipeline definition
 ===========================
@@ -84,4 +84,4 @@ machine. Indeed, using a new machine is a voluntary change for users: they will
 have to activate it in ``customization/custom-pipelines.yml`` the same way you
 did above (which is a suggested template).
 
-.. _Radiuss-Spack-Configs: https://github.com/LLNL/radiuss-spack-configs
+.. _radiuss-spack-configs: https://github.com/LLNL/radiuss-spack-configs

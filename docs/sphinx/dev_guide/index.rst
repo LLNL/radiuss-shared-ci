@@ -11,9 +11,9 @@
 Developer Guide
 ###############
 
-There should be two types of contributions to this Radiuss-Shared-CI: adding
-new shared jobs, contributing changes to the CI implementation (and
-documentation).
+There should be two types of contributions to this radiuss-shared-ci
+repository: adding new shared jobs, contributing changes to the CI
+implementation (and documentation).
 
 We provide guidance for both in this section, using an HowTo format where we
 describe the set of actions to perform for several practical use-cases.
