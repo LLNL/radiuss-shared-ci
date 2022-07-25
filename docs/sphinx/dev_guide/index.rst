@@ -23,5 +23,5 @@ This section of the documentation also explains some technical choice.
 .. toctree::
    :maxdepth: 2
 
-   how_to
    radiuss_ci_explained
+   how_to
