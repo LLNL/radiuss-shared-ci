@@ -18,23 +18,23 @@ Setup the CI using the shared template
 
 The third step in adopting RADIUSS Shared CI infrastructure is to setup the CI.
 
-Once you put in the effort to adopt the first two steps, you should be able to
-benefit from the shared CI infrastructure. In very complex scenario, you will
-always be able to use the template as a starting point for a custom
+Once you have put in the effort to implement the first two steps, you should be
+able to benefit from the shared CI infrastructure. In very complex scenario,
+you will always be able to use the template as a starting point for a custom
 implementation.
 
 By sharing the CI definition, projects share the burden of maintaining it. In
-addition, with our shared CI, they also share a core set of toolchains (spack
-specs) to ensure that they keep running tests with similar configurations.
+addition, with our shared CI, they also share a core set of spack specs to
+ensure that they keep running tests with similar configurations.
 
 =================
 Radiuss Shared CI
 =================
 
-Sharing the CI framework started with `sharing spack configuration files`_, a
-method manage Spack and use it to generate CMake configuration files and a
-``build-and-test`` script with that has the same imputs across projects. We
-will now also share most of the CI implementation itself.
+We started by `sharing spack configuration files`_, then shared a method to
+manage Spack and use it to generate CMake configuration files and finally
+described a ``build-and-test`` script that has the same imputs across
+projects. We will now share most of the CI implementation itself.
 
 By externalizing the CI configuration, we create the need for an interface.
 We try to keep this interface minimalistic, while allowing customization.
@@ -80,7 +80,7 @@ Our CI implementation can be divided in four parts:
 * customization files
 * extra jobs
 
-Setting up the CI will basically consist in four corresponding phases.
+Setting up the CI will basically consist in four corresponding steps.
 
 Write CI Script
 ---------------
@@ -116,8 +116,7 @@ Your CI is now setup to include remote files from the GitLab mirror of
 radiuss-shared-ci.
 
 We now have to complete the interface with the shared CI config. Indeed,
-``.gitlab-ci.yml`` also expects some files to be present locally. Those are the
-next steps.
+``.gitlab-ci.yml`` also expects some files to be present locally.
 
 .. _customize-ci:
 
@@ -125,7 +124,7 @@ Customize CI
 ------------
 
 We provide templates for the required customization files. We need to copy
-them in the ``.gitlab`` directory.
+them in a ``.gitlab`` directory.
 
 .. code-block:: bash
 
@@ -142,6 +141,9 @@ In this file, you will select the machines you want to run tests on. Comment
 the jobs (sections) corresponding to machines you don't want, or don't have
 access to.
 
+.. note::
+   In order to add a new machine, please refer to :ref:`add-a-new-machine`.
+
 ``.gitlab/custom-jobs.yml``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -154,9 +156,8 @@ that will then be included to all you CI jobs. This can be used for example to
 ``.gitlab/custom-variables.yml``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-We should now have a look at ``.gitlab/custom-variables.yml``. Here is a table
-to describe each variable present in the file. Some more details can be found
-in the file itself.
+Here is a table to describe each variable present in the file. Some more
+details can be found in the file itself.
 
  ========================================== ==========================================================================================================================
   Parameter                                  Description
@@ -185,9 +186,9 @@ Edit extra jobs
 We provide templates for the extra jobs files. Those files are required as soon
 as the associated machine has been activated in ``.gitlab/custom-pipelines``.
 
-If no extra-jobs is needed (the shared jobs are automatically included), then
-you should add the extra-jobs files as-is, with a simple variable definition to
-avoid it to be empty.
+If no extra-jobs is needed (if the shared jobs automatically included are
+sufficient), then you should add the extra-jobs files as-is, with a simple
+variable definition to avoid it to be empty.
 
 If you need to define extra-jobs specific to your projects, then you may remove
 the variable definition, uncomment the template job and complete it with the
@@ -196,7 +197,7 @@ required information:
 * A job name, unique, that will appear in CI.
 * A Spack spec used by ``build-and-test`` to know what to build.
 
-.. note::
+.. warning::
    Gitlab supports long and complex job names. Make sure to pick a unique name
    not to override a shared job.
 

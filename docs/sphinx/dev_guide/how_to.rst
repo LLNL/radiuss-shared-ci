@@ -11,12 +11,14 @@
 How To
 ******
 
+.. _add-a-new-machine:
+
 =================
 Add a new machine
 =================
 
 Adding a new machine can be done directly in this project so that the
-configuration is shared with all. However it the associated Spack configuration
+configuration is shared with all. However, the associated Spack configuration
 must first be added to `radiuss-spack-configs`_.
 
 The sub-pipeline definition
@@ -39,8 +41,8 @@ Then go to ``customization/custom-variables.yml`` and add the variables:
   for the shared allocation (salloc) to contain all the jobs.
 * ``<MACHINE>_BUILD_AND_TEST_JOB_ALLOC`` with allocation options for any of the
   jobs (srun) the machine will take. The job will run under the shared
-  allocation, also, do not prescribe a number of cores here, as they should be
-  defined at Spack and Make/CMake level.
+  allocation. Lastly, do not prescribe a number of cores here, as they should
+  be defined at Spack and Make/CMake level.
 
 .. note::
    Use the values we have for ruby and corona as guides, but adapt the

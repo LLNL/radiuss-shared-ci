@@ -25,24 +25,24 @@ Background and Motivation
 =========================
 
 Projects belonging to the RADIUSS scope are targeting the same machines and
-use Spack as a packaging system. We want them to ensure they build with
-similar tool chains.
+use Spack as a packaging system. We want to ensure that they build successfully
+with similar toolchains and we leverage Spack to do so.
 
-We designed an automated *CI infrastructure based on GitLab* that we meant to be
-universal enough to be shared among RADIUSS projects. This infrastructure
+We designed an automated *CI infrastructure based on GitLab* that we meant to
+be universal enough to be shared among RADIUSS projects. This infrastructure
 involves *using Spack to setup the project dependencies and generate a
 configuration file*. This allows projects to easily *share the full context of
 their builds*. The project is then built and tested as usual and most of *the
-CI infrastructure is shared* to avoid duplication and ease the maintenance.
+CI infrastructure is shared* to avoid duplication and reduce maintenance cost.
 
 ========
 Overview
 ========
 
-We split the design in three steps necessary to adopt RADIUSS Shared CI
-methodology. Those actions will be documented in the `user_guide`_.
+We split the documentation in three steps necessary to adopt RADIUSS Shared CI
+methodology. Those actions will be documented in the :ref:`user_guide`.
 
-1. **Use Spack to configure the project build.**
+1. **Use Spack to install dependencies and configure the project build.**
    Spack provides a single context to express *toolchains*, *machines
    setup* and *build sequence*. It is increasingly used to install the
    dependency tree of large simulation codes.
@@ -53,12 +53,12 @@ methodology. Those actions will be documented in the `user_guide`_.
    and options are already set coherently with the spec provided to build the
    dependency tree.
 3. **Setup the CI using the shared template.**
-   Once you have put in the effort to adopt the first two steps, you should be
-   able to benefit from the shared CI infrastructure. In very complex scenario,
-   you would still be able to use the RADIUSS Shared CI template as a starting
-   point for a custom implementation.
+   Once you have put in the effort to implement the first two steps, you should
+   be able to benefit from the shared CI infrastructure. In very complex
+   scenario, you would still be able to use the RADIUSS Shared CI template as a
+   starting point for a custom implementation.
 
-In the `dev_guide`_, we discuss the layout of the RADIUSS Shared CI
+In the :ref:`dev_guide`, we discuss the layout of the RADIUSS Shared CI
 infrastructure and how the different pieces work with one another. Technical
 choices are also explained there.
 
