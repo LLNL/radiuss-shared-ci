@@ -5,27 +5,57 @@
 .. ## SPDX-License-Identifier: (MIT)
 .. ##
 
-.. _getting_started-label:
+.. _setup_ci-label:
 
 **************************************
-Getting started with Radiuss-Shared-CI
+Setup the CI using the shared template
 **************************************
 
-Radiuss-Shared-CI is a repo containing only Gitlab CI YAML files and
-documentation. There is no installation and the CI files contained here do not
-define a CI for this project, meaning there is no test for this repo.
+.. image:: images/UberenvWorkflowCI.png
+   :scale: 32 %
+   :alt: Once Spack and the build script setup, adopting the shared CI should be easy.
+   :align: center
 
-Radiuss-Shared-CI is meant to live on LC GitLab instance. The main repo, hosted
-on GitHub for accessibility and visibility, is mirrored on LC GitLab. To
-include files from Radiuss-Shared-CI, we recommend pointing to the mirror repo
-on GitLab rather than the GitHub one. We only document that option.
+The third step in adopting RADIUSS Shared CI infrastructure is to setup the CI.
+
+Once you have put in the effort to implement the first two steps, you should be
+able to benefit from the shared CI infrastructure. In very complex scenario,
+you will always be able to use the template as a starting point for a custom
+implementation.
+
+By sharing the CI definition, projects share the burden of maintaining it. In
+addition, with our shared CI, they also share a core set of spack specs to
+ensure that they keep running tests with similar configurations.
 
 =================
+Radiuss Shared CI
+=================
+
+We started by `sharing spack configuration files`_, then shared a method to
+manage Spack and use it to generate CMake configuration files and finally
+described a ``build-and-test`` script that has the same imputs across
+projects. We will now share most of the CI implementation itself.
+
+By externalizing the CI configuration, we create the need for an interface.
+We try to keep this interface minimalistic, while allowing customization.
+
+.. note::
+   GitLab allows projects to include external files to configure their CI. We
+   rely on this mechanism to share most of the CI configuration among projects.
+
 The short version
 =================
 
 .. code-block:: bash
 
+   ### Prerequisites
+   cd my_project
+   mkdir -p scripts/gitlab
+   vim scripts/gitlab/build-and-test
+   # write CI script
+
+   ### CI Setup
+   cd my_project/..
    git clone https://github.com/LLNL/radiuss-shared-ci.git
    cd my_project
    cp ../radiuss-shared-ci/customization/gitlab-ci.yml .gitlab-ci.yml
@@ -36,40 +66,44 @@ The short version
    # customize CI
    vim .gitlab/*-extra.yml
    # edit extra jobs
-   mkdir -p scripts/gitlab
-   vim scripts/gitlab/build-and-test
-   # write CI script
 
 Jump to the corresponding section to deal with :ref:`customize-ci`,
 :ref:`edit-extra-jobs` and :ref:`write-ci-script`.
 
-====================
 The detailed version
 ====================
 
 Our CI implementation can be divided in four parts:
 
+* local build-and-test script
 * shared files
 * customization files
 * extra jobs
-* local build-and-test script
 
-Setting up the CI will basically consist in four corresponding phases.
+Setting up the CI will basically consist in four corresponding steps.
+
+Write CI Script
+---------------
+
+The very first step is to provide a CI script. You should already have one
+after completing :ref:`write-ci-script` at Step 2.
+
+Once you have that script, you can move on to the CI setup.
+
+Core CI implementation
+----------------------
 
 Start by cloning the project locally, for example next to the project you intend
 to add CI to.
 
 .. code-block:: bash
 
+   cd my_project/..
    git clone https://github.com/LLNL/radiuss-shared-ci.git
    cd my_project
 
-
-Core CI implementation
-======================
-
 By default, GitLab expects a ``.gitlab-ci-yml`` file to interpret the CI setup.
-We provide one that projects can copy-paste in ``customization/gitlab-ci.yml``,
+We provide one in ``customization/gitlab-ci.yml`` that projects can copy-paste,
 just be sure to place it at the root of your project, with a dot (``.``) at the
 beginning of the name.
 
@@ -79,19 +113,18 @@ beginning of the name.
 
 
 Your CI is now setup to include remote files from the GitLab mirror of
-Radiuss-Shared-CI.
+radiuss-shared-ci.
 
 We now have to complete the interface with the shared CI config. Indeed,
-``.gitlab-ci.yml`` also expects some files to be present locally. Those are the
-next steps.
+``.gitlab-ci.yml`` also expects some files to be present locally.
 
 .. _customize-ci:
 
 Customize CI
-============
+------------
 
 We provide templates for the required customization files. We need to copy
-them in the ``.gitlab`` directory.
+them in a ``.gitlab`` directory.
 
 .. code-block:: bash
 
@@ -102,14 +135,17 @@ We will now browse the files to see what changes they may require to suit your
 needs.
 
 ``.gitlab/custom-pipelines.yml``
-------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 In this file, you will select the machines you want to run tests on. Comment
 the jobs (sections) corresponding to machines you don't want, or don't have
 access to.
 
+.. note::
+   In order to add a new machine, please refer to :ref:`add-a-new-machine`.
+
 ``.gitlab/custom-jobs.yml``
-------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 No change is strictly required to get started here.
 
@@ -118,11 +154,10 @@ that will then be included to all you CI jobs. This can be used for example to
 `export jUnit test reports`_.
 
 ``.gitlab/custom-variables.yml``
-------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-We should now have a look at ``.gitlab/custom-variables.yml``. Here is a table
-to describe each variable present in the file. Some more details can be found
-in the file itself.
+Here is a table to describe each variable present in the file. Some more
+details can be found in the file itself.
 
  ========================================== ==========================================================================================================================
   Parameter                                  Description
@@ -140,20 +175,20 @@ in the file itself.
    If a variable is blank in the template file, then it does not require a
    value. If a variable has a value there, it does require one.
 
-.. note::
+.. warning::
    We strongly recommend that you set your CI to use a service account.
 
 .. _edit-extra-jobs:
 
 Edit extra jobs
-===============
+---------------
 
 We provide templates for the extra jobs files. Those files are required as soon
 as the associated machine has been activated in ``.gitlab/custom-pipelines``.
 
-If no extra-jobs is needed (the shared jobs are automatically included), then
-you should add the extra-jobs files as-is, with a simple variable definition to
-avoid it to be empty.
+If no extra-jobs is needed (if the shared jobs automatically included are
+sufficient), then you should add the extra-jobs files as-is, with a simple
+variable definition to avoid it to be empty.
 
 If you need to define extra-jobs specific to your projects, then you may remove
 the variable definition, uncomment the template job and complete it with the
@@ -162,31 +197,10 @@ required information:
 * A job name, unique, that will appear in CI.
 * A Spack spec used by ``build-and-test`` to know what to build.
 
-.. note::
+.. warning::
    Gitlab supports long and complex job names. Make sure to pick a unique name
    not to override a shared job.
 
-.. _write-ci-script:
-
-Write CI Script
-===============
-
-The last step is to provide a CI script. You may already have one you can
-adapt, the requirements are:
-
-* The script should be named ``build-and-test`` and located in
-  ``scripts/gitlab``, and it should take a Spack spec as input through the
-  environment variable ``$SPEC``.
-
-* The script should use that spec to instruct Spack to install the
-  dependencies. Then you can build your project using those. This is the
-  workflow documented in `Radiuss CI`_ and we encourage you to use it.
-
-Umpire, RAJA, CHAI, MFEM each have their own script you could easily adapt. All
-these projects use Uberenv to drive Spack. Umpire, RAJA and CHAI share the
-Spack configuration files in `Radiuss-Spack-Configs`_ in order to keep building
-with the same tool-chains.
-
-.. _Radiuss CI: https://radiuss-ci.readthedocs.io/en/latest/index.html
-.. _Radiuss-Spack-Configs: https://github.com/LLNL/radiuss-spack-configs
+.. _Radiuss Shared CI: https://radiuss-shared-ci.readthedocs.io/en/latest/index.html
 .. _export jUnit test reports: https://github.com/LLNL/Umpire/blob/develop/.gitlab/custom-jobs.yml
+.. _sharing spack configuration files: https://github.com/LLNL/radiuss-spack-configs
