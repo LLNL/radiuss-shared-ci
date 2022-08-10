@@ -7,20 +7,20 @@
 
 .. _dev_common_issues-label:
 
-******
-How To
-******
+*************
+Common Issues
+*************
 
 ===================================================================
 Project *radiuss/radiuss-shared-ci* reference [...] does not exist!
 ===================================================================
 
 .. image:: images/error-mirrored-reference.png
-   :scale: 90 %
+   :scale: 50 %
    :alt: Check that the reference is mirrored on LC GitLab.
    :align: center
 
-If you are attemping to use a specific reference in ``radiuss-shared-ci``, make
+If you are attempting to use a specific reference in ``radiuss-shared-ci``, make
 sure this reference has been mirrored on LC GitLab: be sure to create a PR on
 GitHub so that the mirroring happens.
 
