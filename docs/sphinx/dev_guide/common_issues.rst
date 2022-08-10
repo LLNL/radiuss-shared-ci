@@ -33,7 +33,7 @@ Invalid character ``\x1b`` looking for beginning of value
 =========================================================
 
 .. image:: images/error-empty-custom-dir.png
-   :scale: 50 %
+   :scale: 30 %
    :alt: Check that the reference is mirrored on LC GitLab.
    :align: center
 
