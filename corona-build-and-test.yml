@@ -40,8 +40,6 @@ stages:
     - export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
     - echo ${JOBID}
     - srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) ${RUBY_BUILD_AND_TEST_JOB_ALLOC} scripts/gitlab/build_and_test.sh
-  variables:
-    SLURM_OVERLAP: 1
 
 # In pre-build phase, allocate a node for builds.
 allocate_resources (on corona):
