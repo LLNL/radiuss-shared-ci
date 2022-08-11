@@ -16,9 +16,10 @@ Project ``radiuss/radiuss-shared-ci`` reference [...] does not exist!
 =====================================================================
 
 .. image:: images/error-mirrored-reference.png
-   :scale: 50 %
+   :scale: 45 %
    :alt: Check that the reference is mirrored on LC GitLab.
    :align: center
+
 
 If you are attempting to use a specific reference in ``radiuss-shared-ci``, make
 sure this reference has been mirrored on LC GitLab: be sure to create a PR on
@@ -36,6 +37,7 @@ Invalid character ``\x1b`` looking for beginning of value
    :scale: 30 %
    :alt: Check that the reference is mirrored on LC GitLab.
    :align: center
+
 
 This error appears if you leave ``CUSTOM_CI_BUILDS_DIR: ""`` uncommented in
 ``.gitlab/custom-variables.yml`` as suggested in earlier version, typically
