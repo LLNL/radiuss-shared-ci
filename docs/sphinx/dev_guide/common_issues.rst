@@ -40,8 +40,8 @@ Invalid character ``\x1b`` looking for beginning of value
 
 
 This error appears if you leave ``CUSTOM_CI_BUILDS_DIR: ""`` uncommented in
-``.gitlab/custom-variables.yml`` as suggested in earlier version, typically
-when no service account is in use.
+``.gitlab/custom-variables.yml`` (as suggested in earlier versions of the
+documentation), usually when no service account is in use.
 
 Simply comment that line. Setting the variable to an empty value generates
 a failure in the runner initialization script.
