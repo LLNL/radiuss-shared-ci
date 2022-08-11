@@ -25,3 +25,4 @@ This section of the documentation also explains some technical choice.
 
    radiuss_ci_explained
    how_to
+   common_issues
