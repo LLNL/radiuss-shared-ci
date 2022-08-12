@@ -35,7 +35,7 @@ stages:
 status-pending:
   stage: build_and_test
   script:
-    - report-status ${CONTEXT} pending
+    - scripts/report-status ${CONTEXT} pending
 
 # Gitlab jobs for the lassen machine at LLNL.
 
@@ -89,11 +89,11 @@ xl_16_1_1_10_gcc_8_3_1_cuda_11:
 status-success:
   stage: status-update
   script:
-    - report-status ${CONTEXT} success
+    - scripts/report-status ${CONTEXT} success
   when: on_success
 
 status-failure:
   stage: status-update
   script:
-    - report-status ${CONTEXT} failure
+    - scripts/report-status ${CONTEXT} failure
   when: on_failure
