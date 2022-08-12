@@ -47,7 +47,7 @@ stages:
     SLURM_OVERLAP: 1
 
 status-pending:
-  stage: allocate_ressources
+  stage: allocate_resources
   script:
     - report-status ${CONTEXT} pending
 
