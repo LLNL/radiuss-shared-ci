@@ -5,6 +5,9 @@
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
 
+variables:
+  CONTEXT: ruby
+
 stages:
   - allocate_resources
   - build_and_test
@@ -36,6 +39,11 @@ stages:
   variables:
     SLURM_OVERLAP: 1
 
+status-pending:
+  stage: allocate_ressources
+  script:
+    - report-status ${CONTEXT} pending
+
 # In pre-build phase, allocate a node for builds.
 # TODO: make the resource configurable, not all projects will want the same.
 allocate_resources (on ruby):
@@ -57,6 +65,18 @@ release_resources (on ruby):
   script:
     - export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
     - ([[ -n "${JOBID}" ]] && scancel ${JOBID})
+
+status-success:
+  stage: release_resources
+  script:
+    - report-status ${CONTEXT} success
+  when: on_success
+
+status-failure:
+  stage: release_resources
+  script:
+    - report-status ${CONTEXT} failure
+  when: on_failure
 
 # Gitlab jobs for the Ruby machine at LLNL.
 clang_10:

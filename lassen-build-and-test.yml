@@ -5,8 +5,12 @@
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
 
+variables:
+  CONTEXT: lassen
+
 stages:
   - build_and_test
+  - status-update
 
 ##############################################################################
 # LASSEN
@@ -27,6 +31,11 @@ stages:
   stage: build_and_test
   script:
     - lalloc ${LASSEN_BUILD_AND_TEST_JOB_ALLOC} scripts/gitlab/build_and_test.sh
+
+status-pending:
+  stage: build_and_test
+  script:
+    - report-status ${CONTEXT} pending
 
 # Gitlab jobs for the lassen machine at LLNL.
 
@@ -76,3 +85,15 @@ xl_16_1_1_10_gcc_8_3_1_cuda_11:
   variables:
     SPEC: "+cuda tests=none %xl@16.1.1.10 cxxflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" cflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" ^cuda@11.0.2"
   extends: .build_and_test_on_lassen
+
+status-success:
+  stage: status-update
+  script:
+    - report-status ${CONTEXT} success
+  when: on_success
+
+status-failure:
+  stage: status-update
+  script:
+    - report-status ${CONTEXT} failure
+  when: on_failure

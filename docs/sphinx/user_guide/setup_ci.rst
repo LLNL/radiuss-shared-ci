@@ -67,6 +67,11 @@ The short version
    vim .gitlab/*-extra.yml
    # edit extra jobs
 
+   ### Non-RADIUSS projects
+   open https://lc.llnl.gov/gitlab/<group>/<project>/-/settings/ci_cd
+   # Set CI/CD variable GITHUB_TOKEN to hold token with repo:status
+   # permissions.
+
 Jump to the corresponding section to deal with :ref:`customize-ci`,
 :ref:`edit-extra-jobs` and :ref:`write-ci-script`.
 
@@ -200,6 +205,20 @@ required information:
 .. warning::
    Gitlab supports long and complex job names. Make sure to pick a unique name
    not to override a shared job.
+
+Non-RADIUSS Projects
+--------------------
+
+Radiuss-Shared-CI features a customized status report mechanism that allows to
+report on GitHub the CI status of each sub-pipeline (one per machine).
+
+This feature requires the creation of a GitHub token with ``repo:status``
+permissions, and registering it as a CI/CD variable named ``GITHUB_TOKEN`` in
+the project (or the group) on GitLab.
+
+Visit ``https://lc.llnl.gov/gitlab/<group>/<project>/-/settings/ci_cd`` to
+create the variable once the token has been generated on GitHub.
+
 
 .. _Radiuss Shared CI: https://radiuss-shared-ci.readthedocs.io/en/latest/index.html
 .. _export jUnit test reports: https://github.com/LLNL/Umpire/blob/develop/.gitlab/custom-jobs.yml

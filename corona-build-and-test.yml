@@ -5,6 +5,9 @@
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
 
+variables:
+  CONTEXT: corona
+
 stages:
   - allocate_resources
   - build_and_test
@@ -43,6 +46,11 @@ stages:
   variables:
     SLURM_OVERLAP: 1
 
+status-pending:
+  stage: allocate_ressources
+  script:
+    - report-status ${CONTEXT} pending
+
 # In pre-build phase, allocate a node for builds.
 allocate_resources (on corona):
   variables:
@@ -63,3 +71,15 @@ release_resources (on corona):
   script:
     - export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
     - ([[ -n "${JOBID}" ]] && scancel ${JOBID})
+
+status-success:
+  stage: release_resources
+  script:
+    - report-status ${CONTEXT} success
+  when: on_success
+
+status-failure:
+  stage: release_resources
+  script:
+    - report-status ${CONTEXT} failure
+  when: on_failure
