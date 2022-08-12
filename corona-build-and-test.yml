@@ -52,6 +52,11 @@ allocate_resources (on corona):
   script:
     - salloc ${RUBY_BUILD_AND_TEST_SHARED_ALLOC} --no-shell --job-name=${ALLOC_NAME}
 
+rocm_5_1_1_clang_13_0_0:
+  variables:
+    SPEC: "${PROJECT_CORONA_VARIANTS} +rocm amdgpu_target=gfx906 %clang@13.0.0 ^hip@5.1.1 ${PROJECT_CORONA_DEPS}"
+  extends: .build_and_test_on_corona
+
 # In post-build phase, deallocate resources.
 # Note : we make sure this is run even on build phase failure using a specific
 # rule in the template ".on_corona".
