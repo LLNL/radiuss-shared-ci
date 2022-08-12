@@ -12,6 +12,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Documentation regarding known issues.
 
+### Changed
+
+- Slurm allocation now uses command line option on project side (--overlap)
+  instead of environment variable (SLURM_OVERLAP) in shared CI.
+
 ### Fix
 
 - Wrong defaults in custom-variables file.
