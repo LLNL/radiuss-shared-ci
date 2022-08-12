@@ -5,9 +5,6 @@
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
 
-variables:
-  CONTEXT: ruby
-
 stages:
   - allocate_resources
   - build_and_test
@@ -36,6 +33,13 @@ stages:
     # A true statement is expected to allow jobs to run. Here is the default.
     - when: on_success
 
+.status_report: &status_report
+    - export context="ruby"
+    - curl --url "https://api.github.com/repos/LLNL/${CI_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
+           --header 'Content-Type: application/json' \
+           --header "authorization: Bearer ${GITHUB_TOKEN}" \
+           --data "{ \"state\": \"${pipeline_status}\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab ${context} pipeline\", \"context\": \"ci/gitlab/${context}\" }"
+
 .build_and_test_on_ruby:
   extends: [.custom_build_and_test, .on_ruby]
   stage: build_and_test
@@ -61,7 +65,8 @@ status_pending:
   extends: [.on_ruby]
   stage: allocate_resources
   script:
-    - scripts/report-status ${CONTEXT} pending
+    - export pipeline_status="pending"
+    - *status_report
 
 # Gitlab jobs for the Ruby machine at LLNL.
 clang_10:
@@ -105,12 +110,14 @@ status_success:
   extends: [.on_ruby]
   stage: release_resources
   script:
-    - scripts/report-status ${CONTEXT} success
+    - export pipeline_status="success"
+    - *status_report
   when: on_success
 
 status_failure:
   extends: [.on_ruby]
   stage: release_resources
   script:
-    - scripts/report-status ${CONTEXT} failure
+    - export pipeline_status="failure"
+    - *status_report
   when: on_failure
