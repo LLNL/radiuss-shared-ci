@@ -35,7 +35,8 @@ stages:
 
 .status_report: &status_report
     - export context="ruby"
-    - curl --url "https://api.github.com/repos/LLNL/${CI_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
+    - |
+      curl --url "https://api.github.com/repos/LLNL/${CI_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
            --header 'Content-Type: application/json' \
            --header "authorization: Bearer ${GITHUB_TOKEN}" \
            --data "{ \"state\": \"${pipeline_status}\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab ${context} pipeline\", \"context\": \"ci/gitlab/${context}\" }"
