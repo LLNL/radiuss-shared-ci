@@ -33,46 +33,46 @@ stages:
 # CPU only.
 ibm_clang_9:
   variables:
-    SPEC: "%clang@ibm.9.0.0"
+    SPEC: "${PROJECT_LASSEN_VARIANTS} %clang@ibm.9.0.0 ${PROJECT_LASSEN_DEPS}"
   extends: .build_and_test_on_lassen
 
 ibm_clang_9_gcc_8:
   variables:
-    SPEC: "%clang@ibm.9.0.0 cxxflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" cflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\""
+    SPEC: "${PROJECT_LASSEN_VARIANTS} %clang@ibm.9.0.0 cxxflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" cflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" ${PROJECT_LASSEN_DEPS}"
   extends: .build_and_test_on_lassen
 
 gcc_8_3_1:
   variables:
-    SPEC: "%gcc@8.3.1"
+    SPEC: "${PROJECT_LASSEN_VARIANTS} %gcc@8.3.1 ${PROJECT_LASSEN_DEPS}"
   extends: .build_and_test_on_lassen
 
 pgi_20_4_gcc_8_3_1:
   variables:
-    SPEC: "%pgi@20.4 cxxflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" cflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\""
+    SPEC: "${PROJECT_LASSEN_VARIANTS} %pgi@20.4 cxxflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" cflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" ${PROJECT_LASSEN_DEPS}"
   extends: .build_and_test_on_lassen
 
 xl_16_1_1_10:
   variables:
-    SPEC: "%xl@16.1.1.10"
+    SPEC: "${PROJECT_LASSEN_VARIANTS} %xl@16.1.1.10 ${PROJECT_LASSEN_DEPS}"
   extends: .build_and_test_on_lassen
 
 xl_16_1_1_10_gcc_8_3_1:
   variables:
-    SPEC: "%xl@16.1.1.10 cxxflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" cflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\""
+    SPEC: "${PROJECT_LASSEN_VARIANTS} %xl@16.1.1.10 cxxflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" cflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" ${PROJECT_LASSEN_DEPS}"
   extends: .build_and_test_on_lassen
 
 # CUDA.
 ibm_clang_9_gcc_8_cuda:
   variables:
-    SPEC: "+cuda %clang@ibm.9.0.0 cxxflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" cflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" ^cuda@10.1.168"
+    SPEC: "${PROJECT_LASSEN_VARIANTS} +cuda %clang@ibm.9.0.0 cxxflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" cflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" ^cuda@10.1.168 ${PROJECT_LASSEN_DEPS}"
   extends: .build_and_test_on_lassen
 
 xl_16_1_1_10_cuda:
   variables:
-    SPEC: "+cuda %xl@16.1.1.10 cxxflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-7.3.1\" cflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-7.3.1\" ^cuda@10.1.168 ^cmake@3.14.5"
+    SPEC: "${PROJECT_LASSEN_VARIANTS} +cuda %xl@16.1.1.10 cxxflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-7.3.1\" cflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-7.3.1\" ^cuda@10.1.168 ^cmake@3.14.5 ${PROJECT_LASSEN_DEPS}"
   extends: .build_and_test_on_lassen
 
 xl_16_1_1_10_gcc_8_3_1_cuda_11:
   variables:
-    SPEC: "+cuda tests=none %xl@16.1.1.10 cxxflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" cflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" ^cuda@11.0.2"
+    SPEC: "${PROJECT_LASSEN_VARIANTS} +cuda tests=none %xl@16.1.1.10 cxxflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" cflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" ^cuda@11.0.2 ${PROJECT_LASSEN_DEPS}"
   extends: .build_and_test_on_lassen
