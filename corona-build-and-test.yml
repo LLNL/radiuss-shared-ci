@@ -31,4 +31,4 @@ stages:
   extends: [.custom_build_and_test, .on_corona]
   stage: build_and_test
   script:
-    - flux mini run ${RUBY_BUILD_AND_TEST_JOB_ALLOC} scripts/gitlab/build_and_test.sh
+    - flux mini run ${CORONA_BUILD_AND_TEST_JOB_ALLOC} scripts/gitlab/build_and_test.sh
