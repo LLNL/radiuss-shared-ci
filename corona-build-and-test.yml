@@ -39,7 +39,7 @@ stages:
     - |
       set -x
       echo ${ALLOC_NAME}
-      export JOB_URI=$(flux jobs -o "{uri} {name}" | grep ${ALLOC_NAME} | awk '{print $1}')
+      export FLUX_URI=$(flux jobs -o "{uri} {name}" | grep ${ALLOC_NAME} | awk '{print $1}')
       flux mini run ${CORONA_BUILD_AND_TEST_JOB_ALLOC} scripts/gitlab/build_and_test.sh
   variables:
     SLURM_OVERLAP: 1
