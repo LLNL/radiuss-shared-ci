@@ -53,7 +53,7 @@ allocate_resources (on corona):
   script:
     - |
       set -x
-      flux mini batch {CORONA_BUILD_AND_TEST_SHARED_ALLOC} --job-name={ALLOC_NAME} --wrap sleep inf
+      flux mini batch ${CORONA_BUILD_AND_TEST_SHARED_ALLOC} --job-name=${ALLOC_NAME} --wrap sleep inf
 
 # In post-build phase, deallocate resources.
 # Note : we make sure this is run even on build phase failure using a specific
