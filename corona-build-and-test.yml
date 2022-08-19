@@ -53,7 +53,8 @@ allocate_resources (on corona):
   script:
     - |
       set -x
-      flux mini batch ${CORONA_BUILD_AND_TEST_SHARED_ALLOC} --job-name=${ALLOC_NAME} --wrap sleep inf
+      echo "Shared allocation disabled: runs slowly, needs a fix"
+      #flux mini batch ${CORONA_BUILD_AND_TEST_SHARED_ALLOC} --job-name=${ALLOC_NAME} --wrap sleep inf
 
 # In post-build phase, deallocate resources.
 # Note : we make sure this is run even on build phase failure using a specific
@@ -66,5 +67,6 @@ release_resources (on corona):
   script:
     - |
       set -x
-      export JOBID=$(flux jobs -o "{id} {name}" | grep ${ALLOC_NAME} | awk '{print $1}')
-      ([[ -n "${JOBID}" ]] && flux job kill ${JOBID})
+      echo "Shared allocation disabled: runs slowly, needs a fix"
+      #export JOBID=$(flux jobs -o "{id} {name}" | grep ${ALLOC_NAME} | awk '{print $1}')
+      #([[ -n "${JOBID}" ]] && flux job kill ${JOBID})
