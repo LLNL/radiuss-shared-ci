@@ -50,7 +50,7 @@ stages:
     - echo ${ALLOC_NAME}
     - export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
     - echo ${JOBID}
-    - srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) ${RUBY_BUILD_AND_TEST_JOB_ALLOC} scripts/gitlab/build_and_test.sh
+    - srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) ${CORONA_BUILD_AND_TEST_JOB_ALLOC} scripts/gitlab/build_and_test.sh
   variables:
     SLURM_OVERLAP: 1
 
@@ -61,7 +61,7 @@ allocate_resources (on corona):
   extends: .on_corona
   stage: allocate_resources
   script:
-    - salloc ${RUBY_BUILD_AND_TEST_SHARED_ALLOC} --no-shell --job-name=${ALLOC_NAME}
+    - salloc ${CORONA_BUILD_AND_TEST_SHARED_ALLOC} --no-shell --job-name=${ALLOC_NAME}
 
 status_pending:
   extends: [.on_corona]
