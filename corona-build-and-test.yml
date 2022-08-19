@@ -39,7 +39,7 @@ stages:
     - |
       set -x
       echo ${ALLOC_NAME}
-      URI=$(flux jobs -o "{uri} {name}" | grep ${ALLOC_NAME} | awk '{print $1}')
+      URI=$(flux jobs -o "{uri} {name}" | grep ${ALLOC_NAME} | awk '{print $1}') || echo "Empty URI"
       ([[ -n "$URI" ]] && export FLUX_URI=$URI)
       flux mini run ${CORONA_BUILD_AND_TEST_JOB_ALLOC} scripts/gitlab/build_and_test.sh
   variables:
