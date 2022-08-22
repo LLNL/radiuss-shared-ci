@@ -174,6 +174,8 @@ details can be found in the file itself.
   ``ALLOC_NAME``                             Name of the shared allocation. Should be unique, our default should be fine.
   ``<MACHINE>_BUILD_AND_TEST_SHARED_ALLOC``  Parameters for the shared allocation. You may extend the resource and time.
   ``<MACHINE>_BUILD_AND_TEST_JOB_ALLOC``     Parameters for the job allocation. You may extend the resource and time within the scope of the shared allocation.
+  ``PROJECT_<MACHINE>_VARIANTS``             Global variants to be added to all the shared specs.
+  ``PROJECT_<MACHINE>_DEPS``                 Global dependencies to be added to all the shared specs.
  ========================================== ==========================================================================================================================
 
 .. note::
@@ -205,6 +207,13 @@ required information:
 .. warning::
    Gitlab supports long and complex job names. Make sure to pick a unique name
    not to override a shared job.
+
+.. note::
+   ``PROJECT_<MACHINE>_VARIANTS/DEPS`` apply to all the shared specs. If you
+   want to build a spec without them, you need to define an extra job. Note
+   also that if you want to build a shared spec with no change, you will need
+   to duplicate it from radiuss-shared-ci into your extra jobs and remove
+   ``PROJECT_<MACHINE>_VARIANTS/DEPS``.
 
 Non-RADIUSS Projects
 --------------------

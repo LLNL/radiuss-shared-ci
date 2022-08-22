@@ -11,6 +11,41 @@
 How To
 ******
 
+====================================================
+Deal with project specific variants and dependencies
+====================================================
+
+The use case
+============
+
+Projects often have a variant they use most of the time, but is not set by
+default to keep the default Spack spec simple.
+
+For Umpire, there is ``+fortran``, or ``+openmp`` for RAJA. Those variants
+cannot be shared in Radiuss-Shared-CI because they are likely not implemented
+or relevant by default in other projects.
+
+Similarly, Umpire and RAJA require ``^blt@develop`` on corona, which is not
+exportable to every projects.
+
+The solution
+============
+
+Variables ``PROJECT_<MACHINE>_VARIANTS`` and ``PROJECT_<MACHINE>_DEPS`` can be
+set in ``custom-variables.yml`` to define a global variant or dependency to
+apply to all the shared specs.
+
+The flip side
+=============
+
+If a you want to build a given shared spec without those global variants
+or dependencies, you need to duplicate the original job from ``radiuss-shared-ci``
+and remove those variables from the spec.
+
+.. note::
+   You can keep the same job name and only the spec without global variants and
+   dependencies will be built. Or you can rename it to build both specs.
+
 ===========================
 List the Spack specs tested
 ===========================

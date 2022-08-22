@@ -35,6 +35,17 @@ configuration file*. This allows projects to easily *share the full context of
 their builds*. The project is then built and tested as usual and most of *the
 CI infrastructure is shared* to avoid duplication and reduce maintenance cost.
 
+===========================================
+Cool features provided by Radiuss-Shared-CI
+===========================================
+
+* A shared configuration, for reduced maintenance.
+* A core set of specs to build coherently with other projects.
+* Adding extra specs is supported.
+* Uses GitLab child pipelines to keep the pipeline readable.
+* Each child pipeline reports independently to GitHub.
+* Project can extend their pipeline at will.
+
 ========
 Overview
 ========
