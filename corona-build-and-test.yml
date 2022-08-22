@@ -36,10 +36,12 @@ stages:
   extends: [.custom_build_and_test, .on_corona]
   stage: build_and_test
   script:
-    - echo ${ALLOC_NAME}
-    - export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
-    - echo ${JOBID}
-    - srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) ${CORONA_BUILD_AND_TEST_JOB_ALLOC} scripts/gitlab/build_and_test.sh
+    - |
+      set -x
+      echo ${ALLOC_NAME}
+      URI=$(flux jobs -o "{uri} {name}" | grep ${ALLOC_NAME} | awk '{print $1}') || echo "Empty URI"
+      if [[ -n "$URI" ]]; then export FLUX_URI=$URI; fi
+      flux mini run ${CORONA_BUILD_AND_TEST_JOB_ALLOC} scripts/gitlab/build_and_test.sh
   variables:
     SLURM_OVERLAP: 1
 
@@ -50,7 +52,10 @@ allocate_resources (on corona):
   extends: .on_corona
   stage: allocate_resources
   script:
-    - salloc ${CORONA_BUILD_AND_TEST_SHARED_ALLOC} --no-shell --job-name=${ALLOC_NAME}
+    - |
+      set -x
+      echo "Shared allocation disabled: runs slowly, needs a fix"
+      #flux mini batch ${CORONA_BUILD_AND_TEST_SHARED_ALLOC} --job-name=${ALLOC_NAME} --wrap sleep inf
 
 # In post-build phase, deallocate resources.
 # Note : we make sure this is run even on build phase failure using a specific
@@ -61,5 +66,8 @@ release_resources (on corona):
   extends: .on_corona
   stage: release_resources
   script:
-    - export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
-    - ([[ -n "${JOBID}" ]] && scancel ${JOBID})
+    - |
+      set -x
+      echo "Shared allocation disabled: runs slowly, needs a fix"
+      #export JOBID=$(flux jobs -o "{id} {name}" | grep ${ALLOC_NAME} | awk '{print $1}')
+      #([[ -n "${JOBID}" ]] && flux job kill ${JOBID})
