@@ -8,6 +8,13 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## Next
 
+### Changed
+
+- Update xl compiler
+- Update cuda is some xl specs
+
+## [v2022.08.1 - 2022-08-xx]
+
 ### Added
 
 - Documentation regarding known issues.
