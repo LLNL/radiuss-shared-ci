@@ -14,6 +14,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Report status for each sub-pipeline.
 - Project can now specify global (custom) variants and dependencies.
 - A How-To about global variants and dependencies.
+- A How-To about choosing a spack reference in Uberenv.
 
 ### Changed
 
