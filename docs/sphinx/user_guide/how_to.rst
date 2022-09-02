@@ -161,7 +161,7 @@ happen before it can be added to Spack.
 
 Then, we want:
 
-* To limit the use of a local patch: after a release there should be not local
+* To limit the use of a local patch: after a release there should be no local
   patching needed.
 
 * To make sure we keep testing our code as close as possible to the user
@@ -176,14 +176,14 @@ Uberenv as soon as the Spack package has been updated.
    changes in spack@develop. In other words, we could anticipate the creation
    of a pull request in Spack and use it as a reference in Uberenv. However, it
    is not advised to create the release with this setting, because uberenv now
-   points to a PR in Spcak that will likely disappear in the future.
+   points to a PR in Spack that will likely disappear in the future.
 
 In a nutshell
 =============
 
 The chosen Spack reference used in uberenv should evolve in time as follow:
 
-* After a project release, when the upstream Spack packages gets updated, and
+* After a project release, when the upstream Spack package gets updated, and
   Uberenv should point to the corresponding Spack merge commit.
 
 * Then, when a new Spack release comes out, it will have our latest changes and
