@@ -90,7 +90,7 @@ Some options
 ^^^^^^^^^^^^
 
 ``--spec=`` is used to define how your project will be built. It should be the
-same as a spack spec, without the project name:
+same as a Spack spec, without the project name:
 
 * ``--spec=%clang@9.0.0``
 * ``--spec=%clang@8.0.1+cuda``
@@ -105,3 +105,90 @@ you would like to reuse (in supplement of the local one managed by Uberenv), you
 can do so with the ``--upstream=`` option:
 
 * ``--upstream=<path_to_my_spack>/opt/spack ...``
+
+===========================================
+Choose a Spack reference (commit or branch)
+===========================================
+
+Uberenv needs to know which version of Spack to clone locally. In general,
+using the latest Spack release should be the default strategy. But things can
+quickly get complicated.
+
+Among the decision parameters:
+
+* Need for a newer Spack feature / fix.
+
+* Need for a newer package version, for example supporting the latest release
+  of a given product.
+
+* Coherency with other projects.
+
+Let’s take the example of Umpire/RAJA/CHAI. Those projects work together and
+have synchronized releases. They all use Uberenv for their CI.
+
+For those projects we try to:
+
+* Use the same Spack reference (behave coherently in tests).
+
+* Use a Spack reference as new as possible, without changing it every month
+  (for now).
+
+* Limit local patching of Spack packages.
+
+Limiting local patching of Spack packages
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Uberenv allows projects to duplicate any Spack package locally and patch it.
+It is important to limit the amount of patching however. Every local patch
+creates a divergence between the developer / CI configuration and the one the
+user gets from through upstream Spack.
+
+Typical use case for a local package patch:
+
+* Test changes to the package that will be necessary for the next release.
+
+* Fix a bug, test a tweak in a toolchain configuration (we have seen the need
+  for flags, or hip / cuda tweaks in the past).
+
+In any case, those local changes should be pushed to upstream Spack as soon as
+possible.
+
+Spack reference during the release process
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+As discussed above, when a projects wants to do a release, the release has to
+happen before it can be added to Spack.
+
+Then, we want:
+
+* To limit the use of a local patch: after a release there should be not local
+  patching needed.
+
+* To make sure we keep testing our code as close as possible to the user
+  configuration: only the latest Spack package has the logic to build the
+  latest release, users will want that.
+
+For the project, that means we will have to update the Spack reference for
+Uberenv as soon as the Spack package has been updated.
+
+.. note::
+   Upstream of the release, we might want to test the upcoming Spack package
+   changes in spack@develop. In other words, we could anticipate the creation
+   of a pull request in Spack and use it as a reference in Uberenv. However, it
+   is not advised to create the release with this setting, because uberenv now
+   points to a PR in Spcak that will likely disappear in the future.
+
+In a nutshell
+^^^^^^^^^^^^^
+
+The chosen Spack reference used in uberenv should evolve in time as follow:
+
+* After a project release, when the upstream Spack packages gets updated, and
+  Uberenv should point to the corresponding Spack merge commit.
+
+* Then, when a new Spack release comes out, it will have our latest changes and
+  should be used as a reference.
+
+* Approaching a new release, Uberenv should point to the latest Spack release,
+  but we might want to anticipate some testing with spack@develop, without
+  merging that change.
