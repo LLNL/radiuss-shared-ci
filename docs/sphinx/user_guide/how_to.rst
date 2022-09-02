@@ -87,7 +87,7 @@ to specify which compiler to use: add the compiler spec to the ``--spec=``
 Uberenv command line option.
 
 Some options
-^^^^^^^^^^^^
+============
 
 ``--spec=`` is used to define how your project will be built. It should be the
 same as a Spack spec, without the project name:
@@ -136,7 +136,7 @@ For those projects we try to:
 * Limit local patching of Spack packages.
 
 Limiting local patching of Spack packages
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+=========================================
 
 Uberenv allows projects to duplicate any Spack package locally and patch it.
 It is important to limit the amount of patching however. Every local patch
@@ -154,7 +154,7 @@ In any case, those local changes should be pushed to upstream Spack as soon as
 possible.
 
 Spack reference during the release process
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==========================================
 
 As discussed above, when a projects wants to do a release, the release has to
 happen before it can be added to Spack.
@@ -179,7 +179,7 @@ Uberenv as soon as the Spack package has been updated.
    points to a PR in Spcak that will likely disappear in the future.
 
 In a nutshell
-^^^^^^^^^^^^^
+=============
 
 The chosen Spack reference used in uberenv should evolve in time as follow:
 
