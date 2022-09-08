@@ -60,9 +60,11 @@ The short version
    cd my_project
    cp ../radiuss-shared-ci/customization/gitlab-ci.yml .gitlab-ci.yml
    mkdir -p .gitlab
-   cp ../radiuss-shared-ci/customization/custom-*.yml .gitlab
+   cp ../radiuss-shared-ci/customization/subscribed-pipelines.yml .gitlab
+   cp ../radiuss-shared-ci/customization/custom-jobs-and-variables.yml .gitlab
    cp ../radiuss-shared-ci/example-extra-jobs/*-extra.yml .gitlab
-   vim .gitlab/custom-*.yml
+   vim .gitlab/subscription-pipelines.yml
+   vim .gitlab/custom-jobs-and-variables.yml
    # customize CI
    vim .gitlab/*-extra.yml
    # edit extra jobs
@@ -134,12 +136,13 @@ them in a ``.gitlab`` directory.
 .. code-block:: bash
 
    mkdir -p .gitlab
-   cp ../radiuss-shared-ci/customization/custom-*.yml .gitlab
+   cp ../radiuss-shared-ci/customization/subscribed-pipelines.yml .gitlab
+   cp ../radiuss-shared-ci/customization/custom-jobs-and-variables.yml .gitlab
 
 We will now browse the files to see what changes they may require to suit your
 needs.
 
-``.gitlab/custom-pipelines.yml``
+``.gitlab/subscribed-pipelines.yml``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 In this file, you will select the machines you want to run tests on. Comment
@@ -149,17 +152,8 @@ access to.
 .. note::
    In order to add a new machine, please refer to :ref:`add-a-new-machine`.
 
-``.gitlab/custom-jobs.yml``
+``.gitlab/custom-jobs-and-variables.yml``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-No change is strictly required to get started here.
-
-In this file, you may add configuration to the ``.custom_build_and_test`` job
-that will then be included to all you CI jobs. This can be used for example to
-`export jUnit test reports`_.
-
-``.gitlab/custom-variables.yml``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Here is a table to describe each variable present in the file. Some more
 details can be found in the file itself.
@@ -185,13 +179,18 @@ details can be found in the file itself.
 .. warning::
    We strongly recommend that you set your CI to use a service account.
 
+You may add configuration to the ``.custom_build_and_test`` job that will then
+be included to all you CI jobs. This can be used for example to `export jUnit
+test reports`_. Changes to that section are not mandatory.
+
 .. _edit-extra-jobs:
 
 Edit extra jobs
 ---------------
 
 We provide templates for the extra jobs files. Those files are required as soon
-as the associated machine has been activated in ``.gitlab/custom-pipelines``.
+as the associated machine has been activated in
+``.gitlab/subscribed-pipelines``.
 
 If no extra-jobs is needed (if the shared jobs automatically included are
 sufficient), then you should add the extra-jobs files as-is, with a simple
@@ -230,5 +229,5 @@ create the variable once the token has been generated on GitHub.
 
 
 .. _Radiuss Shared CI: https://radiuss-shared-ci.readthedocs.io/en/latest/index.html
-.. _export jUnit test reports: https://github.com/LLNL/Umpire/blob/develop/.gitlab/custom-jobs.yml
+.. _export jUnit test reports: https://github.com/LLNL/Umpire/blob/develop/.gitlab/custom-jobs-and-variables.yml
 .. _sharing spack configuration files: https://github.com/LLNL/radiuss-spack-configs
