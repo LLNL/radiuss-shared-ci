@@ -5,24 +5,6 @@
 # SPDX-License-Identifier: (MIT)
 ###############################################################################
 
-# We define the following GitLab pipeline variables:
-variables:
-
-# Use the umdev LLNL service user to run CI. This prevents from running
-# pipelines as an actual user.
-  LLNL_SERVICE_USER: ""
-
-# Use the service user workspace. Solves permission issues, stores everything
-# at the same location whoever triggers a pipeline.
-#  CUSTOM_CI_BUILDS_DIR: ""
-
-# Tells Gitlab to recursively update the submodules when cloning the project.
-  GIT_SUBMODULE_STRATEGY: recursive
-
-# We build the projects in the CI clone directory.
-# TODO: add a clean-up mechanism
-  BUILD_ROOT: ${CI_PROJECT_DIR}
-
 # On LLNL's ruby, this pipeline creates only one allocation shared among jobs
 # in order to save time and resources. This allocation has to be uniquely named
 # so that we are sure to retrieve it and avoid collisions.
@@ -56,3 +38,12 @@ variables:
   PROJECT_LASSEN_VARIANTS: ""
 # Project specific deps for lassen
   PROJECT_LASSEN_DEPS: ""
+
+
+# Configuration shared by build and test jobs specific to this project.
+# Not all configuration can be shared. Here projects can fine tune the
+# CI behavior.
+# See Umpire for an example (export junit test reports).
+.custom_build_and_test:
+  variables:
+    JOB_TEMPLATE_CANNOT_BE_EMPTY: "True"
