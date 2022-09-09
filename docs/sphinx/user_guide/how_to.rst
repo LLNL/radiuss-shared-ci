@@ -71,12 +71,12 @@ Reference used to import radiuss-spack-configs
 ==============================================
 
 In ``.uberenv_config.json``, the entry ``spack-config-path`` designates the
-directory receiving Spack configuration. This in fact point to a submodule: a
+directory receiving Spack configuration. It should point to a submodule: a
 clone of `radiuss-spack-configs`_. Check the status of this submodule to look
 for differences.
 
 .. note::
-   The hash used to checkout out a submodule is also visible in
+   The hash used to checkout a submodule is also visible in
    ``.gitmodules``.
 
 The Spack configuration can affect the external packages to use, the default
@@ -94,18 +94,18 @@ different.
 .. _update-shared-ci:
 
 =====================================================================
-Update the CI configuration, Spack, Uberenv, or RADIUSS Spack Configs
+Update the CI configuration, Spack, Uberenv or RADIUSS Spack Configs
 =====================================================================
 
-RADIUSS Shared CI rely on three other components to work properly: `Spack`_,
-`Uberenv`_ and `radiuss-spack-configs`_. As general rule, any update of one
-may or will result in the update of the others.
+RADIUSS Shared CI relies on three other components to work properly: `Spack`_,
+`Uberenv`_ and `radiuss-spack-configs`_. As a general rule, any update of one
+may or will result in an update of the others.
 
 Updating RADIUSS Shared CI
 ==========================
 
-RADIUSS Shared CI is bound to the versions of `radiuss-spack-configs` and
-`Spack` because the shared specs requires the package versions to exist.
+RADIUSS Shared CI is bound to the versions of `radiuss-spack-configs`_ and
+`Spack`_ because the shared specs requires the package versions to exist.
 
 If you have overridden shared specs in your extra jobs, you need to check for
 changes in the original shared spec after the update: Is the job still there?
@@ -121,7 +121,7 @@ force you to update `radiuss-spack-configs`_ and `Uberenv`_.
 Updating radiuss-spack-configs
 ==============================
 
-Be aware of incompatibilities between `Spack`_ and `radiuss-spack-configs`
+Be aware of incompatibilities between `Spack`_ and `radiuss-spack-configs`_
 versions. In radiuss-spack-configs, we use tags to mark changes in the required
 version of Spack.
 
