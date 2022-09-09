@@ -62,18 +62,18 @@ projects and look for:
 
 * differences between jobs with the same name.
 
-* jobs overrides: an "extra" job, if it has the same name as a shared
-job, overrides the shared job.
+* jobs overrides: an "extra" job, if it has the same name as a shared job,
+  overrides the shared job.
 
 * jobs present only in one of the two projects.
 
 Reference used by RADIUSS Spack Configs to import Spack configuration
 =====================================================================
 
-In ``.uberenv_config.json``, the entry ``spack-config-path`` designate the
-directory receiving Spack configuration. This in fact point to a submodule:
-a clone of `radiuss-spack-configs`_. Check the status of this submodule to
-look for differences.
+In ``.uberenv_config.json``, the entry ``spack-config-path`` designates the
+directory receiving Spack configuration. This in fact point to a submodule: a
+clone of `radiuss-spack-configs`_. Check the status of this submodule to look
+for differences.
 
 .. note::
    The hash used to checkout out a submodule is also visible in
@@ -107,9 +107,9 @@ Updating RADIUSS Shared CI
 RADIUSS Shared CI is bound to the versions of `radiuss-spack-configs` and
 `Spack` because the shared specs requires the package versions to exist.
 
-If you have overridden shared specs in your extra jobs, you need to check
-for changes in the original shared spec after the update: Is the job still
-there? Has the spec changed? Is there still a need to override it?
+If you have overridden shared specs in your extra jobs, you need to check for
+changes in the original shared spec after the update: Is the job still there?
+Has the spec changed? Is there still a need to override it?
 
 Updating Spack
 ==============
