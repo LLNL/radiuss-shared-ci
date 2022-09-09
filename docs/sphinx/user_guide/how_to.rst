@@ -11,7 +11,7 @@
 How To
 ******
 
-.._compare_ci_configs
+.. _compare_ci_configs:
 
 ============================================
 Compare the CI configuration of two projects
