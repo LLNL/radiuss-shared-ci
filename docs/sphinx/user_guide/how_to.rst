@@ -67,8 +67,8 @@ projects and look for:
 
 * jobs present only in one of the two projects.
 
-Reference used by RADIUSS Spack Configs to import Spack configuration
-=====================================================================
+Reference used to import radiuss-spack-configs
+==============================================
 
 In ``.uberenv_config.json``, the entry ``spack-config-path`` designates the
 directory receiving Spack configuration. This in fact point to a submodule: a
