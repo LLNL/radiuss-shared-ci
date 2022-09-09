@@ -33,7 +33,7 @@ Radiuss Shared CI
 
 We started by `sharing spack configuration files`_, then shared a method to
 manage Spack and use it to generate CMake configuration files and finally
-described a ``build-and-test`` script that has the same imputs across
+described a ``build-and-test`` script that has the same inputs across
 projects. We will now share most of the CI implementation itself.
 
 By externalizing the CI configuration, we create the need for an interface.
@@ -109,20 +109,38 @@ to add CI to.
    git clone https://github.com/LLNL/radiuss-shared-ci.git
    cd my_project
 
-By default, GitLab expects a ``.gitlab-ci-yml`` file to interpret the CI setup.
-We provide one in ``customization/gitlab-ci.yml`` that projects can copy-paste,
-just be sure to place it at the root of your project, with a dot (``.``) at the
+By default, GitLab expects a ``.gitlab-ci.yml`` file to interpret the CI setup.
+We provide one in ``customization/gitlab-ci.yml`` that projects can copy-paste.
+Just be sure to place it at the root of your project, with a dot (``.``) at the
 beginning of the name.
 
 .. code-block:: bash
 
    cp ../radiuss-shared-ci/customization/gitlab-ci.yml .gitlab-ci.yml
 
+In ``.gitlab-ci.yml``, there are some variables you will need to adapt to your
+projects:
+
+ ========================================== ==========================================================================================================================
+  Parameter                                  Description
+ ========================================== ==========================================================================================================================
+  ``LLNL_SERVICE_USER``                      Service Account used in CI
+  ``CUSTOM_CI_BUILD_DIR``                    Where to locate build directories (prevent overquota)
+  ``GIT_SUBMODULES_STRATEGY``                Controls strategy for the clone performed by GitLab. Consider ``recursive`` if you have submodules, otherwise comment it.
+  ``BUILD_ROOT``                             Location (path) where the projects should be built. We provide a sensible default.
+ ========================================== ==========================================================================================================================
+
+.. note::
+   If a variable is blank in the template file, then it does not require a
+   value. If a variable has a value there, it does require one.
+
+.. warning::
+   We strongly recommend that you set your CI to use a service account.
 
 Your CI is now setup to include remote files from the GitLab mirror of
 radiuss-shared-ci.
 
-We now have to complete the interface with the shared CI config. Indeed,
+We now have to complete the interface with the shared CI configuration:
 ``.gitlab-ci.yml`` also expects some files to be present locally.
 
 .. _customize-ci:
@@ -161,10 +179,6 @@ details can be found in the file itself.
  ========================================== ==========================================================================================================================
   Parameter                                  Description
  ========================================== ==========================================================================================================================
-  ``LLNL_SERVICE_USER``                      Service Account used in CI
-  ``CUSTOM_CI_BUILD_DIR``                    Where to locate build directories (prevent overquota)
-  ``GIT_SUBMODULES_STRATEGY``                Controls strategy for the clone performed by GitLab. Consider ``recursive`` if you have submodules, otherwise comment it.
-  ``BUILD_ROOT``                             Location (path) where the projects should be built. We provide a sensible default.
   ``ALLOC_NAME``                             Name of the shared allocation. Should be unique, our default should be fine.
   ``<MACHINE>_BUILD_AND_TEST_SHARED_ALLOC``  Parameters for the shared allocation. You may extend the resource and time.
   ``<MACHINE>_BUILD_AND_TEST_JOB_ALLOC``     Parameters for the job allocation. You may extend the resource and time within the scope of the shared allocation.
@@ -175,9 +189,6 @@ details can be found in the file itself.
 .. note::
    If a variable is blank in the template file, then it does not require a
    value. If a variable has a value there, it does require one.
-
-.. warning::
-   We strongly recommend that you set your CI to use a service account.
 
 You may add configuration to the ``.custom_build_and_test`` job that will then
 be included to all you CI jobs. This can be used for example to `export jUnit
@@ -194,7 +205,7 @@ as the associated machine has been activated in
 
 If no extra-jobs is needed (if the shared jobs automatically included are
 sufficient), then you should add the extra-jobs files as-is, with a simple
-variable definition to avoid it to be empty.
+variable definition to prevent it from being empty.
 
 If you need to define extra-jobs specific to your projects, then you may remove
 the variable definition, uncomment the template job and complete it with the
@@ -209,10 +220,9 @@ required information:
 
 .. note::
    ``PROJECT_<MACHINE>_VARIANTS/DEPS`` apply to all the shared specs. If you
-   want to build a spec without them, you need to define an extra job. Note
-   also that if you want to build a shared spec with no change, you will need
-   to duplicate it from radiuss-shared-ci into your extra jobs and remove
-   ``PROJECT_<MACHINE>_VARIANTS/DEPS``.
+   want to build a spec without them, you need to define an extra job, even if
+   this is a shared spec: in that case you can give the extra jobs the exact
+   same name as the shared one so that the latter will be overridden.
 
 Non-RADIUSS Projects
 --------------------
