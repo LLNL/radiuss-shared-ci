@@ -6,12 +6,21 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next
+## [v2022.09.0 - 2022-09-09]
+
+### Added
+
+- New HowTo articles in documentation
 
 ### Changed
 
+- Modified file layout to work around issue with variable override
 - Update xl compiler
 - Update cuda is some xl specs
+
+### Fixed
+
+- Coherent job naming
 
 ## [v2022.08.1 - 2022-08-xx]
 
