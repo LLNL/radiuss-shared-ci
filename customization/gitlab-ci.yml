@@ -18,7 +18,7 @@
 #
 # However, each project should provide:
 # - .gitlab/custom-jobs-and-variables.yml
-# - .gitlab/custom-pipelines.yml
+# - .gitlab/subscribed-pipelines.yml
 # - .gitlab/${MACHINE}-build-and-test-extra.yml
 ###############################################################################
 
