@@ -11,6 +11,118 @@
 How To
 ******
 
+.._compare_ci_configs
+
+============================================
+Compare the CI configuration of two projects
+============================================
+
+Let’s say you want to be in sync in terms of CI configuration with another
+project. We summarize here the checklist you should follow to make sure both
+configuration are exactly the same, or find the difference between those.
+
+We don’t want to duplicate the whole CI configuration but to check that the
+tested specs are the same.
+
+Radiuss Shared CI reference used to import configuration
+========================================================
+
+In ``.gitlab-ci.yml`` look for the reference used for radiuss-shared-ci.
+
+.. code-block:: yaml
+   :emphasize-lines: 7
+
+  .build-and-test:
+    stage: build-and-test
+    trigger:
+      include:
+        - local: '.gitlab/custom-jobs-and-variables.yml'
+        - project: 'radiuss/radiuss-shared-ci'
+          ref: v2022.09.0
+          file: '${CI_MACHINE}-build-and-test.yml'
+        - local: '.gitlab/${CI_MACHINE}-build-and-test-extra.yml'
+      strategy: depend
+      forward:
+        pipeline_variables: true
+
+Two different versions can have differences between the shared specs tested,
+you may compare files named ``"<MACHINE>-build-and-test.yml`` between the two
+references.
+
+Extra jobs added by the project
+===============================
+
+In ``.gitlab/*-build-and-test-extra``, look for:
+
+* differences between jobs with the same name.
+* jobs overrides: an "extra" job, if it has the same name as a shared
+job, overrides the shared job.
+* jobs present only in one of the two projects.
+
+Radiuss Spack Configs reference used to import Spack configuration
+==================================================================
+
+In ``.uberenv_config.json``, the entry ``spack-config-path`` designate the
+directory receiving Spack configuration. This in fact point to a submodule:
+a clone of `radiuss-spack-configs`_. Check the status of this submodule to
+look for differences.
+
+.. note::
+   The hash used to checkout out a submodule is also visible in
+   ``.gitmodules``.
+
+The Spack configuration can affect the external packages to use, the default
+versions for a dependencies to build, etc.
+
+Which Spack reference is used by Uberenv to clone Spack.
+===============================
+
+In ``.uberenv_config.json``, the reference used to clone `Spack`_ can be set
+with either ``spack_branch`` or ``spack_commit``.
+
+It is basically impossible to ensure identical builds if the Spack versions are
+different.
+
+.. _update-shared-ci:
+
+=====================================================================
+Update the CI configuration, Spack, Uberenv, or Radiuss Spack Configs
+=====================================================================
+
+Radiuss Shared CI rely on three other components to work properly: `Spack`_,
+`Uberenv`_ and `radiuss-spack-configs`_. As general rule, any update of one
+may or will result in the update of the others.
+
+Updating Radiuss Shared CI
+==========================
+
+Radiuss Shared CI is bound to the versions of `radiuss-spack-configs` and
+`Spack` because the shared specs requires the package versions to exist.
+
+If you have overridden shared specs in your extra jobs, you need to check
+for changes in the original shared spec after the update: Is the job still
+there? Has the spec changed? Is there still a need to override it?
+
+Updating Spack
+==============
+
+Spack may be updated without updating radiuss-shared-ci, however there are
+regularly changes in the Spack configuration formatting and options that will
+force you to update `radiuss-spack-configs`_ and `Uberenv`_.
+
+Updating Radiuss-Spack-Configs
+==============================
+
+Be aware of incompatibilities between `Spack`_ and `radiuss-spack-configs`
+versions. In Radiuss Spack Configs, we use tags to mark changes in the required
+version of Spack.
+
+Updating Uberenv
+================
+
+In general, `Uberenv`_ is lagging behind in terms of compatibility with
+`Spack`_. That's obviously not a guarantee.
+
 ====================================================
 Deal with project specific variants and dependencies
 ====================================================
@@ -105,3 +217,23 @@ you would like to reuse (in supplement of the local one managed by Uberenv), you
 can do so with the ``--upstream=`` option:
 
 * ``--upstream=<path_to_my_spack>/opt/spack ...``
+
+======================================
+Allow failure for a spec known to fail
+======================================
+
+If a RADIUSS Shared CI pipeline comes with a particular spec that is known to
+fail, you may want to allow this spec to fail in CI.
+
+To do so, you will have to duplicate the job in the corresponding
+``.gitlab/<MACHINE>-build-and-test-extra.yaml`` keeping the exact same job name
+and then add ``allow_failure: true`` to the job definition.
+
+This is a job override. The flip side is that you will have to manually check
+for changes in the original shared job when updating RADIUSS Shared CI. See
+`update-shared-ci`_ for details.
+
+
+.. _radiuss-spack-configs: https://github.com/LLNL/radiuss-spack-configs
+.. _Uberenv: https://github.com/LLNL/uberenv
+.. _Spack: https://github.com/spack/spack
