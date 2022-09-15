@@ -130,9 +130,9 @@ ibm_clang_9_0_0_gcc_8_3_1_cuda_10_1_168:
     SPEC: "${PROJECT_LASSEN_VARIANTS} +cuda %clang@ibm.9.0.0 cxxflags==\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" cflags==\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" ^cuda@10.1.168 ${PROJECT_LASSEN_DEPS}"
   extends: .build_and_test_on_lassen
 
-xl_16_1_1_12_gcc_8_3_1_cuda_11_0_2:
+xl_16_1_1_12_gcc_7_3_1_cuda_10_1_168:
   variables:
-    SPEC: "${PROJECT_LASSEN_VARIANTS} +cuda %xl@16.1.1.12 cxxflags==\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" cflags==\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" ^cuda@11.0.2 ^cmake@3.14.5 ${PROJECT_LASSEN_DEPS}"
+    SPEC: "${PROJECT_LASSEN_VARIANTS} +cuda %xl@16.1.1.12 cxxflags==\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-7.3.1\" cflags==\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-7.3.1\" ^cuda@10.1.168 ${PROJECT_LASSEN_DEPS}"
   extends: .build_and_test_on_lassen
 
 xl_16_1_1_12_gcc_8_3_1_cuda_11_0_2:
