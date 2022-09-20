@@ -46,6 +46,8 @@ stages:
 
 status_pending:
   extends: [.on_lassen]
+  variables:
+    GIT_STRATEGY: none
   stage: status_initiate
   script:
     - export pipeline_status="pending"
@@ -102,6 +104,8 @@ xl_16_1_1_12_gcc_8_3_1_cuda_11_0_2:
 
 status_success:
   extends: [.on_lassen]
+  variables:
+    GIT_STRATEGY: none
   stage: status_update
   script:
     - export pipeline_status="success"
@@ -110,6 +114,8 @@ status_success:
 
 status_failure:
   extends: [.on_lassen]
+  variables:
+    GIT_STRATEGY: none
   stage: status_update
   script:
     - export pipeline_status="failure"

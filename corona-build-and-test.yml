@@ -68,6 +68,8 @@ allocate_resources (on corona):
 
 status_pending:
   extends: [.on_corona]
+  variables:
+    GIT_STRATEGY: none
   stage: allocate_resources
   script:
     - export pipeline_status="pending"
@@ -95,6 +97,8 @@ release_resources (on corona):
 
 status_success:
   extends: [.on_corona]
+  variables:
+    GIT_STRATEGY: none
   stage: release_resources
   script:
     - export pipeline_status="success"
@@ -102,6 +106,8 @@ status_success:
 
 status_failure:
   extends: [.on_corona]
+  variables:
+    GIT_STRATEGY: none
   stage: release_resources
   script:
     - export pipeline_status="failure"
