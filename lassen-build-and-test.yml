@@ -54,14 +54,14 @@ status_pending:
 # Gitlab jobs for the lassen machine at LLNL.
 
 # CPU only.
-ibm_clang_9_0_0:
+ibm_clang_12_0_1:
   variables:
-    SPEC: "${PROJECT_LASSEN_VARIANTS} %clang@ibm.9.0.0 ${PROJECT_LASSEN_DEPS}"
+    SPEC: "${PROJECT_LASSEN_VARIANTS} %clang@ibm.12.0.1 ${PROJECT_LASSEN_DEPS}"
   extends: .build_and_test_on_lassen
 
-ibm_clang_9_0_0_gcc_8_3_1:
+ibm_clang_12_0_1_gcc_8_3_1:
   variables:
-    SPEC: "${PROJECT_LASSEN_VARIANTS} %clang@ibm.9.0.0 cxxflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" cflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" ${PROJECT_LASSEN_DEPS}"
+    SPEC: "${PROJECT_LASSEN_VARIANTS} %clang@ibm.12.0.1 cxxflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" cflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" ${PROJECT_LASSEN_DEPS}"
   extends: .build_and_test_on_lassen
 
 gcc_8_3_1:
@@ -85,9 +85,9 @@ xl_16_1_1_12_gcc_8_3_1:
   extends: .build_and_test_on_lassen
 
 # CUDA.
-ibm_clang_9_0_0_gcc_8_3_1_cuda_10_1_168:
+ibm_clang_12_0_1_gcc_8_3_1_cuda_10_1_168:
   variables:
-    SPEC: "${PROJECT_LASSEN_VARIANTS} +cuda %clang@ibm.9.0.0 cxxflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" cflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" ^cuda@10.1.168 ${PROJECT_LASSEN_DEPS}"
+    SPEC: "${PROJECT_LASSEN_VARIANTS} +cuda %clang@ibm.12.0.1 cxxflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" cflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" ^cuda@10.1.168 ${PROJECT_LASSEN_DEPS}"
   extends: .build_and_test_on_lassen
 
 xl_16_1_1_12_gcc_8_3_1_cuda_11_0_2:
