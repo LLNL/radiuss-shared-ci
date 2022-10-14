@@ -12,6 +12,8 @@ Radiuss Shared CI allows project to share CI configuration for GitLab.
 This project is meant to be hosted in a Gitlab instance so that other projects
 can import files from it to complete their CI configuration.
 
+User documentation is located here: [**RADIUSS Shared CI Docs**](https://readthedocs.org/projects/radiuss-shared-ci/).
+
 ### Installing
 
 This project requires no installation.
