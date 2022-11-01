@@ -11,6 +11,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 
 - New HowTo articles in documentation
+- build-and-test file for Tioga
 
 ### Changed
 
