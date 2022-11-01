@@ -73,9 +73,9 @@ status_pending:
     - export pipeline_status="pending"
     - *status_report
 
-rocm_5_1_1_clang_13_0_0:
+rocm_5_3_0_clang_13_0_0:
   variables:
-    SPEC: "${PROJECT_TIOGA_VARIANTS} +rocm amdgpu_target=gfx90a %clang@13.0.0 ^hip@5.1.1 ${PROJECT_TIOGA_DEPS}"
+    SPEC: "${PROJECT_TIOGA_VARIANTS} +rocm amdgpu_target=gfx90a %clang@13.0.0 ^hip@5.3.0 ${PROJECT_TIOGA_DEPS}"
   extends: .build_and_test_on_tioga
 
 # In post-build phase, deallocate resources.
