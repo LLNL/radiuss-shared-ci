@@ -65,4 +65,4 @@ include:
   - local: .gitlab/subscribed-pipelines.yml
   - project: 'radiuss/radiuss-shared-ci'
     ref: v2022.09.0
-    file: 'preliminary-should-we-test.yml'
+    file: 'preliminary-ignore-draft-pr.yml'

@@ -13,7 +13,7 @@
 
 # This job should fail if we don’t want the pipeline to run.
 # Here, we make sure the pipeline fails if the PR is a draft.
-should-we-test:
+ignore-draft-pr:
   stage: .pre
   tags: [shell, oslic]
   variables:
