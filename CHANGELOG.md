@@ -10,6 +10,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+- A job that tests whether the machine is up, and reports the failure to GitHub otherwise.
+
 ### Changed
 
 - Speed-up CI by not cloning the project in jobs only reporting to GitHub.
