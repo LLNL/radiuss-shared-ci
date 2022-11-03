@@ -60,9 +60,10 @@ stages:
     forward:
       pipeline_variables: true
 
-# pipelines subscribed by the project
 include:
-  - local: .gitlab/subscribed-pipelines.yml
+  # [Optional] checks preliminary to running the actual CI test
   - project: 'radiuss/radiuss-shared-ci'
     ref: v2022.09.0
     file: 'preliminary-ignore-draft-pr.yml'
+  # pipelines subscribed by the project
+  - local: .gitlab/subscribed-pipelines.yml

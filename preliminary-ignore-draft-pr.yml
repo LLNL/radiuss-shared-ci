@@ -5,6 +5,9 @@
 # SPDX-License-Identifier: (BSD-3-Clause)
 ###############################################################################
 
+# This file is optional, only include it in your CI (see
+# customization/gitlab-ci.yml) if you want to skip the CI on draft branches.
+
 # Requirements:
 # The following variables must be defined:
 # - GITHUB_TOKEN (granted in radiuss group)
