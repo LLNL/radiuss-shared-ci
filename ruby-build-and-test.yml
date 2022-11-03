@@ -80,6 +80,8 @@ allocate_resources (on ruby):
 
 status_pending:
   extends: [.on_ruby]
+  variables:
+    GIT_STRATEGY: none
   stage: allocate_resources
   script:
     - export pipeline_status="pending"
@@ -125,6 +127,8 @@ release_resources (on ruby):
 
 status_success:
   extends: [.on_ruby]
+  variables:
+    GIT_STRATEGY: none
   stage: release_resources
   script:
     - export pipeline_status="success"
@@ -133,6 +137,8 @@ status_success:
 
 status_failure:
   extends: [.on_ruby]
+  variables:
+    GIT_STRATEGY: none
   stage: release_resources
   script:
     - export pipeline_status="failure"
