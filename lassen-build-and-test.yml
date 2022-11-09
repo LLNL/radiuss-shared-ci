@@ -6,6 +6,7 @@
 ##############################################################################
 
 stages:
+  - is-machine-up
   - status_initiate
   - build_and_test
   - status_update
@@ -30,6 +31,23 @@ stages:
     # A true statement is expected to allow jobs to run. Here is the default.
     - when: on_success
 
+is-machine-up-check:
+  stage: is-machine-up
+  tags: [shell, oslic]
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - |
+      if [[ $(jq '.lassen.total_nodes_up' /usr/global/tools/lorenz/data/loginnodeStatus) == 0 ]]
+      then
+        echo -e "\e[31mNo node available on Lassen\e[0m"
+        curl --url "https://api.github.com/repos/LLNL/${CI_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
+             --header 'Content-Type: application/json' \
+             --header "authorization: Bearer ${GITHUB_TOKEN}" \
+             --data "{ \"state\": \"failure\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab Lassen Down\", \"context\": \"ci/gitlab/lassen\" }"
+        exit 1
+      fi
+
 .status_report: &status_report
     - export context="lassen"
     - |
@@ -46,6 +64,8 @@ stages:
 
 status_pending:
   extends: [.on_lassen]
+  variables:
+    GIT_STRATEGY: none
   stage: status_initiate
   script:
     - export pipeline_status="pending"
@@ -102,6 +122,8 @@ xl_16_1_1_12_gcc_8_3_1_cuda_11_0_2:
 
 status_success:
   extends: [.on_lassen]
+  variables:
+    GIT_STRATEGY: none
   stage: status_update
   script:
     - export pipeline_status="success"
@@ -110,6 +132,8 @@ status_success:
 
 status_failure:
   extends: [.on_lassen]
+  variables:
+    GIT_STRATEGY: none
   stage: status_update
   script:
     - export pipeline_status="failure"

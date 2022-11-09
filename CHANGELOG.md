@@ -6,12 +6,16 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next
+## [Next]
 
 ### Added
 
+- A job that tests whether the machine is up, and reports the failure to GitHub otherwise.
+
 ### Changed
- - Improved documentation, fixed links and syntax.
+
+- Speed-up CI by not cloning the project in jobs only reporting to GitHub.
+- Improved documentation, fixed links and syntax.
 
 ### Fixed
 

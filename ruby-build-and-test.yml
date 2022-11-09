@@ -6,6 +6,7 @@
 ##############################################################################
 
 stages:
+  - is-machine-up
   - allocate_resources
   - build_and_test
   - release_resources
@@ -32,6 +33,23 @@ stages:
       when: on_failure
     # A true statement is expected to allow jobs to run. Here is the default.
     - when: on_success
+
+is-machine-up-check:
+  stage: is-machine-up
+  tags: [shell, oslic]
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - |
+      if [[ $(jq '.ruby.total_nodes_up' /usr/global/tools/lorenz/data/loginnodeStatus) == 0 ]]
+      then
+        echo -e "\e[31mNo node available on Ruby\e[0m"
+        curl --url "https://api.github.com/repos/LLNL/${CI_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
+             --header 'Content-Type: application/json' \
+             --header "authorization: Bearer ${GITHUB_TOKEN}" \
+             --data "{ \"state\": \"failure\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab Ruby Down\", \"context\": \"ci/gitlab/ruby\" }"
+        exit 1
+      fi
 
 .status_report: &status_report
     - export context="ruby"
@@ -62,6 +80,8 @@ allocate_resources (on ruby):
 
 status_pending:
   extends: [.on_ruby]
+  variables:
+    GIT_STRATEGY: none
   stage: allocate_resources
   script:
     - export pipeline_status="pending"
@@ -107,6 +127,8 @@ release_resources (on ruby):
 
 status_success:
   extends: [.on_ruby]
+  variables:
+    GIT_STRATEGY: none
   stage: release_resources
   script:
     - export pipeline_status="success"
@@ -115,6 +137,8 @@ status_success:
 
 status_failure:
   extends: [.on_ruby]
+  variables:
+    GIT_STRATEGY: none
   stage: release_resources
   script:
     - export pipeline_status="failure"
