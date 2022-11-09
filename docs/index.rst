@@ -16,9 +16,9 @@ RADIUSS projects.
 
 .. note::
    LLNL's RADIUSS project (Rapid Application Development via an Institutional
-   Universal Software Stack) aims to broaden usage across LLNL and the open source
-   community of a set of libraries and tools used for HPC scientific application
-   development.
+   Universal Software Stack) aims to broaden usage across LLNL and the open 
+   source community of a set of libraries and tools used for HPC scientific 
+   application development.
 
 For more detailed information, please see the following documentation.
 
