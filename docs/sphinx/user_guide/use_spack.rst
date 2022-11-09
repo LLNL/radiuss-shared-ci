@@ -7,8 +7,8 @@
 
 .. _run_spack-label:
 
-**********
-Run Spack
-**********
+****************************************************************
+Run Spack to install dependencies and configure a project build
+****************************************************************
 
 Fill this in...

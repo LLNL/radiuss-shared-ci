@@ -41,13 +41,7 @@ and is mirrored on the Livermore Computing (LC) CZ Gitlab instance. A project
 points to the Gitlab mirror to access RADIUSS Shared CI configurations.
 
 RADIUSS Shared CI design revolves around three steps a project must follow to 
-adopt the shared CI methodology:
-
-  * Run Spack to install dependencies and configure a project build
-  * Build and test the code
-  * Set up Gitlab CI for the project using the RADIUSS Shared CI infrastructure
-
-These steps are described in the following sections.
+adopt the shared CI methodology. These are described in the following sections.
 
 .. toctree::
    :maxdepth: 2

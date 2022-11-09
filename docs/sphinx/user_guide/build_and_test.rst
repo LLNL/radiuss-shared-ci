@@ -8,9 +8,9 @@
 .. _build_and_test-label:
 
 
-*******************************************
-Build and test without breaking your habits
-*******************************************
+******************************************************
+Build and test your code using your usual workflow
+******************************************************
 
 .. image:: images/UberenvWorkflowScript.png
    :scale: 32 %
