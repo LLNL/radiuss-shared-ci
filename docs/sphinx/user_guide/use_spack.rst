@@ -7,4 +7,8 @@
 
 .. _run_spack-label:
 
-Why Spack ?
+**********
+Run Spack
+**********
+
+Fill this in...
