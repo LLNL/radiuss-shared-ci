@@ -31,8 +31,8 @@ specified by the Spack spec.
 Using configuration files to build the project
 ==============================================
 
-The (CMake) configuration files are specific to the desired machine and
-toolchain. With CMake, the usage is as follows:
+(CMake) configuration files are specific to each machine and toolchain. 
+With CMake, the usage is as follows:
 
 .. code-block:: bash
 
@@ -52,15 +52,19 @@ Writing a script for CI
 
 The CI expects a script that:
 
-* is named ``build-and-test.sh and lives in the directory ``scripts/gitlab`` 
-  in your project Git repo.
-* is parametrized by the variable ``SPEC`` which should contain a Spack spec
-  with the project name stripped out.
-* covers both step 1 (installation of dependencies, configuration file
-  generation) and step 2 (build the project from the configuration file 
-  and run your tests).
+* is named ``build-and-test.sh`` and lives in the directory 
+  ``scripts/gitlab`` in your project Git repo.
+* is parametrized by the variable ``SPEC`` which is used to prescribe a 
+  Spack spec with the project name stripped out.
+* executes the project build and test processes:
+    # install dependencies and generate CMake configuration file
+      (using Spack as described earlier)
+    # configure a build with the configuration and build the project source 
+      code
+    # run the project tests
 
-The script should therefore be callable:
+The script should be callable to make it easier to test and debug. 
+For example:
 
 .. code-block:: bash
 
@@ -72,10 +76,11 @@ The script should therefore be callable:
   interactive mode, making it easier to test. This is why we document it in the
   build part rather than the CI part.
 
-Umpire, RAJA, CHAI, MFEM each have their own script you could easily adapt. All
-these projects use Uberenv to drive Spack. Umpire, RAJA and CHAI share the
-Spack configuration files in `radiuss-spack-configs`_ in order to build and
-test with the same toolchains and configurations.
+Umpire, RAJA, CHAI, MFEM each have their own script that you could use as a 
+starting point and adapt to your project. These projects use Uberenv to drive 
+Spack. Umpire, RAJA and CHAI share Spack configuration files in 
+`radiuss-spack-configs`_ in order to build and test with the same toolchains 
+and configurations.
 
 
 =========
@@ -83,34 +88,33 @@ Debugging
 =========
 
 In the workflow described above, there are 4 levels of scripts to control the
-build of a package. From the lower to the higher level:
+build of a package. From the lowest to the highest level:
 
 * The *build system* is controlled by a configuration file (whether generated 
   by Spack or not).
-* The *Spack package* is controlled by the spec provided and spack 
+* The *Spack package* is controlled by the spec provided and Spack 
   configuration.
 * *Uberenv* takes a spec and a json configuration file.
-* A ``build-and-test.sh`` script also sometimes called test driver. The one 
+* A ``build-and-test.sh`` script, which is a test driver. The scripts 
   in Umpire and RAJA requires a spec and some other control variables.
 
-Now, when it comes to debugging, each level has some requirements to reproduce
-a failing build:
+When debugging, each level has requirements to reproduce a failing build:
 
 * The ``build-and-test.sh`` script typically runs in CI context. This means 
   that it may not be designed to run outside CI. It is better if it does, and 
   we try to do that in RADIUSS, but it is not guaranteed. Uberenv provides a 
-  turnkey way to install the project and its dependencies. It is usually a good
+  turnkey way to install a project and its dependencies. It is usually a good
   way to reproduce a build on a given machine. The CI creates working 
   directories in which the Uberenv install directory *may* 
   persist, but it is better to reproduce in a local clone.
 * Reproducing a build with ``Spack`` by itself requires a deep knowledge of it.
   Fortunately, Uberenv simplifies much of the complexity by encoding many 
   Spack usage mechanics. We recommend that you use Uberenv to generate 
-  the Spack instance. Then, loading the spack instance generated and working 
+  the Spack instance. Then, loading the Spack instance generated and working 
   with it is relatively simple and safe.
-* Going down to the ``build system`` is also doable, especially when using the
-  generated configuration files. Once spack has installed the dependencies and
-  generated the configuration files, the latter can be used to control the
-  build of the code and this should not require using Spack.
+* Going down to a project ``build system`` is also doable, especially when 
+  using generated configuration files. Once Spack has installed dependencies and
+  generated configuration files, the latter can be used to control the
+  build of the code, which should not require using Spack.
 
 .. _radiuss-spack-configs: https://github.com/LLNL/radiuss-spack-configs
