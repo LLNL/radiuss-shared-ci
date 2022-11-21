@@ -36,9 +36,9 @@ and Vcpkg on Windows. RADIUSS Spack Configs contains a set of compiler and
 package configurations that projects shared to construct uniform build 
 configurations.
 
-Shared Gitlab CI is this RADIUSS Shared CI project, which is hosted on GitHub
-and is mirrored on the Livermore Computing (LC) CZ Gitlab instance. A project
-points to the Gitlab mirror to access RADIUSS Shared CI configurations.
+Shared GitLab CI is this RADIUSS Shared CI project, which is hosted on GitHub
+and is mirrored on the Livermore Computing (LC) CZ GitLab instance. A project
+points to the GitLab mirror to access RADIUSS Shared CI configurations.
 
 RADIUSS Shared CI design revolves around three steps a project must follow to 
 adopt the shared CI methodology. These are described in the following sections.
