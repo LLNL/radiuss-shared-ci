@@ -15,6 +15,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Changed
 
 - Speed-up CI by not cloning the project in jobs only reporting to GitHub.
+- BREAKING: now require to specify GitHub project name and organization for status reports.
 
 ### Fixed
 

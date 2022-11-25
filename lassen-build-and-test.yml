@@ -41,7 +41,7 @@ is-machine-up-check:
       if [[ $(jq '.lassen.total_nodes_up' /usr/global/tools/lorenz/data/loginnodeStatus) == 0 ]]
       then
         echo -e "\e[31mNo node available on Lassen\e[0m"
-        curl --url "https://api.github.com/repos/LLNL/${CI_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
+        curl --url "https://api.github.com/repos/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
              --header 'Content-Type: application/json' \
              --header "authorization: Bearer ${GITHUB_TOKEN}" \
              --data "{ \"state\": \"failure\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab Lassen Down\", \"context\": \"ci/gitlab/lassen\" }"
@@ -51,7 +51,7 @@ is-machine-up-check:
 .status_report: &status_report
     - export context="lassen"
     - |
-      curl --url "https://api.github.com/repos/LLNL/${CI_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
+      curl --url "https://api.github.com/repos/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
            --header 'Content-Type: application/json' \
            --header "authorization: Bearer ${GITHUB_TOKEN}" \
            --data "{ \"state\": \"${pipeline_status}\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab ${context} pipeline\", \"context\": \"ci/gitlab/${context}\" }"
@@ -71,7 +71,7 @@ status_pending:
     - export pipeline_status="pending"
     - *status_report
 
-# Gitlab jobs for the lassen machine at LLNL.
+# Gitlab jobs for the lassen machine at ${GITHUB_PROJECT_ORG}.
 
 # CPU only.
 ibm_clang_9_0_0:
