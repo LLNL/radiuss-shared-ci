@@ -77,9 +77,9 @@ is-machine-up-check:
   stage: build_and_test
   script:
     # Allocation information
-    - echo -e "### Allocation name is: ${ALLOC_NAME}"
+    - echo -e "### Allocation name is ${ALLOC_NAME}"
     - export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
-    - echo -e "### Job ID is: ${JOBID}"
+    - echo -e "### Job ID is ${JOBID}"
     # Print a reproducer
     - *print_ruby_reproducer
     # The actual launch command
