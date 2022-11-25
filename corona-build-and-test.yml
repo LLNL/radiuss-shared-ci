@@ -12,9 +12,7 @@ stages:
   - release_resources
 
 ##############################################################################
-# CORONA
-# These are templates (.name) that can be included in other jobs to share part
-# of the job definition.
+# UTILITIES
 .on_corona:
   tags:
     - shell
@@ -36,6 +34,45 @@ stages:
     # A true statement is expected to allow jobs to run. Here is the default.
     - when: on_success
 
+.status_report: &status_report
+    - export context="corona"
+    - |
+      curl --url "https://api.github.com/repos/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
+           --header 'Content-Type: application/json' \
+           --header "authorization: Bearer ${GITHUB_TOKEN}" \
+           --data "{ \"state\": \"${pipeline_status}\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab ${context} pipeline\", \"context\": \"ci/gitlab/${context}\" }"
+
+.print_corona_reproducer: &print_corona_reproducer
+    - |
+      echo -e "\e[7;32m### Corona reproducer\e[0m"
+      if [[ -n "${LLNL_SERVICE_USER}" ]]; then echo -e "xsu ${LLNL_SERVICE_USER}"; fi
+      echo -e "
+      working_dir=\"/usr/worskspace/\${USER}/\${RANDOM}\"
+      mkdir -p \${working_dir} && cd \${working_dir} \n
+      git clone git@github.com:${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}.git --single-branch --depth=1 \n
+      git fetch --depth=1 ${CI_COMMIT_SHA} \n
+      git checkout ${CI_COMMIT_SHA} \n
+      git submodule update --init --recursive \n
+      SPEC=${SPEC} flux mini run ${CORONA_BUILD_AND_TEST_JOB_ALLOC} scripts/gitlab/build_and_test.sh"
+      echo -e "\e[7;32m### End of reproducer\e[0m"
+
+.build_and_test_on_corona:
+  extends: [.custom_build_and_test, .on_corona]
+  stage: build_and_test
+  script:
+    # Allocation information
+    - |
+      set -x
+      echo ${ALLOC_NAME}
+      URI=$(flux jobs -o "{uri} {name}" | grep ${ALLOC_NAME} | awk '{print $1}') || echo "Empty URI"
+      if [[ -n "$URI" ]]; then export FLUX_URI=$URI; fi
+    # Print a reproducer
+    - *print_lassen_reproducer
+    # The actual launch command
+      flux mini run ${CORONA_BUILD_AND_TEST_JOB_ALLOC} scripts/gitlab/build_and_test.sh
+
+##############################################################################
+# JOBS
 is-machine-up-check:
   stage: is-machine-up
   tags: [shell, oslic]
@@ -52,25 +89,6 @@ is-machine-up-check:
              --data "{ \"state\": \"failure\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab Corona Down\", \"context\": \"ci/gitlab/corona\" }"
         exit 1
       fi
-
-.status_report: &status_report
-    - export context="corona"
-    - |
-      curl --url "https://api.github.com/repos/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
-           --header 'Content-Type: application/json' \
-           --header "authorization: Bearer ${GITHUB_TOKEN}" \
-           --data "{ \"state\": \"${pipeline_status}\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab ${context} pipeline\", \"context\": \"ci/gitlab/${context}\" }"
-
-.build_and_test_on_corona:
-  extends: [.custom_build_and_test, .on_corona]
-  stage: build_and_test
-  script:
-    - |
-      set -x
-      echo ${ALLOC_NAME}
-      URI=$(flux jobs -o "{uri} {name}" | grep ${ALLOC_NAME} | awk '{print $1}') || echo "Empty URI"
-      if [[ -n "$URI" ]]; then export FLUX_URI=$URI; fi
-      flux mini run ${CORONA_BUILD_AND_TEST_JOB_ALLOC} scripts/gitlab/build_and_test.sh
 
 # In pre-build phase, allocate a node for builds.
 allocate_resources (on corona):

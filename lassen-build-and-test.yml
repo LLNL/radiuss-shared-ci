@@ -12,7 +12,7 @@ stages:
   - status_update
 
 ##############################################################################
-# LASSEN
+# UTILITIES
 .on_lassen:
   tags:
     - shell
@@ -31,6 +31,39 @@ stages:
     # A true statement is expected to allow jobs to run. Here is the default.
     - when: on_success
 
+.status_report: &status_report
+    - export context="lassen"
+    - |
+      curl --url "https://api.github.com/repos/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
+           --header 'Content-Type: application/json' \
+           --header "authorization: Bearer ${GITHUB_TOKEN}" \
+           --data "{ \"state\": \"${pipeline_status}\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab ${context} pipeline\", \"context\": \"ci/gitlab/${context}\" }"
+
+.print_lassen_reproducer: &print_lassen_reproducer
+    - |
+      echo -e "\e[7;32m### Lassen reproducer\e[0m"
+      if [[ -n "${LLNL_SERVICE_USER}" ]]; then echo -e "xsu ${LLNL_SERVICE_USER}"; fi
+      echo -e "
+      working_dir=\"/usr/worskspace/\${USER}/\${RANDOM}\"
+      mkdir -p \${working_dir} && cd \${working_dir} \n
+      git clone git@github.com:${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}.git --single-branch --depth=1 \n
+      git fetch --depth=1 ${CI_COMMIT_SHA} \n
+      git checkout ${CI_COMMIT_SHA} \n
+      git submodule update --init --recursive \n
+      SPEC=${SPEC} lalloc ${LASSEN_BUILD_AND_TEST_JOB_ALLOC} scripts/gitlab/build_and_test.sh"
+      echo -e "\e[7;32m### End of reproducer\e[0m"
+
+.build_and_test_on_lassen:
+  extends: [.custom_build_and_test, .on_lassen]
+  stage: build_and_test
+  script:
+    # Print a reproducer
+    - *print_lassen_reproducer
+    # The actual launch command
+    - lalloc ${LASSEN_BUILD_AND_TEST_JOB_ALLOC} scripts/gitlab/build_and_test.sh
+
+##############################################################################
+# JOBS
 is-machine-up-check:
   stage: is-machine-up
   tags: [shell, oslic]
@@ -47,20 +80,6 @@ is-machine-up-check:
              --data "{ \"state\": \"failure\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab Lassen Down\", \"context\": \"ci/gitlab/lassen\" }"
         exit 1
       fi
-
-.status_report: &status_report
-    - export context="lassen"
-    - |
-      curl --url "https://api.github.com/repos/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
-           --header 'Content-Type: application/json' \
-           --header "authorization: Bearer ${GITHUB_TOKEN}" \
-           --data "{ \"state\": \"${pipeline_status}\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab ${context} pipeline\", \"context\": \"ci/gitlab/${context}\" }"
-
-.build_and_test_on_lassen:
-  extends: [.custom_build_and_test, .on_lassen]
-  stage: build_and_test
-  script:
-    - lalloc ${LASSEN_BUILD_AND_TEST_JOB_ALLOC} scripts/gitlab/build_and_test.sh
 
 status_pending:
   extends: [.on_lassen]
