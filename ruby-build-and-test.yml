@@ -60,17 +60,17 @@ is-machine-up-check:
            --data "{ \"state\": \"${pipeline_status}\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab ${context} pipeline\", \"context\": \"ci/gitlab/${context}\" }"
 
 .print_ruby_reproducer: &print_ruby_reproducer
-    - echo -e "\e[32m### Ruby reproducer\e[0m"
+    - echo -e "\e[7;32m### Ruby reproducer\e[0m"
     - if [[ -n "${LLNL_SERVICE_USER}" ]]; then echo -e "xsu ${LLNL_SERVICE_USER}"; fi
     - echo -e "
       working_dir=\"/usr/worskspace/\${USER}/\${RANDOM}\"
       mkdir -p \${working_dir} && cd \${working_dir} \n
-      git clone ${CI_REPOSITORY_URL} --single-branch --depth=1 \n
+      git clone git@github.com:${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}.git --single-branch --depth=1 \n
       git fetch --depth=1 ${CI_COMMIT_SHA} \n
       git checkout ${CI_COMMIT_SHA} \n
       git submodule update --init --recursive \n
       SPEC=${SPEC} srun ${RUBY_BUILD_AND_TEST_JOB_ALLOC} scripts/gitlab/build_and_test.sh"
-    - echo -e "\e[32m### End of reproducer\e[0m"
+    - echo -e "\e[7;32m### End of reproducer\e[0m"
 
 .build_and_test_on_ruby:
   extends: [.custom_build_and_test, .on_ruby]
