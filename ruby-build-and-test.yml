@@ -44,7 +44,7 @@ is-machine-up-check:
       if [[ $(jq '.ruby.total_nodes_up' /usr/global/tools/lorenz/data/loginnodeStatus) == 0 ]]
       then
         echo -e "\e[31mNo node available on Ruby\e[0m"
-        curl --url "https://api.github.com/repos/LLNL/${CI_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
+        curl --url "https://api.github.com/repos/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
              --header 'Content-Type: application/json' \
              --header "authorization: Bearer ${GITHUB_TOKEN}" \
              --data "{ \"state\": \"failure\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab Ruby Down\", \"context\": \"ci/gitlab/ruby\" }"
@@ -54,7 +54,7 @@ is-machine-up-check:
 .status_report: &status_report
     - export context="ruby"
     - |
-      curl --url "https://api.github.com/repos/LLNL/${CI_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
+      curl --url "https://api.github.com/repos/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
            --header 'Content-Type: application/json' \
            --header "authorization: Bearer ${GITHUB_TOKEN}" \
            --data "{ \"state\": \"${pipeline_status}\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab ${context} pipeline\", \"context\": \"ci/gitlab/${context}\" }"
@@ -87,7 +87,7 @@ status_pending:
     - export pipeline_status="pending"
     - *status_report
 
-# Gitlab jobs for the Ruby machine at LLNL.
+# Gitlab jobs for the Ruby machine at ${GITHUB_PROJECT_ORG}.
 clang_10_0_1:
   variables:
     SPEC: "${PROJECT_RUBY_VARIANTS} %clang@10.0.1 ${PROJECT_RUBY_DEPS}"

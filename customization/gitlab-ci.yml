@@ -24,7 +24,7 @@
 
 # We define the following GitLab pipeline variables:
 variables:
-# Identify the corresponding GitHub repository.
+# Required information about GitHub repository
   GITHUB_PROJECT_NAME: "..."
   GITHUB_PROJECT_ORG: "..."
 # Use an LLNL service user to run CI. This prevents from running pipelines as
