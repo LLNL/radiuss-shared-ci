@@ -59,9 +59,9 @@ is-machine-up-check:
            --header "authorization: Bearer ${GITHUB_TOKEN}" \
            --data "{ \"state\": \"${pipeline_status}\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab ${context} pipeline\", \"context\": \"ci/gitlab/${context}\" }"
 
-.print_ruby_reproducer: $print_ruby_reproducer
+.print_ruby_reproducer: &print_ruby_reproducer
     - echo -e "\e[32m### Ruby reproducer\e[0m"
-    - if [[ -n \"${LLNL_SERVICE_USER}\" ]]; then echo -e "xsu ${LLNL_SERVICE_USER}"; fi
+    - if [[ -n "${LLNL_SERVICE_USER}" ]]; then echo -e "xsu ${LLNL_SERVICE_USER}"; fi
     - echo -e "
       working_dir=\"/usr/worskspace/\${USER}/\${RANDOM}\"
       mkdir -p \${working_dir} && cd \${working_dir} \n
