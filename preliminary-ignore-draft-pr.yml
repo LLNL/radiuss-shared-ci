@@ -1,0 +1,51 @@
+###############################################################################
+# Copyright (c) 2022, Lawrence Livermore National Security, LLC and RADIUSS
+# project contributors. See the RAJA/LICENSE file for details.
+#
+# SPDX-License-Identifier: (BSD-3-Clause)
+###############################################################################
+
+# This file is optional, only include it in your CI (see
+# customization/gitlab-ci.yml) if you want to skip the CI on draft branches.
+
+# Requirements:
+# The following variables must be defined:
+# - GITHUB_TOKEN (granted in radiuss group)
+# - GITHUB_PROJECT_NAME
+# - GITHUB_PROJECT_ORG
+
+# This job should fail if we don’t want the pipeline to run.
+# Here, we make sure the pipeline fails if the PR is a draft.
+ignore-draft-pr:
+  stage: .pre
+  tags: [shell, oslic]
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - |
+      curl --header "authorization: Bearer ${GITHUB_TOKEN}" -X POST -d " \
+      { \
+        \"query\": \"query { \
+                             repository(name: \\\"${GITHUB_PROJECT_NAME}\\\", owner: \\\"${GITHUB_PROJECT_ORG}\\\") { \
+                               pullRequests(last: 1, headRefName: \\\"${CI_COMMIT_REF_NAME}\\\") { \
+                                 nodes { \
+                                   number, \
+                                   isDraft \
+                                 } \
+                               } \
+                             } \
+                          }\" \
+      } \
+      " https://api.github.com/graphql > data.json 2> /dev/null
+      if $(jq '.data.repository.pullRequests.nodes[].isDraft' data.json)
+      then
+        curl --url "https://api.github.com/repos/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
+             --header 'Content-Type: application/json' \
+             --header "authorization: Bearer ${GITHUB_TOKEN}" \
+             --data "{ \"state\": \"failure\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab: Skipped Draft PR\", \"context\": \"ci/gitlab/skipped-draft-pr\" }"
+        exit 1
+      fi
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "web"
+      when: never
+    - when: on_success
