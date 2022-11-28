@@ -69,7 +69,7 @@ stages:
     # Print a reproducer
     - *print_lassen_reproducer
     # The actual launch command
-      flux mini run ${CORONA_BUILD_AND_TEST_JOB_ALLOC} scripts/gitlab/build_and_test.sh
+    - flux mini run ${CORONA_BUILD_AND_TEST_JOB_ALLOC} scripts/gitlab/build_and_test.sh
 
 ##############################################################################
 # JOBS
