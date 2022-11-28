@@ -47,7 +47,7 @@ stages:
       echo -e "\e[7;32m### Ruby reproducer\e[0m"
       if [[ -n "${LLNL_SERVICE_USER}" ]]; then echo -e "xsu ${LLNL_SERVICE_USER}"; fi
       echo -e "
-      working_dir=\"/usr/worskspace/\${USER}/\${RANDOM}\"
+      working_dir=\"/usr/workspace/\${USER}/\${RANDOM}\"
       mkdir -p \${working_dir} && cd \${working_dir} \n
       git clone git@github.com:${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}.git --single-branch --depth=1 \n
       git fetch --depth=1 ${CI_COMMIT_SHA} \n
