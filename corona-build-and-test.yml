@@ -139,6 +139,7 @@ status_success:
   script:
     - export pipeline_status="success"
     - *status_report
+  when: on_success
 
 status_failure:
   extends: [.on_corona]
@@ -148,3 +149,4 @@ status_failure:
   script:
     - export pipeline_status="failure"
     - *status_report
+  when: on_failure
