@@ -50,6 +50,7 @@ stages:
       working_dir=\"/usr/workspace/\${USER}/\${RANDOM}\"
       mkdir -p \${working_dir} && cd \${working_dir} \n
       git clone git@github.com:${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}.git --single-branch --depth=1 \n
+      cd ${GITHUB_PROJECT_NAME}
       git fetch --depth=1 ${CI_COMMIT_SHA} \n
       git checkout ${CI_COMMIT_SHA} \n
       git submodule update --init --recursive \n
