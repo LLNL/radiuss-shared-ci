@@ -51,7 +51,7 @@ stages:
       mkdir -p \${working_dir} && cd \${working_dir} \n
       git clone https://github.com/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}.git --single-branch --depth=1 \n
       cd ${GITHUB_PROJECT_NAME}
-      git fetch --depth=1 ${CI_COMMIT_SHA} \n
+      git fetch origin --depth=1 ${CI_COMMIT_SHA} \n
       git checkout ${CI_COMMIT_SHA} \n
       git submodule update --init --recursive \n
       SPEC=\"${SPEC//\"/\\\"}\" srun ${RUBY_BUILD_AND_TEST_JOB_ALLOC} scripts/gitlab/build_and_test.sh"
