@@ -7,9 +7,9 @@
 
 .. _user_how_to-label:
 
-******
-How To
-******
+***********
+How To...
+***********
 
 This section describes how to perform various maintenance tasks once you have
 the RADIUSS Shared CI framework set up for your project.
@@ -97,7 +97,7 @@ be set with either ``spack_branch`` or ``spack_commit``.
 .. _update-shared-ci:
 
 =====================================================================
-Update the CI configuration, Spack, Uberenv or RADIUSS Spack Configs
+Update the CI configuration, Spack, Uberenv, or RADIUSS Spack Configs
 =====================================================================
 
 RADIUSS Shared CI relies on three other components to work properly: `Spack`_,
@@ -121,6 +121,12 @@ Spack may be updated without updating the radiuss-shared-ci project version.
 However, there are often changes in the Spack configuration formatting and 
 options that will require you to update `radiuss-spack-configs`_ and `Uberenv`_.
 
+Updating Uberenv
+================
+
+In general, `Uberenv`_ is lagging behind in terms of compatibility with
+`Spack`_. That's obviously not a guarantee.
+
 Updating radiuss-spack-configs
 ==============================
 
@@ -128,21 +134,16 @@ Be aware of incompatibilities between `Spack`_ and `radiuss-spack-configs`_
 versions. In radiuss-spack-configs, we use tags to mark changes in the required
 version of Spack.
 
-Updating Uberenv
-================
-
-In general, `Uberenv`_ is lagging behind in terms of compatibility with
-`Spack`_. That's obviously not a guarantee.
-
 ===================================================
 Project specific variants and dependencies
 ====================================================
 
-The use case
-============
+Projects often have build variants they want to test, but it does not make
+sense to include them in the shared configurations since they may not apply to
+other projects. Also, we want to keep the default Spack specs simple. 
 
-Projects often have a variant they use most of the time, but is not set by
-default to keep the default Spack spec simple.
+Example cases
+==============
 
 For example, in Umpire there is ``+fortran``, and ``+openmp`` for RAJA. Those 
 variants cannot be shared via the RADIUSS Shared CI project because they are 
@@ -207,7 +208,7 @@ Use Uberenv
   ./scripts/uberenv/uberenv.py``
 
 Unless otherwise specified, Spack will default to a compiler. It is recommended
-to specify which compiler to use: add the compiler spec to the ``--spec=``
+to specify which compiler to use by adding the compiler spec to the ``--spec=``
 Uberenv command line option.
 
 Some options
@@ -234,11 +235,13 @@ can do so with the ``--upstream=`` option:
 Choose a Spack reference (commit or branch)
 ===========================================
 
-Uberenv needs to know which version of Spack to clone locally. In general,
-using the latest Spack release should be the default strategy. But things can
-quickly get complicated.
+Uberenv needs to know which version of Spack to clone locally. The Spack 
+version used by a project can be found in the ``.uberenv_config.json`` file
+in the top-level project directory.
 
-Among the parameters, one should consider are:
+In general, using the latest Spack release should be the default strategy. 
+But things can quickly get complicated. Among the considerations for choosing 
+a Spack version are:
 
 * Need for a newer Spack feature / fix.
 
@@ -247,12 +250,12 @@ Among the parameters, one should consider are:
 
 * Coherency with other projects.
 
-Let's consider the example of Umpire/RAJA/CHAI. Those projects work together and
-have synchronized releases. They all use Uberenv for their CI.
+Let's consider the example of Umpire/RAJA/CHAI. Those projects work together 
+and have synchronized releases. They all use Uberenv for their CI.
 
 For those projects we try to:
 
-* Use the same Spack reference (behave coherently in tests).
+* Use the same Spack reference so testing behaves coherently across projects.
 
 * Use a Spack reference as new as possible, without changing it every month
   (for now).
@@ -263,11 +266,11 @@ Limiting local patching of Spack packages
 =========================================
 
 Uberenv allows projects to duplicate any Spack package locally and patch it.
-It is important to limit the amount of patching however. Every local patch
-creates a divergence between the developer / CI configuration and the one the
-user gets from through upstream Spack.
+It is important to limit the amount of patching, however. Every local patch
+creates a divergence between the developer / CI configuration and the one a
+project gets from the Spack repo.
 
-Typical use case for a local package patch:
+Typical use cases for a local package patch include:
 
 * Test changes to the package that will be necessary for the next release.
 
@@ -275,7 +278,8 @@ Typical use case for a local package patch:
   for flags, or HIP / CUDA tweaks in the past).
 
 In any case, those local changes should be pushed to upstream Spack as soon as
-possible.
+possible. Typically, a project upstreams changes to its Spack package when
+a release is done.
 
 Spack reference during the release process
 ==========================================
@@ -290,22 +294,22 @@ Then, we want:
 
 * To make sure we keep testing our code as close as possible to the user
   configuration: only the latest Spack package has the logic to build the
-  latest release, users will want that.
+  latest release. **(Most) users will want that.**
 
-For the project, that means we will have to update the Spack reference for
+For a project, that means we will have to update the Spack reference for
 Uberenv as soon as the Spack package has been updated.
 
 .. note::
    Upstream of the release, we might want to test the upcoming Spack package
    changes in spack@develop. In other words, we could anticipate the creation
    of a pull request in Spack and use it as a reference in Uberenv. However, it
-   is not advised to create the release with this setting, because uberenv now
-   points to a PR in Spack that will likely disappear in the future.
+   is not advised to create the release with this setting, because Uberenv now
+   points to a PR in Spack that may disappear in the future.
 
 In a nutshell
 =============
 
-The chosen Spack reference used in uberenv should evolve in time as follow:
+The chosen Spack reference used in Uberenv should evolve in time as follow:
 
 * After a project release, when the upstream Spack package gets updated, and
   Uberenv should point to the corresponding Spack merge commit.
