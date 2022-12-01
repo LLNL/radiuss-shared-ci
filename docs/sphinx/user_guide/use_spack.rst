@@ -21,13 +21,13 @@ The first step in adopting RADIUSS CI infrastructure is to setup your project
 so that Spack can be used to install the dependencies and generate a
 configuration file for the build.
 
-The above figure illustrate how we use Uberenv to drive Spack, which is
+The above figure illustrates how we use Uberenv to drive Spack, which is
 configured with custom packages and RADIUSS Spack Configs. The end product is
 a CMake Cached configuration file.
 
 .. note::
-   Spack generates a CMake Cached configuration file during the project build
-   when the package inherits from the CacheCMakePackage class. We used to
+   In Spack, packages that inherits from the CachedCMakePackage class generate a
+   CMake Cached configuration file during the project build. We used to
    implement this logic by ourselves in our Spack packages. `MFEM`_ stands out
    as the only non-CMake project that also generates a configuration file that
    is used in the CI workflow with Uberenv.
@@ -205,7 +205,7 @@ while only using CMake and a traditionnal developer workflow.
 CMake projects: Spack CachedCMakePackage
 ========================================
 
-CMake build system is strongly recommended to adopt RADIUSS CI workflow, mostly
+CMake is strongly recommended to adopt RADIUSS CI workflow, mostly
 because of this step. With CMake, we generate a cache file describing the
 configuration necessary to trigger a build later on. This is supported in Spack
 as soon as your package inherits from ``CachedCMakePackage``.
