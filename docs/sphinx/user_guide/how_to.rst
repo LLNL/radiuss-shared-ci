@@ -63,7 +63,7 @@ projects and look for:
 
 * differences between jobs with the same name.
 
-* jobs overriden: an "extra" job, if it has the same name as a shared job,
+* overridden jobs: an "extra" job, if it has the same name as a shared job,
   overrides the shared job.
 
 * jobs present only in one of the two projects.
@@ -175,7 +175,7 @@ List the Spack specs tested
 ===========================
 
 RADIUSS Shared CI uses Spack specs to express the types of builds to test.
-We aim at sharing those specs so that projects build with similar 
+We aim at sharing those specs so that projects build with similar
 configurations. However we allow projects to add extra specs to test locally.
 
 Shared specs for machine ``ruby``, for example, can be listed directly in 

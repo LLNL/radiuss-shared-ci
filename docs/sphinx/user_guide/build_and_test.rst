@@ -59,8 +59,8 @@ The CI expects a script that:
 * executes the project build and test processes:
     # install dependencies and generate CMake configuration file
       (using Spack as described earlier)
-    # configure a build with the configuration and build the project source 
-      code
+    # configure a build with the configuration file and build the project
+      source code
     # run the project tests
 
 The script should be callable to make it easier to test and debug. 
@@ -95,12 +95,12 @@ build of a package. From the lowest to the highest level:
 * The *Spack package* is controlled by the spec provided and Spack 
   configuration.
 * *Uberenv* takes a spec and a json configuration file.
-* A ``build-and-test.sh`` script, which is a test driver. The scripts 
+* A ``build_and_test.sh`` script, which is a test driver. The scripts 
   in Umpire and RAJA requires a spec and some other control variables.
 
 When debugging, each level has requirements to reproduce a failing build:
 
-* The ``build-and-test.sh`` script typically runs in CI context. This means 
+* The ``build_and_test.sh`` script typically runs in CI context. This means 
   that it may not be designed to run outside CI. It is better if it does, and 
   we try to do that in RADIUSS, but it is not guaranteed. Uberenv provides a 
   turnkey way to install a project and its dependencies. It is usually a good

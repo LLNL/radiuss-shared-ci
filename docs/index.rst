@@ -38,8 +38,8 @@ RADIUSS Shared CI Developer Documentation
 Background and Motivation
 =========================
 
-Projects in the RADIUSS effort target the same machines and use Spack
-the `Spack packaging system <https://spack.io>`_ to ensure that they
+Projects in the RADIUSS effort target the same machines and use the
+`Spack packaging system <https://spack.io>`_ to ensure that they
 build successfully with similar toolchains.
 
 We designed an automated *CI infrastructure based on GitLab* that we meant to

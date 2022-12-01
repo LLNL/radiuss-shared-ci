@@ -38,8 +38,7 @@ The RADIUSS Shared CI project extends this by developing a CI implementation
 that can be shared across projects, which drive it with a ``build-and-test`` 
 script that has the same inputs across projects.
 
-With a centralized CI configuration that is shared by projects, we try to keep 
-its interface minimal, while allowing for project-specific customization.
+With a centralized CI configuration that is shared by projects, we create an interface between local and shared configuration. we try to keep this interface minimal, while allowing for project-specific customization. Only a handful of modifications are required to get the CI to work for your projects, while files in the ``customization`` directory allow for finer tuning and extensibility.
 
 .. note::
    GitLab allows projects to include external files to configure their CI. We
@@ -126,7 +125,7 @@ your project. They are described in the following table:
  ========================================== ==========================================================================================================================
   Parameter                                  Description
  ========================================== ==========================================================================================================================
-  ``LLNL_SERVICE_USER``                      Service Account for project used in CI
+  ``LLNL_SERVICE_USER``                      Project specific Service Account used in CI
   ``CUSTOM_CI_BUILD_DIR``                    Where to locate build directories (prevent overquota)
   ``GIT_SUBMODULES_STRATEGY``                Controls strategy for the clone performed by GitLab. Consider ``recursive`` if you have submodules, otherwise comment it.
   ``BUILD_ROOT``                             Location (path) where the projects should be built. We provide a sensible default.
@@ -194,7 +193,7 @@ details can be found in the file itself.
    value. If a variable has a value there, it does require one.
 
 You may add configurations to the ``.custom_build_and_test`` job that will then
-be included in all you CI jobs. This can be used `export jUnit test reports`_,
+be included in all you CI jobs. This can be used to `export jUnit test reports`_,
 for example. Changes to that section are not mandatory.
 
 .. _edit-extra-jobs:
