@@ -19,25 +19,26 @@ Setup the CI using the shared template
 The third step in adopting RADIUSS Shared CI infrastructure is to setup the CI.
 
 Once you have put in the effort to implement the first two steps, you should be
-able to benefit from the shared CI infrastructure. In very complex scenario,
+able to benefit from the shared CI infrastructure. In more complex scenarios,
 you will always be able to use the template as a starting point for a custom
 implementation.
 
 By sharing the CI definition, projects share the burden of maintaining it. In
-addition, with our shared CI, they also share a core set of spack specs to
+addition, with our shared CI, they also share a core set of Spack specs to
 ensure that they keep running tests with similar configurations.
 
 =================
-Radiuss Shared CI
+RADIUSS Shared CI
 =================
 
-We started by `sharing spack configuration files`_, then shared a method to
-manage Spack and use it to generate CMake configuration files and finally
-described a ``build-and-test`` script that has the same inputs across
-projects. We will now share most of the CI implementation itself.
+Initially, the RADIUSS effort developed a mechanism to 
+`share Spack configuration files`_ across projects. Then, we developed a 
+process to manage Spack and use it to generate CMake configuration files.
+The RADIUSS Shared CI project extends this by developing a CI implementation
+that can be shared across projects, which drive it with a ``build-and-test`` 
+script that has the same inputs across projects.
 
-By externalizing the CI configuration, we create the need for an interface.
-We try to keep this interface minimalistic, while allowing customization.
+With a centralized CI configuration that is shared by projects, we create an interface between local and shared configuration. we try to keep this interface minimal, while allowing for project-specific customization. Only a handful of modifications are required to get the CI to work for your projects, while files in the ``customization`` directory allow for finer tuning and extensibility.
 
 .. note::
    GitLab allows projects to include external files to configure their CI. We
@@ -74,7 +75,7 @@ The short version
    # Set CI/CD variable GITHUB_TOKEN to hold token with repo:status
    # permissions.
 
-Jump to the corresponding section to deal with :ref:`customize-ci`,
+Jump to a corresponding section for details on :ref:`customize-ci`,
 :ref:`edit-extra-jobs` and :ref:`write-ci-script`.
 
 The detailed version
@@ -87,21 +88,21 @@ Our CI implementation can be divided in four parts:
 * customization files
 * extra jobs
 
-Setting up the CI will basically consist in four corresponding steps.
+Setting up the CI consists of four corresponding steps.
 
 Write CI Script
 ---------------
 
-The very first step is to provide a CI script. You should already have one
+The first step is to provide a CI script, which you should already have 
 after completing :ref:`write-ci-script` at Step 2.
 
-Once you have that script, you can move on to the CI setup.
+Once you have that script, you are ready to move on to the CI setup.
 
 Core CI implementation
 ----------------------
 
-Start by cloning the project locally, for example next to the project you intend
-to add CI to.
+Start by cloning the RADIUSS Shared CI project locally, for example next to 
+the project you intend to add CI to.
 
 .. code-block:: bash
 
@@ -111,20 +112,20 @@ to add CI to.
 
 By default, GitLab expects a ``.gitlab-ci.yml`` file to interpret the CI setup.
 We provide one in ``customization/gitlab-ci.yml`` that projects can copy-paste.
-Just be sure to place it at the root of your project, with a dot (``.``) at the
-beginning of the name.
+Make sure to place the file in the top-level directory of your project, and
+that it has a dot (``.``) at the beginning of the name.
 
 .. code-block:: bash
 
    cp ../radiuss-shared-ci/customization/gitlab-ci.yml .gitlab-ci.yml
 
-In ``.gitlab-ci.yml``, there are some variables you will need to adapt to your
-projects:
+In the ``.gitlab-ci.yml`` file, there are some variables you need to adapt to 
+your project. They are described in the following table:
 
  ========================================== ==========================================================================================================================
   Parameter                                  Description
  ========================================== ==========================================================================================================================
-  ``LLNL_SERVICE_USER``                      Service Account used in CI
+  ``LLNL_SERVICE_USER``                      Project specific Service Account used in CI
   ``CUSTOM_CI_BUILD_DIR``                    Where to locate build directories (prevent overquota)
   ``GIT_SUBMODULES_STRATEGY``                Controls strategy for the clone performed by GitLab. Consider ``recursive`` if you have submodules, otherwise comment it.
   ``BUILD_ROOT``                             Location (path) where the projects should be built. We provide a sensible default.
@@ -137,19 +138,21 @@ projects:
 .. warning::
    We strongly recommend that you set your CI to use a service account.
 
-Your CI is now setup to include remote files from the GitLab mirror of
-radiuss-shared-ci.
+Your CI is now set up to include remote files from the GitLab mirror of the
+radiuss-shared-ci project.
 
-We now have to complete the interface with the shared CI configuration:
-``.gitlab-ci.yml`` also expects some files to be present locally.
+We now have to complete the interface with the shared CI configuration.
+In particular, the ``.gitlab-ci.yml`` file requires some files to be present 
+in your Git repository. These are described in the next few sections.
 
 .. _customize-ci:
 
 Customize CI
 ------------
 
-We provide templates for the required customization files. We need to copy
-them in a ``.gitlab`` directory.
+We provide templates for the required customization files. You need to have a
+``.gitlab`` subdirectory in the top-level directory of your Git repo. Then,
+you can copy the template files to that directory in your repo.
 
 .. code-block:: bash
 
@@ -160,20 +163,19 @@ them in a ``.gitlab`` directory.
 We will now browse the files to see what changes they may require to suit your
 needs.
 
-``.gitlab/subscribed-pipelines.yml``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The ``.gitlab/subscribed-pipelines.yml`` file
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-In this file, you will select the machines you want to run tests on. Comment
-the jobs (sections) corresponding to machines you don't want, or don't have
-access to.
+In this file, you select the machines you want to run tests on. Comment out
+the jobs (sections) for machines you don't want, or don't have access to.
 
 .. note::
-   In order to add a new machine, please refer to :ref:`add-a-new-machine`.
+   To add a new machine, please refer to :ref:`add-a-new-machine`.
 
-``.gitlab/custom-jobs-and-variables.yml``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The ``.gitlab/custom-jobs-and-variables.yml`` file 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Here is a table to describe each variable present in the file. Some more
+Here is a table that describes each variable present in the file. More
 details can be found in the file itself.
 
  ========================================== ==========================================================================================================================
@@ -190,33 +192,35 @@ details can be found in the file itself.
    If a variable is blank in the template file, then it does not require a
    value. If a variable has a value there, it does require one.
 
-You may add configuration to the ``.custom_build_and_test`` job that will then
-be included to all you CI jobs. This can be used for example to `export jUnit
-test reports`_. Changes to that section are not mandatory.
+You may add configurations to the ``.custom_build_and_test`` job that will then
+be included in all you CI jobs. This can be used to `export jUnit test reports`_,
+for example. Changes to that section are not mandatory.
 
 .. _edit-extra-jobs:
 
 Edit extra jobs
 ---------------
 
-We provide templates for the extra jobs files. Those files are required as soon
-as the associated machine has been activated in
-``.gitlab/subscribed-pipelines``.
+We provide templates for the extra jobs files. Typically, these files are 
+included in your project's ``.gitlab`` subdirectory and named 
+``<platform>-build-and-test-extra.yml``, where ``platform`` is the associated
+machine name. Those files are required as soon as the associated machine has 
+been activated in the ``.gitlab/subscribed-pipelines`` file.
 
-If no extra-jobs is needed (if the shared jobs automatically included are
-sufficient), then you should add the extra-jobs files as-is, with a simple
-variable definition to prevent it from being empty.
+If no extra jobs are needed, for example if the shared jobs automatically 
+included are sufficient, then you should add the extra jobs files as-is, with 
+a simple variable definition to prevent it from being empty.
 
-If you need to define extra-jobs specific to your projects, then you may remove
-the variable definition, uncomment the template job and complete it with the
-required information:
+If you need to define extra jobs that are specific to your project, then you 
+may remove the variable definition, uncomment the template job and complete 
+it with the required information:
 
-* A job name, unique, that will appear in CI.
+* A unique job name that will appear in CI.
 * A Spack spec used by ``build-and-test`` to know what to build.
 
 .. warning::
-   Gitlab supports long and complex job names. Make sure to pick a unique name
-   not to override a shared job.
+   GitLab supports long and complex job names. Make sure to pick names that
+   are sufficiently unique so that your extra jobs do not override a shared job.
 
 .. note::
    ``PROJECT_<MACHINE>_VARIANTS/DEPS`` apply to all the shared specs. If you
@@ -227,8 +231,8 @@ required information:
 Non-RADIUSS Projects
 --------------------
 
-Radiuss-Shared-CI features a customized status report mechanism that allows to
-report on GitHub the CI status of each sub-pipeline (one per machine).
+RADIUSS Shared CI features a customized status report mechanism that reports to
+to GitHub the CI status of each sub-pipeline (one per machine).
 
 This feature requires the creation of a GitHub token with ``repo:status``
 permissions, and registering it as a CI/CD variable named ``GITHUB_TOKEN`` in
