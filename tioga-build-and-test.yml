@@ -6,14 +6,13 @@
 ##############################################################################
 
 stages:
+  - is-machine-up
   - allocate_resources
   - build_and_test
   - release_resources
 
 ##############################################################################
-# TIOGA 
-# These are templates (.name) that can be included in other jobs to share part
-# of the job definition.
+# UTILITIES
 .on_tioga:
   tags:
     - shell
@@ -38,21 +37,59 @@ stages:
 .status_report: &status_report
     - export context="tioga"
     - |
-      curl --url "https://api.github.com/repos/LLNL/${CI_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
+      curl --url "https://api.github.com/repos/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
            --header 'Content-Type: application/json' \
            --header "authorization: Bearer ${GITHUB_TOKEN}" \
            --data "{ \"state\": \"${pipeline_status}\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab ${context} pipeline\", \"context\": \"ci/gitlab/${context}\" }"
+
+.print_tioga_reproducer: &print_tioga_reproducer
+    - |
+      echo -e "\e[7;32m### Tioga reproducer\e[0m"
+      if [[ -n "${LLNL_SERVICE_USER}" ]]; then echo -e "xsu ${LLNL_SERVICE_USER}"; fi
+      echo -e "
+      working_dir=\"/usr/workspace/\${USER}/\${RANDOM}\"
+      mkdir -p \${working_dir} && cd \${working_dir} \n
+      git clone https://github.com/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}.git --single-branch --depth=1 \n
+      cd ${GITHUB_PROJECT_NAME}
+      git fetch origin --depth=1 ${CI_COMMIT_SHA} \n
+      git checkout ${CI_COMMIT_SHA} \n
+      git submodule update --init --recursive \n
+      SPEC=\"${SPEC//\"/\\\"}\" flux mini run ${TIOGA_BUILD_AND_TEST_JOB_ALLOC} scripts/gitlab/build_and_test.sh"
+      echo -e "\e[7;32m### End of reproducer\e[0m"
 
 .build_and_test_on_tioga:
   extends: [.custom_build_and_test, .on_tioga]
   stage: build_and_test
   script:
+    # Allocation information
     - |
-      set -x
       echo ${ALLOC_NAME}
       URI=$(flux jobs -o "{uri} {name}" | grep ${ALLOC_NAME} | awk '{print $1}') || echo "Empty URI"
+      echo ${URI}
       if [[ -n "$URI" ]]; then export FLUX_URI=$URI; fi
-      flux mini run ${TIOGA_BUILD_AND_TEST_JOB_ALLOC} scripts/gitlab/build_and_test.sh
+    # Print a reproducer
+    - *print_tioga_reproducer
+    # The actual launch command
+    - flux mini run ${TIOGA_BUILD_AND_TEST_JOB_ALLOC} scripts/gitlab/build_and_test.sh
+
+##############################################################################
+# JOBS
+is-machine-up-check:
+  stage: is-machine-up
+  tags: [shell, oslic]
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - |
+      if [[ $(jq '.tioga.total_nodes_up' /usr/global/tools/lorenz/data/loginnodeStatus) == 0 ]]
+      then
+        echo -e "\e[31mNo node available on Tioga\e[0m"
+        curl --url "https://api.github.com/repos/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
+             --header 'Content-Type: application/json' \
+             --header "authorization: Bearer ${GITHUB_TOKEN}" \
+             --data "{ \"state\": \"failure\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab Tioga Down\", \"context\": \"ci/gitlab/tioga\" }"
+        exit 1
+      fi
 
 # In pre-build phase, allocate a node for builds.
 allocate_resources (on tioga):
@@ -68,6 +105,8 @@ allocate_resources (on tioga):
 
 status_pending:
   extends: [.on_tioga]
+  variables:
+    GIT_STRATEGY: none
   stage: allocate_resources
   script:
     - export pipeline_status="pending"
@@ -95,14 +134,20 @@ release_resources (on tioga):
 
 status_success:
   extends: [.on_tioga]
+  variables:
+    GIT_STRATEGY: none
   stage: release_resources
   script:
     - export pipeline_status="success"
     - *status_report
+  when: on_success
 
 status_failure:
   extends: [.on_tioga]
+  variables:
+    GIT_STRATEGY: none
   stage: release_resources
   script:
     - export pipeline_status="failure"
     - *status_report
+  when: on_failure
