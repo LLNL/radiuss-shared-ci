@@ -6,10 +6,11 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v2022.12.0 - ???]
+## [v2022.12.0 - 2022-12-14]
 
 ### Added
 
+- Tioga machine.
 - A job that tests whether the machine is up, and reports the failure to GitHub otherwise:
   machine is therefore skipped when down. (Assumes oslic is always up).
 - Print a complete reproducer of the job.
