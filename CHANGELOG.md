@@ -6,6 +6,12 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Next
+
+### Fixed
+
+- Allow selected branches to skip the draft test: allow to run CI on develop.
+
 ## [v2022.12.0 - 2022-12-14]
 
 ### Added
