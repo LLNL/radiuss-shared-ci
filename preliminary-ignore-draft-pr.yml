@@ -23,27 +23,34 @@ ignore-draft-pr:
     GIT_STRATEGY: none
   script:
     - |
-      curl --header "authorization: Bearer ${GITHUB_TOKEN}" -X POST -d " \
-      { \
-        \"query\": \"query { \
-                             repository(name: \\\"${GITHUB_PROJECT_NAME}\\\", owner: \\\"${GITHUB_PROJECT_ORG}\\\") { \
-                               pullRequests(last: 1, headRefName: \\\"${CI_COMMIT_REF_NAME}\\\") { \
-                                 nodes { \
-                                   number, \
-                                   isDraft \
-                                 } \
-                               } \
-                             } \
-                          }\" \
-      } \
-      " https://api.github.com/graphql > data.json 2> /dev/null
-      if $(jq '.data.repository.pullRequests.nodes[].isDraft' data.json)
+      # Create a list of branch on which we always run.
+      # Note: the list can be overridden setting ALWAYS_RUN_LIST.
+      always_run_list="${ALWAYS_RUN_LIST:-"develop main master"}"
+      # If the current branch is not in the always run list
+      if ! ( echo ${always_run_list} | grep -w -q ${CI_COMMIT_REF_NAME} );
       then
-        curl --url "https://api.github.com/repos/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
-             --header 'Content-Type: application/json' \
-             --header "authorization: Bearer ${GITHUB_TOKEN}" \
-             --data "{ \"state\": \"failure\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab: Skipped Draft PR\", \"context\": \"ci/gitlab/skipped-draft-pr\" }"
-        exit 1
+          curl --header "authorization: Bearer ${GITHUB_TOKEN}" -X POST -d " \
+          { \
+            \"query\": \"query { \
+                                 repository(name: \\\"${GITHUB_PROJECT_NAME}\\\", owner: \\\"${GITHUB_PROJECT_ORG}\\\") { \
+                                   pullRequests(last: 1, headRefName: \\\"${CI_COMMIT_REF_NAME}\\\") { \
+                                     nodes { \
+                                       number, \
+                                       isDraft \
+                                     } \
+                                   } \
+                                 } \
+                              }\" \
+          } \
+          " https://api.github.com/graphql > data.json 2> /dev/null
+          if $(jq '.data.repository.pullRequests.nodes[].isDraft' data.json)
+          then
+            curl --url "https://api.github.com/repos/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
+                 --header 'Content-Type: application/json' \
+                 --header "authorization: Bearer ${GITHUB_TOKEN}" \
+                 --data "{ \"state\": \"failure\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab: Skipped Draft PR\", \"context\": \"ci/gitlab/skipped-draft-pr\" }"
+            exit 1
+          fi
       fi
   rules:
     - if: $CI_PIPELINE_SOURCE == "web"
