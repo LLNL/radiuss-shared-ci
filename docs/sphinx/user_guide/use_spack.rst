@@ -85,17 +85,17 @@ install your project dependencies and generate the configuration file.
 Getting Uberenv as a submodule (recommended)
 ============================================
 
-1. Get uberenv.py script.
+#. Get ``uberenv.py`` script.
 
     Use ``git submodule add`` to get `Uberenv`_ into a ``uberenv`` directory.
 
-2. Edit .uberenv.json.
+#. Edit ``.uberenv.json``.
 
     Create ``.uberenv.json`` in a directory that is a parent of ``uberenv``. Set
     your project package name, and other parameters like Spack reference
     commit/tag (we suggest the latest release tag).
 
-3. Add RADIUSS Spack Configs submodule.
+#. Add RADIUSS Spack Configs submodule.
 
     * Use ``git submodule add`` to get `RADIUSS Spack Configs`_ in a second
       submodule or custom location.
@@ -103,7 +103,7 @@ Getting Uberenv as a submodule (recommended)
     * In ``.uberenv.json`` set ``spack_configs_path`` to point to
       ``<some_relative_path>/radiuss-spack-configs``.
 
-4. Add custom packages.
+#. Add custom packages.
 
     If you need to make local modifications to your project package or a
       dependency package, you may put it in a corresponding directory:
@@ -112,8 +112,8 @@ Getting Uberenv as a submodule (recommended)
     Then, in ``.uberenv.json``, set ``spack_packages_path`` to point to
       ``<some_relative_path>/packages``
 
-5. Make sure that <your_project>/package.py generates a CMake configuration
-   file.
+#. Make sure that the ``package.py`` file for your project generates a CMake 
+   configuration file.
 
     This is usually done adding a specific stage to the package. In particular,
     Spack now supports this for CMake build system with the CacheCMakePackages
@@ -124,31 +124,31 @@ Getting Uberenv as a submodule (recommended)
 Getting Uberenv by clone/fetch/copy
 ===================================
 
-1. Get uberenv.py script.
+#. Get ``uberenv.py`` script.
 
     Clone/Fetch/Copy it from `Uberenv`_ repository.
     into a ``uberenv`` directory, not as a submodule.
 
-2. Edit uberenv/project.json.
+#. Edit ``uberenv/project.json``.
 
     Set your project package name, and other parameters like Spack reference
     commit/tag (we suggest the latest release tag).
 
-3. Add RADIUSS Spack Configs submodule.
+#. Add RADIUSS Spack Configs submodule.
 
     * Use ``git submodule add`` to get `RADIUSS Spack Configs`_.
 
     * Create a symlink ``uberenv/spack_configs`` that points to
       ``radiuss-spack-configs``.
 
-4. Add custom packages.
+#. Add custom packages.
 
     | If you need to make local modifications to your project package or a
       dependency package, you may put it in a corresponding directory:
     | ``uberenv/packages/<package_name>/package.py``.
 
-5. Make sure that <your_project>/package.py generates a CMake configuration
-   file.
+#. Make sure that the ``package.py`` file for your project generates a CMake 
+   configuration file.
 
     This is usually done adding a specific stage to the package. In particular,
     Spack now supports this for CMake build system with the CacheCMakePackages

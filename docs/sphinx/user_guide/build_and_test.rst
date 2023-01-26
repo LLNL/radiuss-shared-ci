@@ -56,12 +56,13 @@ The CI expects a script that:
   ``scripts/gitlab`` in your project Git repo.
 * is parametrized by the variable ``SPEC`` which is used to prescribe a 
   Spack spec with the project name stripped out.
-* executes the project build and test processes:
-    # install dependencies and generate CMake configuration file
-      (using Spack as described earlier)
-    # configure a build with the configuration file and build the project
-      source code
-    # run the project tests
+* executes the following project build and test processes:
+
+    #. install dependencies and generate CMake configuration file
+       (using Spack as described earlier)
+    #. configure a build with the configuration file and build the project
+       source code
+    #. run the project tests
 
 The script should be callable to make it easier to test and debug. 
 For example:
