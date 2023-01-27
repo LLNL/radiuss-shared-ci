@@ -103,7 +103,12 @@ clang_12_0_1_cuda_11_2_0:
     SPEC: "${PROJECT_LASSEN_VARIANTS} +cuda %clang@12.0.1 ^cuda@11.2.0 ${PROJECT_LASSEN_DEPS}"
   extends: .build_and_test_on_lassen
 
-clang_14_0_5_gcc_8_3_1_cuda_12_0_0:
+clang_13_0_1_gcc_8_3_1_cuda_11_7_0:
+  variables:
+    SPEC: "${PROJECT_LASSEN_VARIANTS} +cuda %clang@13.0.1.gcc.8.3.1 ^cuda@11.7.0 ${PROJECT_LASSEN_DEPS}"
+  extends: .build_and_test_on_lassen
+
+clang_14_0_5_gcc_8_3_1_cuda_11_7_0:
   variables:
     SPEC: "${PROJECT_LASSEN_VARIANTS} +cuda %clang@14.0.5.gcc.8.3.1 ^cuda@11.7.0 ${PROJECT_LASSEN_DEPS}"
   extends: .build_and_test_on_lassen
