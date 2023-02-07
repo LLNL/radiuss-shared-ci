@@ -11,6 +11,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Fixed
 
 - Allow selected branches to skip the draft test: allow to run CI on develop.
+- Restrict tioga CI to tioga11 runner, tioga10 has issues.
 
 ## [v2022.12.0 - 2022-12-14]
 
