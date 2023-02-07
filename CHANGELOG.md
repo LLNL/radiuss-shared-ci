@@ -8,9 +8,14 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## Next
 
+### Changed
+
+- We now set the build-and-test script command with a variable.
+
 ### Fixed
 
 - Allow selected branches to skip the draft test: allow to run CI on develop.
+- Shorter working dir path in reproducer prevents issues when using local spack.
 
 ## [v2022.12.0 - 2022-12-14]
 
