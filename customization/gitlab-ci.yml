@@ -39,7 +39,7 @@ variables:
   BUILD_ROOT: ${CI_PROJECT_DIR}
 # Set the build-and-test command.
   BUILD_AND_TEST_CMD: "..."
-# Set the list of branch that should run even as draft
+# Override the list of branch that will skip the "draft PR test".
 # Add protected branches here. Defaults to "develop main master".
 #  ALWAYS_RUN_LIST: ""
 
