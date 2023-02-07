@@ -16,7 +16,7 @@ stages:
 .on_tioga:
   tags:
     - shell
-    - tioga
+    - tioga11
   rules:
     # Runs except if we explicitly deactivate tioga by variable.
     - if: '$ON_TIOGA == "OFF"'
@@ -92,7 +92,7 @@ is-machine-up-check:
       fi
 
 # In pre-build phase, allocate a node for builds.
-allocate_resources (on tioga):
+allocate_resources:
   variables:
     GIT_STRATEGY: none
   extends: .on_tioga
@@ -104,7 +104,7 @@ allocate_resources (on tioga):
       #flux mini batch ${TIOGA_BUILD_AND_TEST_SHARED_ALLOC} --job-name=${ALLOC_NAME} --wrap sleep inf
 
 status_pending:
-  extends: [.on_tioga]
+  extends: .on_tioga
   variables:
     GIT_STRATEGY: none
   stage: allocate_resources
@@ -120,7 +120,7 @@ rocm_5_2_3_clang_13_0_0:
 # In post-build phase, deallocate resources.
 # Note : we make sure this is run even on build phase failure using a specific
 # rule in the template ".on_tioga".
-release_resources (on tioga):
+release_resources:
   variables:
     GIT_STRATEGY: none
   extends: .on_tioga
@@ -133,7 +133,7 @@ release_resources (on tioga):
       #([[ -n "${JOBID}" ]] && flux job kill ${JOBID})
 
 status_success:
-  extends: [.on_tioga]
+  extends: .on_tioga
   variables:
     GIT_STRATEGY: none
   stage: release_resources
@@ -143,7 +143,7 @@ status_success:
   when: on_success
 
 status_failure:
-  extends: [.on_tioga]
+  extends: .on_tioga
   variables:
     GIT_STRATEGY: none
   stage: release_resources
