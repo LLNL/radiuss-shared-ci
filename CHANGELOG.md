@@ -10,7 +10,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Changed
 
-- We now set the build-and-test script command with a variable.
+- BREAKING: We now set the build-and-test script command with a variable.
 
 ### Fixed
 
