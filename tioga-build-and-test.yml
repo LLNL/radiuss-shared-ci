@@ -117,7 +117,7 @@ rocm_5_4_3_clang_15_0_0:
     SPEC: "${PROJECT_TIOGA_VARIANTS} +rocm amdgpu_target=gfx90a %clang@15.0.0.rocm.5.4.3 ^hip@5.4.3 ${PROJECT_TIOGA_DEPS}"
   extends: .build_and_test_on_tioga
 
-cce_15_0_0c:
+cce_15_0_1:
   variables:
     SPEC: "${PROJECT_TIOGA_VARIANTS} %cce@15.0.1 ${PROJECT_TIOGA_DEPS}"
   extends: .build_and_test_on_tioga
