@@ -18,7 +18,7 @@
 # Here, we make sure the pipeline fails if the PR is a draft.
 ignore-draft-pr:
   stage: .pre
-  tags: [shell, oslic]
+  tags: [shell, ruby]
   variables:
     GIT_STRATEGY: none
   script:

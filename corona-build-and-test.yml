@@ -76,7 +76,7 @@ stages:
 # JOBS
 is-machine-up-check:
   stage: is-machine-up
-  tags: [shell, oslic]
+  tags: [shell, ruby]
   variables:
     GIT_STRATEGY: none
   script:
