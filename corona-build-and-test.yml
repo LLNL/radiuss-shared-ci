@@ -62,10 +62,7 @@ stages:
   stage: build_and_test
   script:
     # Allocation information
-    - |
-      echo ${ALLOC_NAME}
-      URI=$(flux jobs -o "{uri} {name}" | grep ${ALLOC_NAME} | awk '{print $1}')
-      echo ${URI}
+    #- echo ${ALLOC_NAME}
     # Print a reproducer
     - *print_corona_reproducer
     # The actual launch command
