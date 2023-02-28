@@ -62,11 +62,14 @@ stages:
   stage: build_and_test
   script:
     # Allocation information
-    #- echo ${ALLOC_NAME}
+    - |
+      echo ${ALLOC_NAME}
+      URI=$(flux jobs -o "{uri} {name}" | grep ${ALLOC_NAME} | awk '{print $1}') || echo "Empty URI"
+      echo ${URI}
     # Print a reproducer
     - *print_corona_reproducer
     # The actual launch command
-    - flux mini run ${CORONA_BUILD_AND_TEST_JOB_ALLOC} ${BUILD_AND_TEST_CMD}
+    - $( [[ -n "${URI}" ]] && echo "flux proxy ${URI}" ) flux mini run ${CORONA_BUILD_AND_TEST_JOB_ALLOC} ${BUILD_AND_TEST_CMD}
 
 ##############################################################################
 # JOBS
@@ -97,7 +100,7 @@ allocate_resources (on corona):
     - |
       set -x
       echo "Shared allocation disabled: runs slowly, needs a fix"
-      #flux mini batch ${CORONA_BUILD_AND_TEST_SHARED_ALLOC} --job-name=${ALLOC_NAME} --wrap sleep inf
+      flux --parent mini alloc ${CORONA_BUILD_AND_TEST_SHARED_ALLOC} --job-name=${ALLOC_NAME} --bg
 
 status_pending:
   extends: [.on_corona]
@@ -108,9 +111,9 @@ status_pending:
     - export pipeline_status="pending"
     - *status_report
 
-rocm_5_4_1_clang_15_0_0:
+rocmcc_5_4_1_hip:
   variables:
-    SPEC: "${PROJECT_CORONA_VARIANTS} +rocm amdgpu_target=gfx906 %clang@15.0.0 ^hip@5.4.1 ${PROJECT_CORONA_DEPS}"
+    SPEC: "${PROJECT_CORONA_VARIANTS} +rocm amdgpu_target=gfx906 %rocmcc@5.4.1 ^hip@5.4.1 ${PROJECT_CORONA_DEPS}"
   extends: .build_and_test_on_corona
 
 # In post-build phase, deallocate resources.
@@ -125,8 +128,8 @@ release_resources (on corona):
     - |
       set -x
       echo "Shared allocation disabled: runs slowly, needs a fix"
-      #export JOBID=$(flux jobs -o "{id} {name}" | grep ${ALLOC_NAME} | awk '{print $1}')
-      #([[ -n "${JOBID}" ]] && flux job kill ${JOBID})
+      export URI=$(flux jobs -o "{id} {name}" | grep ${ALLOC_NAME} | awk '{print $1}')
+      ([[ -n "${URI}" ]] && flux job kill ${URI})
 
 status_success:
   extends: [.on_corona]
