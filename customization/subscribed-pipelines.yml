@@ -5,31 +5,35 @@
 # SPDX-License-Identifier: (MIT)
 ###############################################################################
 
-.machine-check: &machine_check
-    - |
-      if [[ $(jq '.${machine}.total_nodes_up' /usr/global/tools/lorenz/data/loginnodeStatus) == 0 ]]
-      then
-        echo -e "\e[31mNo node available on ${machine}\e[0m"
-        curl --url "https://api.github.com/repos/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
-             --header 'Content-Type: application/json' \
-             --header "authorization: Bearer ${GITHUB_TOKEN}" \
-             --data "{ \"state\": \"failure\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab {machine} down\", \"context\": \"ci/gitlab/${machine}\" }"
-        exit 1
-      fi
-
-# Trigger a build-and-test pipeline for a machine
-
-###
-# RUBY
-###
-ruby-up-check:
+# The template job to test whether a machine is up.
+# Expects CI_MACHINE defined to machine name.
+.machine-check:
   stage: machines-check
   tags: [shell, oslic]
   variables:
     GIT_STRATEGY: none
   script:
-    - machine="ruby"
-    - *machine_check
+    - |
+      if [[ $(jq '.[env.CI_MACHINE].total_nodes_up' /usr/global/tools/lorenz/data/loginnodeStatus) == 0 ]]
+      then
+        echo -e "\e[31mNo node available on ${CI_MACHINE}\e[0m"
+        curl --url "https://api.github.com/repos/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
+             --header 'Content-Type: application/json' \
+             --header "authorization: Bearer ${GITHUB_TOKEN}" \
+             --data "{ \"state\": \"failure\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab ${CI_MACHINE} down\", \"context\": \"ci/gitlab/${CI_MACHINE}\" }"
+        exit 1
+      fi
+
+###
+# Trigger a build-and-test pipeline for a machine.
+# Comment the jobs for machines you don’t need.
+###
+
+# RUBY
+ruby-up-check:
+  variables:
+    CI_MACHINE: "ruby"
+  extends: [.machine-check]
 
 ruby-build-and-test:
   variables:
@@ -37,17 +41,11 @@ ruby-build-and-test:
   needs: [ruby-up-check]
   extends: [.build-and-test]
 
-###
 # CORONA
-###
 corona-up-check:
-  stage: machines-check
-  tags: [shell, oslic]
   variables:
-    GIT_STRATEGY: none
-  script:
-    - machine="corona"
-    - *machine_check
+    CI_MACHINE: "corona"
+  extends: [.machine-check]
 
 corona-build-and-test:
   variables:
@@ -55,17 +53,11 @@ corona-build-and-test:
   needs: [corona-up-check]
   extends: [.build-and-test]
 
-###
 # TIOGA
-###
 tioga-up-check:
-  stage: machines-check
-  tags: [shell, oslic]
   variables:
-    GIT_STRATEGY: none
-  script:
-    - machine="tioga"
-    - *machine_check
+    CI_MACHINE: "tioga"
+  extends: [.machine-check]
 
 tioga-build-and-test:
   variables:
@@ -73,20 +65,16 @@ tioga-build-and-test:
   needs: [tioga-up-check]
   extends: [.build-and-test]
 
-###
 # LASSEN
-###
 lassen-up-check:
-  stage: machines-check
-  tags: [shell, oslic]
   variables:
-    GIT_STRATEGY: none
-  script:
-    - machine="lassen"
-    - *machine_check
+    CI_MACHINE: "lassen"
+  extends: [.machine-check]
 
 lassen-build-and-test:
   variables:
     CI_MACHINE: "lassen"
   needs: [lassen-up-check]
   extends: [.build-and-test]
+
+
