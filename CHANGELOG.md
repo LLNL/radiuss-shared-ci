@@ -6,11 +6,21 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next
+## [v2022.03.0 - 2023-04-12]
+
+### Added
+
+- Support module specifications in the CI:
+  -> Update you build_and_test script to load modules in $MODULE_LIST.
 
 ### Changed
 
-- BREAKING: We now set the build-and-test script command with a variable.
+- BREAKING: Set the build-and-test script command with a variable.
+  -> Specify the build and test command in your .gitlab-ci.yml (see customization/gitlab-ci.yml).
+- BREAKING: Machine checks jobs moved to parent pipeline:
+  -> Update your .gitlab/subscribed-pipelines.yml w.r.t. customization/subscribed-pipelines.yml.
+- BREAKING: Updated shared specs with current toolchains
+  -> Update your extra jobs: local overrides will be outdated.
 
 ### Fixed
 
