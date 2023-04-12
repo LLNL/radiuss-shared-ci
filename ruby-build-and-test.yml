@@ -54,7 +54,7 @@ stages:
       git fetch origin --depth=1 ${CI_COMMIT_SHA} \n
       git checkout ${CI_COMMIT_SHA} \n
       git submodule update --init --recursive \n
-      SPEC=\"${SPEC//\"/\\\"}\" srun ${RUBY_BUILD_AND_TEST_JOB_ALLOC} ${BUILD_AND_TEST_CMD}"
+      SPEC=\"${SPEC//\"/\\\"}\" MODULE_LIST=\"${MODULE_LIST}\" srun ${RUBY_BUILD_AND_TEST_JOB_ALLOC} ${BUILD_AND_TEST_CMD}"
       echo -e "\e[7;32m### End of reproducer\e[0m"
 
 .build_and_test_on_ruby:
