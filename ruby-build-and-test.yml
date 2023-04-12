@@ -18,7 +18,7 @@ stages:
     - shell
     - ruby
   rules:
-    # Runs except if we explicitly deactivate corona by variable.
+    # Runs except if we explicitly deactivate ruby by variable.
     - if: '$ON_RUBY == "OFF"'
       when: never
     # Advanced jobs can only run on master, develop or if ALL_TARGETS is ON.

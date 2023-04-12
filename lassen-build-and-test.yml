@@ -18,7 +18,7 @@ stages:
     - shell
     - lassen
   rules:
-    # Runs except if we explicitly deactivate corona by variable.
+    # Runs except if we explicitly deactivate lassen by variable.
     - if: '$ON_LASSEN == "OFF"'
       when: never
     # Advanced jobs can only run on master, develop or if ALL_TARGETS is ON.
