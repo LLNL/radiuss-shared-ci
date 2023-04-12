@@ -54,7 +54,7 @@ stages:
       git fetch origin --depth=1 ${CI_COMMIT_SHA} \n
       git checkout ${CI_COMMIT_SHA} \n
       git submodule update --init --recursive \n
-      SPEC=\"${SPEC//\"/\\\"}\" flux mini run ${TIOGA_BUILD_AND_TEST_JOB_ALLOC} ${BUILD_AND_TEST_CMD}"
+      SPEC=\"${SPEC//\"/\\\"}\" MODULE_LIST=\"${MODULE_LIST}\" flux mini run ${TIOGA_BUILD_AND_TEST_JOB_ALLOC} ${BUILD_AND_TEST_CMD}"
       echo -e "\e[7;32m### End of reproducer\e[0m"
 
 .build_and_test_on_tioga:
@@ -73,22 +73,6 @@ stages:
 
 ##############################################################################
 # JOBS
-is-machine-up-check:
-  stage: is-machine-up
-  tags: [shell, oslic]
-  variables:
-    GIT_STRATEGY: none
-  script:
-    - |
-      if [[ $(jq '.tioga.total_nodes_up' /usr/global/tools/lorenz/data/loginnodeStatus) == 0 ]]
-      then
-        echo -e "\e[31mNo node available on Tioga\e[0m"
-        curl --url "https://api.github.com/repos/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
-             --header 'Content-Type: application/json' \
-             --header "authorization: Bearer ${GITHUB_TOKEN}" \
-             --data "{ \"state\": \"failure\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab Tioga Down\", \"context\": \"ci/gitlab/tioga\" }"
-        exit 1
-      fi
 
 # In pre-build phase, allocate a node for builds.
 allocate_resources:
@@ -111,9 +95,14 @@ status_pending:
     - export pipeline_status="pending"
     - *status_report
 
-rocmcc_5_2_3_hip:
+rocmcc_5_4_3_hip:
   variables:
-    SPEC: "${PROJECT_TIOGA_VARIANTS} +rocm amdgpu_target=gfx90a %rocmcc@5.2.3 ^hip@5.2.3 ${PROJECT_TIOGA_DEPS}"
+    SPEC: "${PROJECT_TIOGA_VARIANTS} +rocm amdgpu_target=gfx90a %rocmcc@5.4.3 ^hip@5.4.3 ${PROJECT_TIOGA_DEPS}"
+  extends: .build_and_test_on_tioga
+
+cce_15_0_1:
+  variables:
+    SPEC: "${PROJECT_TIOGA_VARIANTS} %cce@15.0.1 ${PROJECT_TIOGA_DEPS}"
   extends: .build_and_test_on_tioga
 
 # In post-build phase, deallocate resources.

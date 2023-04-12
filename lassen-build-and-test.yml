@@ -18,7 +18,7 @@ stages:
     - shell
     - lassen
   rules:
-    # Runs except if we explicitly deactivate corona by variable.
+    # Runs except if we explicitly deactivate lassen by variable.
     - if: '$ON_LASSEN == "OFF"'
       when: never
     # Advanced jobs can only run on master, develop or if ALL_TARGETS is ON.
@@ -51,7 +51,7 @@ stages:
       git fetch origin --depth=1 ${CI_COMMIT_SHA} \n
       git checkout ${CI_COMMIT_SHA} \n
       git submodule update --init --recursive \n
-      SPEC=\"${SPEC//\"/\\\"}\" lalloc ${LASSEN_BUILD_AND_TEST_JOB_ALLOC} ${BUILD_AND_TEST_CMD}"
+      SPEC=\"${SPEC//\"/\\\"}\" MODULE_LIST=\"${MODULE_LIST}\" lalloc ${LASSEN_BUILD_AND_TEST_JOB_ALLOC} ${BUILD_AND_TEST_CMD}"
       echo -e "\e[7;32m### End of reproducer\e[0m"
 
 .build_and_test_on_lassen:
@@ -65,22 +65,6 @@ stages:
 
 ##############################################################################
 # JOBS
-is-machine-up-check:
-  stage: is-machine-up
-  tags: [shell, oslic]
-  variables:
-    GIT_STRATEGY: none
-  script:
-    - |
-      if [[ $(jq '.lassen.total_nodes_up' /usr/global/tools/lorenz/data/loginnodeStatus) == 0 ]]
-      then
-        echo -e "\e[31mNo node available on Lassen\e[0m"
-        curl --url "https://api.github.com/repos/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
-             --header 'Content-Type: application/json' \
-             --header "authorization: Bearer ${GITHUB_TOKEN}" \
-             --data "{ \"state\": \"failure\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab Lassen Down\", \"context\": \"ci/gitlab/lassen\" }"
-        exit 1
-      fi
 
 status_pending:
   extends: [.on_lassen]
@@ -91,54 +75,42 @@ status_pending:
     - export pipeline_status="pending"
     - *status_report
 
-# Gitlab jobs for the lassen machine at ${GITHUB_PROJECT_ORG}.
-
-# CPU only.
-ibm_clang_9_0_0:
-  variables:
-    SPEC: "${PROJECT_LASSEN_VARIANTS} %clang@ibm.9.0.0 ${PROJECT_LASSEN_DEPS}"
-  extends: .build_and_test_on_lassen
-
-ibm_clang_9_0_0_gcc_8_3_1:
-  variables:
-    SPEC: "${PROJECT_LASSEN_VARIANTS} %clang@ibm.9.0.0 cxxflags==\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" cflags==\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" ${PROJECT_LASSEN_DEPS}"
-  extends: .build_and_test_on_lassen
-
-gcc_8_3_1:
-  variables:
-    SPEC: "${PROJECT_LASSEN_VARIANTS} %gcc@8.3.1 ${PROJECT_LASSEN_DEPS}"
-  extends: .build_and_test_on_lassen
-
-pgi_20_4_gcc_8_3_1:
-  variables:
-    SPEC: "${PROJECT_LASSEN_VARIANTS} %pgi@20.4 cxxflags==\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" cflags==\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" ${PROJECT_LASSEN_DEPS}"
-  extends: .build_and_test_on_lassen
-
-xl_16_1_1_12:
-  variables:
-    SPEC: "${PROJECT_LASSEN_VARIANTS} %xl@16.1.1.12 ${PROJECT_LASSEN_DEPS}"
-  extends: .build_and_test_on_lassen
-
-xl_16_1_1_12_gcc_8_3_1:
-  variables:
-    SPEC: "${PROJECT_LASSEN_VARIANTS} %xl@16.1.1.12 cxxflags==\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" cflags==\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" ${PROJECT_LASSEN_DEPS}"
-  extends: .build_and_test_on_lassen
-
 # CUDA.
-ibm_clang_9_0_0_gcc_8_3_1_cuda_10_1_168:
+clang_12_0_1_gcc_8_3_1_cuda_10_1_243:
   variables:
-    SPEC: "${PROJECT_LASSEN_VARIANTS} +cuda %clang@ibm.9.0.0 cxxflags==\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" cflags==\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" ^cuda@10.1.168 ${PROJECT_LASSEN_DEPS}"
+    SPEC: "${PROJECT_LASSEN_VARIANTS} +cuda %clang@12.0.1.gcc.8.3.1 ^cuda@10.1.243+allow-unsupported-compilers ${PROJECT_LASSEN_DEPS}"
   extends: .build_and_test_on_lassen
 
-xl_16_1_1_12_gcc_7_3_1_cuda_10_1_168:
+clang_12_0_1_gcc_8_3_1_cuda_11_2_0:
   variables:
-    SPEC: "${PROJECT_LASSEN_VARIANTS} +cuda %xl@16.1.1.12 cxxflags==\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-7.3.1\" cflags==\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-7.3.1\" ^cuda@10.1.168 ${PROJECT_LASSEN_DEPS}"
+    SPEC: "${PROJECT_LASSEN_VARIANTS} +cuda %clang@12.0.1.gcc.8.3.1 ^cuda@11.2.0+allow-unsupported-compilers ${PROJECT_LASSEN_DEPS}"
+    MODULE_LIST: "cuda/11.2.0"
   extends: .build_and_test_on_lassen
 
-xl_16_1_1_12_gcc_8_3_1_cuda_11_0_2:
+clang_14_0_5_gcc_8_3_1_cuda_11_7_0:
   variables:
-    SPEC: "${PROJECT_LASSEN_VARIANTS} +cuda %xl@16.1.1.12 cxxflags==\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" cflags==\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" ^cuda@11.0.2 ${PROJECT_LASSEN_DEPS}"
+    SPEC: "${PROJECT_LASSEN_VARIANTS} +cuda %clang@14.0.5.gcc.8.3.1 ^cuda@11.7.0+allow-unsupported-compilers ${PROJECT_LASSEN_DEPS}"
+    MODULE_LIST: "cuda/11.7.0"
   extends: .build_and_test_on_lassen
+
+xl_2022_08_19_gcc_8_3_1_cuda_11_2_0:
+  variables:
+    SPEC: "${PROJECT_LASSEN_VARIANTS} +cuda %xl@16.1.1.12.gcc.8.3.1 ^cuda@11.2.0+allow-unsupported-compilers ${PROJECT_LASSEN_DEPS}"
+    MODULE_LIST: "cuda/11.2.0"
+  extends: .build_and_test_on_lassen
+
+xl_2022_08_19_gcc_8_3_1_cuda_11_7_0:
+  variables:
+    SPEC: "${PROJECT_LASSEN_VARIANTS} +cuda %xl@16.1.1.12.gcc.8.3.1 ^cuda@11.7.0+allow-unsupported-compilers ${PROJECT_LASSEN_DEPS}"
+    MODULE_LIST: "cuda/11.7.0"
+  extends: .build_and_test_on_lassen
+
+gcc_8_3_1_cuda_11_7_0:
+  variables:
+    SPEC: "${PROJECT_LASSEN_VARIANTS} +cuda %gcc@8.3.1 ^cuda@11.7.0+allow-unsupported-compilers ${PROJECT_LASSEN_DEPS}"
+    MODULE_LIST: "cuda/11.7.0"
+  extends: .build_and_test_on_lassen
+
 
 status_success:
   extends: [.on_lassen]
