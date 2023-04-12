@@ -54,7 +54,7 @@ stages:
       git fetch origin --depth=1 ${CI_COMMIT_SHA} \n
       git checkout ${CI_COMMIT_SHA} \n
       git submodule update --init --recursive \n
-      SPEC=\"${SPEC//\"/\\\"}\" srun ${RUBY_BUILD_AND_TEST_JOB_ALLOC} ${BUILD_AND_TEST_CMD}"
+      SPEC=\"${SPEC//\"/\\\"}\" srun ${RUBY_BUILD_AND_TEST_JOB_ALLOC} ${BUILD_AND_TEST_REL_PATH}"
       echo -e "\e[7;32m### End of reproducer\e[0m"
 
 .build_and_test_on_ruby:
@@ -68,7 +68,7 @@ stages:
     # Print a reproducer
     - *print_ruby_reproducer
     # The actual launch command
-    - srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) ${RUBY_BUILD_AND_TEST_JOB_ALLOC} ${BUILD_AND_TEST_CMD}
+    - srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) ${RUBY_BUILD_AND_TEST_JOB_ALLOC} ${PROJECT_DIR}/${BUILD_AND_TEST_REL_PATH}
 
 ##############################################################################
 # JOBS
