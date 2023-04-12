@@ -65,22 +65,6 @@ stages:
 
 ##############################################################################
 # JOBS
-is-machine-up-check:
-  stage: is-machine-up
-  tags: [shell, oslic]
-  variables:
-    GIT_STRATEGY: none
-  script:
-    - |
-      if [[ $(jq '.lassen.total_nodes_up' /usr/global/tools/lorenz/data/loginnodeStatus) == 0 ]]
-      then
-        echo -e "\e[31mNo node available on Lassen\e[0m"
-        curl --url "https://api.github.com/repos/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
-             --header 'Content-Type: application/json' \
-             --header "authorization: Bearer ${GITHUB_TOKEN}" \
-             --data "{ \"state\": \"failure\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab Lassen Down\", \"context\": \"ci/gitlab/lassen\" }"
-        exit 1
-      fi
 
 status_pending:
   extends: [.on_lassen]
@@ -90,8 +74,6 @@ status_pending:
   script:
     - export pipeline_status="pending"
     - *status_report
-
-# Gitlab jobs for the lassen machine at ${GITHUB_PROJECT_ORG}.
 
 # CPU only.
 ibm_clang_9_0_0:

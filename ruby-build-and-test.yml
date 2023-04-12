@@ -92,7 +92,6 @@ status_pending:
     - export pipeline_status="pending"
     - *status_report
 
-# Gitlab jobs for the Ruby machine at ${GITHUB_PROJECT_ORG}.
 clang_10_0_1:
   variables:
     SPEC: "${PROJECT_RUBY_VARIANTS} %clang@10.0.1 ${PROJECT_RUBY_DEPS}"
