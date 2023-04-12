@@ -72,22 +72,6 @@ stages:
 
 ##############################################################################
 # JOBS
-is-machine-up-check:
-  stage: is-machine-up
-  tags: [shell, oslic]
-  variables:
-    GIT_STRATEGY: none
-  script:
-    - |
-      if [[ $(jq '.ruby.total_nodes_up' /usr/global/tools/lorenz/data/loginnodeStatus) == 0 ]]
-      then
-        echo -e "\e[31mNo node available on Ruby\e[0m"
-        curl --url "https://api.github.com/repos/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
-             --header 'Content-Type: application/json' \
-             --header "authorization: Bearer ${GITHUB_TOKEN}" \
-             --data "{ \"state\": \"failure\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab Ruby Down\", \"context\": \"ci/gitlab/ruby\" }"
-        exit 1
-      fi
 
 # In pre-build phase, allocate a node for builds.
 # TODO: make the resource configurable, not all projects will want the same.
@@ -108,7 +92,6 @@ status_pending:
     - export pipeline_status="pending"
     - *status_report
 
-# Gitlab jobs for the Ruby machine at ${GITHUB_PROJECT_ORG}.
 intel_19_1_2_gcc_8_3_1:
   variables:
     SPEC: "${PROJECT_RUBY_VARIANTS} %intel@19.1.2.gcc.8.3.1 ${PROJECT_RUBY_DEPS}"
