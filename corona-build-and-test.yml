@@ -69,7 +69,7 @@ stages:
     # Print a reproducer
     - *print_corona_reproducer
     # The actual launch command
-    - $( [[ -n "${URI}" ]] && echo "flux proxy ${URI}" ) flux mini run ${CORONA_BUILD_AND_TEST_JOB_ALLOC} ${PROJECT_DIR}/${BUILD_AND_TEST_REL_PATH}
+    - $( [[ -n "${URI}" ]] && echo "flux proxy ${URI}" ) flux mini run ${CORONA_BUILD_AND_TEST_JOB_ALLOC} ${CI_PROJECT_DIR}/${BUILD_AND_TEST_REL_PATH}
 
 ##############################################################################
 # JOBS

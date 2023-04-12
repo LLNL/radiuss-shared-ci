@@ -61,7 +61,7 @@ stages:
     # Print a reproducer
     - *print_lassen_reproducer
     # The actual launch command
-    - lalloc ${LASSEN_BUILD_AND_TEST_JOB_ALLOC} ${PROJECT_DIR}/${BUILD_AND_TEST_REL_PATH}
+    - lalloc ${LASSEN_BUILD_AND_TEST_JOB_ALLOC} ${CI_PROJECT_DIR}/${BUILD_AND_TEST_REL_PATH}
 
 ##############################################################################
 # JOBS
