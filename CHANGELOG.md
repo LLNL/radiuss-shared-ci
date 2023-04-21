@@ -19,6 +19,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   -> Specify the build and test command in your .gitlab-ci.yml (see customization/gitlab-ci.yml).
 - BREAKING: Machine checks jobs moved to parent pipeline:
   -> Update your .gitlab/subscribed-pipelines.yml w.r.t. customization/subscribed-pipelines.yml.
+  -> Add the "machine-checks" stage to your .gitlab-ci.yml (see customization/gitlab-ci.yml).
 - BREAKING: Updated shared specs with current toolchains
   -> Update your extra jobs: local overrides will be outdated.
 

@@ -83,7 +83,6 @@ allocate_resources:
   script:
     - |
       set -x
-      echo "Shared allocation disabled: runs slowly, needs a fix"
       flux --parent mini alloc ${TIOGA_BUILD_AND_TEST_SHARED_ALLOC} --job-name=${ALLOC_NAME} --bg
 
 status_pending:
@@ -116,7 +115,6 @@ release_resources:
   script:
     - |
       set -x
-      echo "Shared allocation disabled: runs slowly, needs a fix"
       export URI=$(flux jobs -o "{id} {name}" | grep ${ALLOC_NAME} | awk '{print $1}')
       ([[ -n "${URI}" ]] && flux job kill ${URI})
 
