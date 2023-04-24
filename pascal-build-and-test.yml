@@ -1,0 +1,141 @@
+##############################################################################
+# Copyright (c) 2023, Lawrence Livermore National Security, LLC and RADIUSS
+# project contributors. See the COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: (MIT)
+##############################################################################
+
+stages:
+  - is-machine-up
+  - allocate_resources
+  - build_and_test
+  - release_resources
+
+##############################################################################
+# UTILITIES
+.on_pascal:
+  tags:
+    - shell
+    - pascal
+  rules:
+    # Runs except if we explicitly deactivate pascal by variable.
+    - if: '$ON_PASCAL == "OFF"'
+      when: never
+    # Advanced jobs can only run on master, develop or if ALL_TARGETS is ON.
+    # Set ADVANCED_JOB to ON in the job definition to make it an advanced job.
+    - if: '$ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH != "main" && $CI_COMMIT_BRANCH != "develop" && $ALL_TARGETS != "ON"'
+      when: never
+    # We should always release resources allocated in the pipeline.
+    - if: '$CI_JOB_NAME =~ /release_resources/'
+      when: always
+    # Only report failure if the pipeline failed.
+    - if: '$CI_JOB_NAME =~ /status_failure/'
+      when: on_failure
+    # A true statement is expected to allow jobs to run. Here is the default.
+    - when: on_success
+
+.status_report: &status_report
+    - export context="pascal"
+    - |
+      curl --url "https://api.github.com/repos/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
+           --header 'Content-Type: application/json' \
+           --header "authorization: Bearer ${GITHUB_TOKEN}" \
+           --data "{ \"state\": \"${pipeline_status}\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab ${context} pipeline\", \"context\": \"ci/gitlab/${context}\" }"
+
+.print_pascal_reproducer: &print_pascal_reproducer
+    - |
+      echo -e "\e[7;32m### Pascal reproducer\e[0m"
+      if [[ -n "${LLNL_SERVICE_USER}" ]]; then echo -e "xsu ${LLNL_SERVICE_USER}"; fi
+      echo -e "
+      working_dir=\"/usr/workspace/\${USER}/${GITHUB_PROJECT_NAME}/${CI_COMMIT_REF_NAME//\//-}-${CI_PIPELINE_ID}-\$(date +%s)\"
+      mkdir -p \${working_dir} && cd \${working_dir} \n
+      git clone https://github.com/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}.git --single-branch --depth=1 \n
+      cd ${GITHUB_PROJECT_NAME}
+      git fetch origin --depth=1 ${CI_COMMIT_SHA} \n
+      git checkout ${CI_COMMIT_SHA} \n
+      git submodule update --init --recursive \n
+      SPEC=\"${SPEC//\"/\\\"}\" MODULE_LIST=\"${MODULE_LIST}\" flux mini run ${PASCAL_BUILD_AND_TEST_JOB_ALLOC} ${BUILD_AND_TEST_CMD}"
+      echo -e "\e[7;32m### End of reproducer\e[0m"
+
+.build_and_test_on_pascal:
+  extends: [.custom_build_and_test, .on_pascal]
+  stage: build_and_test
+  script:
+    # Allocation information
+    - |
+      echo ${ALLOC_NAME}
+      URI=$(flux jobs -o "{uri} {name}" | grep ${ALLOC_NAME} | awk '{print $1}') || echo "Empty URI"
+      echo ${URI}
+    # Print a reproducer
+    - *print_pascal_reproducer
+    # The actual launch command
+    - $( [[ -n "${URI}" ]] && echo "flux proxy ${URI}" ) flux run ${PASCAL_BUILD_AND_TEST_JOB_ALLOC} ${BUILD_AND_TEST_CMD}
+
+##############################################################################
+# JOBS
+
+# In pre-build phase, allocate a node for builds.
+allocate_resources (on pascal):
+  variables:
+    GIT_STRATEGY: none
+  extends: .on_pascal
+  stage: allocate_resources
+  script:
+    - |
+      set -x
+      echo "Shared allocation disabled: runs slowly, needs a fix"
+      flux --parent mini alloc ${PASCAL_BUILD_AND_TEST_SHARED_ALLOC} --job-name=${ALLOC_NAME} --bg
+
+status_pending:
+  extends: [.on_pascal]
+  variables:
+    GIT_STRATEGY: none
+  stage: allocate_resources
+  script:
+    - export pipeline_status="pending"
+    - *status_report
+
+gcc_10_3_1:
+  variables:
+    SPEC: "${PROJECT_PASCAL_VARIANTS} %gcc@10.3.1 ${PROJECT_PASCAL_DEPS}"
+  extends: .build_and_test_on_pascal
+
+gcc_10_3_1_cuda_11_8_0:
+  variables:
+    SPEC: "${PROJECT_PASCAL_VARIANTS} +cuda %gcc@10.3.1 ${PROJECT_PASCAL_DEPS}"
+  extends: .build_and_test_on_pascal
+
+# In post-build phase, deallocate resources.
+# Note : we make sure this is run even on build phase failure using a specific
+# rule in the template ".on_pascal".
+release_resources (on pascal):
+  variables:
+    GIT_STRATEGY: none
+  extends: .on_pascal
+  stage: release_resources
+  script:
+    - |
+      set -x
+      echo "Shared allocation disabled: runs slowly, needs a fix"
+      export URI=$(flux jobs -o "{id} {name}" | grep ${ALLOC_NAME} | awk '{print $1}')
+      ([[ -n "${URI}" ]] && flux job kill ${URI})
+
+status_success:
+  extends: [.on_pascal]
+  variables:
+    GIT_STRATEGY: none
+  stage: release_resources
+  script:
+    - export pipeline_status="success"
+    - *status_report
+  when: on_success
+
+status_failure:
+  extends: [.on_pascal]
+  variables:
+    GIT_STRATEGY: none
+  stage: release_resources
+  script:
+    - export pipeline_status="failure"
+    - *status_report
+  when: on_failure

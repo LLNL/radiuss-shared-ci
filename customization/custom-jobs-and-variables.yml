@@ -32,6 +32,16 @@ variables:
 # Project specific deps for corona
   PROJECT_CORONA_DEPS: ""
 
+# Pascal
+# Arguments for top level allocation
+  PASCAL_BUILD_AND_TEST_SHARED_ALLOC: "--exclusive --time-limit=15m --nodes=1"
+# Arguments for job level allocation
+  PASCAL_BUILD_AND_TEST_JOB_ALLOC: "--time-limit=10m --nodes=1"
+# Project specific variants for pascal
+  PROJECT_PASCAL_VARIANTS: ""
+# Project specific deps for pascal
+  PROJECT_PASCAL_DEPS: ""
+
 # Tioga
 # Arguments for top level allocation
   TIOGA_BUILD_AND_TEST_SHARED_ALLOC: "--exclusive --time-limit=15m --nodes=1"
