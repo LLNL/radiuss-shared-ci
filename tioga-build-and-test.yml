@@ -16,7 +16,7 @@ stages:
 .on_tioga:
   tags:
     - shell
-    - tioga11
+    - tioga
   rules:
     # Runs except if we explicitly deactivate tioga by variable.
     - if: '$ON_TIOGA == "OFF"'
