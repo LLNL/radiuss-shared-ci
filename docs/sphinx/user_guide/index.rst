@@ -19,7 +19,7 @@ easily *share the full context of their builds*. A project is then built
 and tested as usual and *most of the CI infrastructure is shared* to reduce
 duplicated effort and ease maintenance of testing for individual projects.
 
-.. figure:: images/UberenvWorkflow.png
+.. image:: images/UberenvWorkflow.png
    :scale: 32 %
    :alt: RADIUSS Shared CI infrastructure in a project repository.
    :align: center
