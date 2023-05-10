@@ -188,7 +188,7 @@ Setup your Spack package to generate a configuration file
 =========================================================
 
 We want to build the dependencies with Spack and then build the project with
-those dependencies but outside of Spack. We need to generate a CMake
+those dependencies outside of Spack. We need to generate a CMake
 configuration file that reproduces the configuration `Spack`_ would have
 generated in the same context. It should contain all the information necessary
 to build your project with the described toolchain and dependencies.
@@ -196,9 +196,9 @@ to build your project with the described toolchain and dependencies.
 In particular, the configuration file should setup:
 
 * flags corresponding with the target requested (Release, Debug).
-* compilers path, and other toolkits (e.g. cuda), etc.
+* paths to compilers and other toolkits (e.g. cuda), etc.
 * paths to installed dependencies.
-* any option that may have an impact on your build.
+* any options that may impact the build.
 
 This provides an easy way to build your project based on `Spack`_ configuration
 while only using CMake and a traditional developer workflow.
@@ -206,23 +206,23 @@ while only using CMake and a traditional developer workflow.
 CMake projects: Spack CachedCMakePackage
 ========================================
 
-CMake is strongly recommended to adopt RADIUSS CI workflow, mostly
+CMake is strongly recommended to use the RADIUSS CI workflow, mostly
 because of this step. With CMake, we generate a cache file describing the
-configuration necessary to trigger a build later on. This is supported in Spack
-as soon as your package inherits from ``CachedCMakePackage``.
+configuration necessary to build the code for a project. This is supported in 
+Spack as soon as your package inherits from ``CachedCMakePackage``.
 
-Once your package has been ported, in Spack, stopping an installation after the
-``initconfig`` phase will prevent it from building your project and the CMake
-configuration file will have been generated already.
+When your package is ported, stopping an installation after the 
+``initconfig`` phase will prevent Spack from building your project after
+the CMake configuration file is generated.
 
 Non-CMake projects: Custom implementation
 =========================================
 
-The only example of a non-CMake project that adopted this workflow is `MFEM`_.
-Although it is using a Makefile build system in its Spack Packages, MFEM is
-generating a configuration file that can be used just like a CMake configuration
-file. We adapted the implementation of the package to mimics the mechanism
-available in CMake-based packages. You may use that as an example.
+The only example of a non-CMake project that has adopted this workflow is 
+`MFEM`_.  Although it is using a Makefile build system in its Spack packages, 
+MFEM is generating a configuration file that can be used just like a CMake 
+configuration file. We adapted the implementation of the package to mimic the 
+mechanism available in CMake-based packages. You may use that as an example.
 
 .. _RADIUSS Spack Configs: https://github.com/LLNL/radiuss-spack-configs
 .. _Uberenv: https://github.com/LLNL/uberenv
