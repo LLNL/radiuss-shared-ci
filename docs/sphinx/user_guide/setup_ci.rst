@@ -18,27 +18,33 @@ Setup the CI using the shared template
 
 The third step in adopting RADIUSS Shared CI infrastructure is to setup the CI.
 
-Once you have put in the effort to implement the first two steps, you should be
-able to benefit from the shared CI infrastructure. In more complex scenarios,
-you will always be able to use the template as a starting point for a custom
-implementation.
+After you have implemented the first two steps :ref:`use_spack-label` and
+:ref:`build_and_test-label`, you should be able to use the shared CI 
+infrastructure. In more complex scenarios, you will always be able to use 
+the template as a starting point for a custom implementation.
 
 By sharing the CI definition, projects share the burden of maintaining it. In
 addition, with our shared CI, they also share a core set of Spack specs to
-ensure that they keep running tests with similar configurations.
+ensure that they keep running tests with similar build configurations.
 
 =================
 RADIUSS Shared CI
 =================
 
 Initially, the RADIUSS effort developed a mechanism to 
-`share Spack configuration files`_ across projects. Then, we developed a 
+*share Spack configuration files* across projects. Then, we developed a 
 process to manage Spack and use it to generate CMake configuration files.
 The RADIUSS Shared CI project extends this by developing a CI implementation
 that can be shared across projects, which drive it with a ``build-and-test`` 
-script that has the same inputs across projects.
+script (described in :ref:`build_and_test-label`) that has the same inputs 
+across projects.
 
-With a centralized CI configuration that is shared by projects, we create an interface between local and shared configuration. we try to keep this interface minimal, while allowing for project-specific customization. Only a handful of modifications are required to get the CI to work for your projects, while files in the ``customization`` directory allow for finer tuning and extensibility.
+With a centralized CI configuration that is shared by projects, we create an 
+interface between local and shared configurations. We try to keep this 
+interface minimal, while allowing for project-specific customization. 
+Only a handful of modifications are required to get the CI to work for your 
+project, while files in the ``customization`` directory allow for finer tuning 
+and extensibility.
 
 .. note::
    GitLab allows projects to include external files to configure their CI. We
@@ -47,12 +53,15 @@ With a centralized CI configuration that is shared by projects, we create an int
 The short version
 =================
 
+The following sequence of steps and commands summarizes the process of 
+integrating the RADIUSS Shared CI infrastructure into  your project.
+
 .. code-block:: bash
 
    ### Prerequisites
    cd my_project
    mkdir -p scripts/gitlab
-   vim scripts/gitlab/build-and-test
+   vim scripts/gitlab/build-and-test.sh
    # write CI script
 
    ### CI Setup
@@ -125,8 +134,8 @@ your project. They are described in the following table:
  ========================================== ==========================================================================================================================
   Parameter                                  Description
  ========================================== ==========================================================================================================================
-  ``LLNL_SERVICE_USER``                      Project specific Service Account used in CI
-  ``CUSTOM_CI_BUILD_DIR``                    Where to locate build directories (prevent overquota)
+  ``LLNL_SERVICE_USER``                      Project specific Service User Account used in CI
+  ``CUSTOM_CI_BUILD_DIR``                    Where to locate build directories (prevent exceeding your disk quota)
   ``GIT_SUBMODULES_STRATEGY``                Controls strategy for the clone performed by GitLab. Consider ``recursive`` if you have submodules, otherwise comment it.
   ``BUILD_ROOT``                             Location (path) where the projects should be built. We provide a sensible default.
  ========================================== ==========================================================================================================================
@@ -136,12 +145,15 @@ your project. They are described in the following table:
    value. If a variable has a value there, it does require one.
 
 .. warning::
-   We strongly recommend that you set your CI to use a service account.
+   We strongly recommend that you set your CI to use a service user account. 
+   This will enable you to add users to associated service user account group 
+   so that they can interact with GitLab runners to restart test pipelines, 
+   for example.
 
 Your CI is now set up to include remote files from the GitLab mirror of the
 radiuss-shared-ci project.
 
-We now have to complete the interface with the shared CI configuration.
+Lastly, we complete the interface with the shared CI configuration.
 In particular, the ``.gitlab-ci.yml`` file requires some files to be present 
 in your Git repository. These are described in the next few sections.
 
@@ -152,7 +164,7 @@ Customize CI
 
 We provide templates for the required customization files. You need to have a
 ``.gitlab`` subdirectory in the top-level directory of your Git repo. Then,
-you can copy the template files to that directory in your repo.
+you can copy the template files to that directory in your repo. For example:
 
 .. code-block:: bash
 
