@@ -78,8 +78,8 @@ configuration. It should point to a submodule: a clone of the
 for differences.
 
 .. note::
-   The hash used to checkout a submodule is also visible in the project
-   ``.gitmodules`` file.
+   The commit hash associated with a Git submodule in a project can be seen
+   by running the command ``git submodule status`` in the project.
 
 The Spack configuration can affect the external packages to use, the default
 versions for a dependencies to build, etc.
@@ -124,8 +124,9 @@ options that will require you to update `radiuss-spack-configs`_ and `Uberenv`_.
 Updating Uberenv
 ================
 
-In general, `Uberenv`_ is lagging behind in terms of compatibility with
-`Spack`_. That's obviously not a guarantee.
+In general, `Uberenv`_ lags behind in terms of compatibility with
+`Spack`_ and updating to a newer Spack version may require modifications to
+Uberenv. That's obviously not a guarantee.
 
 Updating radiuss-spack-configs
 ==============================
@@ -145,9 +146,9 @@ other projects. Also, we want to keep the default Spack specs simple.
 Example cases
 ==============
 
-For example, in Umpire there is ``+fortran``, and ``+openmp`` for RAJA. Those 
+For example, in Umpire there is ``+fortran`` and ``+openmp`` for RAJA. Those 
 variants cannot be shared via the RADIUSS Shared CI project because they are 
-likely not implemented or relevant by default in other projects.
+likely not implemented or relevant to other projects.
 
 Similarly, Umpire and RAJA may require a BLT version that depends on the system
 being tested. Such a requirement is not applicable to every project.
@@ -176,7 +177,8 @@ List the Spack specs tested
 
 RADIUSS Shared CI uses Spack specs to express the types of builds to test.
 We aim at sharing those specs so that projects build with similar
-configurations. However we allow projects to add extra specs to test locally.
+configurations. However we allow projects to add extra specs to test 
+project-specific configurations.
 
 Shared specs for machine ``ruby``, for example, can be listed directly in 
 radiuss-shared-ci:
@@ -203,9 +205,9 @@ Use Uberenv
   $ ./scripts/uberenv/uberenv.py
 
 .. note::
-  On LC machines, it is good practice to do the build step in parallel on a
-  compute node. Here is an example command: ``srun -ppdebug -N1 --exclusive
-  ./scripts/uberenv/uberenv.py``
+  On LC machines, it is following the *good neighbor* policy to do your build 
+  step on a compute node. Here is an example command: 
+  ``srun -ppdebug -N1 --exclusive ./scripts/uberenv/uberenv.py``
 
 Unless otherwise specified, Spack will default to a compiler. It is recommended
 to specify which compiler to use by adding the compiler spec to the ``--spec=``
@@ -278,13 +280,14 @@ Typical use cases for a local package patch include:
   for flags, or HIP / CUDA tweaks in the past).
 
 In any case, those local changes should be pushed to upstream Spack as soon as
-possible. Typically, a project upstreams changes to its Spack package when
-a release is done.
+possible. Typically, a project upstreams changes to its Spack package after
+a project release is done. This allows the new release tag/version to be 
+included in the Spack package update.
 
 Spack reference during the release process
 ==========================================
 
-As discussed above, when a projects wants to do a release, the release has to
+As mentioned above, when a projects does a release, the release has to
 happen before it can be added to Spack.
 
 Then, we want:
@@ -309,7 +312,7 @@ Uberenv as soon as the Spack package has been updated.
 In a nutshell
 =============
 
-The chosen Spack reference used in Uberenv should evolve in time as follow:
+The chosen Spack reference used in Uberenv should evolve in time as follows:
 
 * After a project release, when the upstream Spack package gets updated, and
   Uberenv should point to the corresponding Spack merge commit.

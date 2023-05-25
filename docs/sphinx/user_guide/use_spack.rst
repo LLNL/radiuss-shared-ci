@@ -17,7 +17,7 @@ Use Spack to install dependencies and configure the project build
    :alt: Uberenv is integrated into a project to drive Spack to build the dependencies and produce a CMake cached configuration files
    :align: center
 
-The first step in adopting RADIUSS CI infrastructure is to setup your project
+The first step in adopting RADIUSS CI infrastructure is to set up your project
 so that Spack can be used to install the dependencies and generate a
 configuration file for the build.
 
@@ -26,9 +26,8 @@ configured with custom packages and RADIUSS Spack Configs. The end product is
 a CMake Cached configuration file.
 
 .. note::
-   In Spack, packages that inherits from the CachedCMakePackage class generate a
-   CMake Cached configuration file during the project build. We used to
-   implement this logic by ourselves in our Spack packages. `MFEM`_ stands out
+   In Spack, packages that inherit from the CachedCMakePackage class generate a
+   CMake Cached configuration file during the project build. `MFEM`_ stands out
    as the only non-CMake project that also generates a configuration file that
    is used in the CI workflow with Uberenv.
 
@@ -37,18 +36,18 @@ Why Spack
 =========
 
 Spack provides a single context to express *toolchains*, *machine setup* and
-*build sequence*. Using it will allow us to share configuration files to
-describe the toolchains and machines setup. `RADIUSS Spack Configs`_ is the
+*build sequence*. Using it allows us to share configuration files that
+describe toolchain and machine setup. `RADIUSS Spack Configs`_ is the
 repository where RADIUSS projects Spack configuration is shared.
 
-Spack is increasingly used to install the dependency tree of
+Spack is increasingly used to install dependency trees of
 large simulation codes. As such, it makes sense to use Spack early in the
 development process.
 
 .. note::
    We are not promoting a "Spack everywhere" strategy. But we advocate that
-   Spack should be *one of the ways* to configure and build your projects,
-   since you projects will likely be built that way in production someday.
+   Spack should be *one of the ways* to configure and build your project,
+   since it will likely be built that way when used in production.
 
 ===========
 End product
@@ -89,28 +88,30 @@ Getting Uberenv as a submodule (recommended)
 
     Use ``git submodule add`` to get `Uberenv`_ into a ``uberenv`` directory.
 
-#. Edit ``.uberenv.json``.
+#. Edit the ``.uberenv_config.json`` file.
 
-    Create ``.uberenv.json`` in a directory that is a parent of ``uberenv``. Set
-    your project package name, and other parameters like Spack reference
-    commit/tag (we suggest the latest release tag).
+    Create the ``.uberenv_config.json`` file in a directory that is a parent 
+    of the ``uberenv`` directory. A typical project places the file in the
+    top-level directory of its repository. Set your project package name, and 
+    other parameters like Spack reference commit/tag (we suggest the latest 
+    release tag).
 
 #. Add RADIUSS Spack Configs submodule.
 
     * Use ``git submodule add`` to get `RADIUSS Spack Configs`_ in a second
       submodule or custom location.
 
-    * In ``.uberenv.json`` set ``spack_configs_path`` to point to
+    * In ``.uberenv_config.json`` set ``spack_configs_path`` to point to
       ``<some_relative_path>/radiuss-spack-configs``.
 
 #. Add custom packages.
 
     If you need to make local modifications to your project package or a
-      dependency package, you may put it in a corresponding directory:
-      ``<some_relative_path>/packages/<package_name>/package.py``.
+    dependency package, you may put it in a corresponding directory:
+    ``<some_relative_path>/packages/<package_name>/package.py``.
 
-    Then, in ``.uberenv.json``, set ``spack_packages_path`` to point to
-      ``<some_relative_path>/packages``
+    Then, in ``.uberenv_config.json``, set ``spack_packages_path`` to point to
+    ``<some_relative_path>/packages``
 
 #. Make sure that the ``package.py`` file for your project generates a CMake 
    configuration file.
@@ -129,7 +130,7 @@ Getting Uberenv by clone/fetch/copy
     Clone/Fetch/Copy it from `Uberenv`_ repository.
     into a ``uberenv`` directory, not as a submodule.
 
-#. Edit ``uberenv/project.json``.
+#. Edit ``uberenv_config.json``.
 
     Set your project package name, and other parameters like Spack reference
     commit/tag (we suggest the latest release tag).
@@ -187,7 +188,7 @@ Setup your Spack package to generate a configuration file
 =========================================================
 
 We want to build the dependencies with Spack and then build the project with
-those dependencies but outside of Spack. We need to generate a CMake
+those dependencies outside of Spack. We need to generate a CMake
 configuration file that reproduces the configuration `Spack`_ would have
 generated in the same context. It should contain all the information necessary
 to build your project with the described toolchain and dependencies.
@@ -195,33 +196,33 @@ to build your project with the described toolchain and dependencies.
 In particular, the configuration file should setup:
 
 * flags corresponding with the target requested (Release, Debug).
-* compilers path, and other toolkits (e.g. cuda), etc.
+* paths to compilers and other toolkits (e.g. cuda), etc.
 * paths to installed dependencies.
-* any option that may have an impact on your build.
+* any options that may impact the build.
 
 This provides an easy way to build your project based on `Spack`_ configuration
-while only using CMake and a traditionnal developer workflow.
+while only using CMake and a traditional developer workflow.
 
 CMake projects: Spack CachedCMakePackage
 ========================================
 
-CMake is strongly recommended to adopt RADIUSS CI workflow, mostly
+CMake is strongly recommended to use the RADIUSS CI workflow, mostly
 because of this step. With CMake, we generate a cache file describing the
-configuration necessary to trigger a build later on. This is supported in Spack
-as soon as your package inherits from ``CachedCMakePackage``.
+configuration necessary to build the code for a project. This is supported in 
+Spack as soon as your package inherits from ``CachedCMakePackage``.
 
-Once your package has been ported, in Spack, stopping an installation after the
-``initconfig`` phase will prevent it from building your project and the CMake
-configuration file will have been generated already.
+When your package is ported, stopping an installation after the 
+``initconfig`` phase will prevent Spack from building your project after
+the CMake configuration file is generated.
 
 Non-CMake projects: Custom implementation
 =========================================
 
-The only example of a non-CMake project that adopted this workflow is `MFEM`_.
-Altough it is using a Makefile build system in its Spack Packages, MFEM is
-generating a configuration file that can be used just like a CMake configuraton
-file. We adapted the implementation of the package to mimics the mechanism
-available in CMake-based packages. You may use that as an example.
+The only example of a non-CMake project that has adopted this workflow is 
+`MFEM`_.  Although it is using a Makefile build system in its Spack packages, 
+MFEM is generating a configuration file that can be used just like a CMake 
+configuration file. We adapted the implementation of the package to mimic the 
+mechanism available in CMake-based packages. You may use that as an example.
 
 .. _RADIUSS Spack Configs: https://github.com/LLNL/radiuss-spack-configs
 .. _Uberenv: https://github.com/LLNL/uberenv
