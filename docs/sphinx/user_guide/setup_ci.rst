@@ -54,7 +54,7 @@ The short version
 =================
 
 The following sequence of steps and commands summarizes the process of 
-integrating the RADIUSS Shared CI infrastructure into  your project.
+integrating the RADIUSS Shared CI infrastructure into your project.
 
 .. code-block:: bash
 

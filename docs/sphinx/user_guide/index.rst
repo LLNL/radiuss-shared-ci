@@ -27,7 +27,7 @@ duplicated effort and ease maintenance of testing for individual projects.
    The figure illustrates the various software packages involved (orange boxes)
    and their relationships to a project that uses them. 
 
-A project that uses the shared CI framework, has two Git submodules typically: 
+A project that uses the shared CI framework typically has two Git submodules: 
 `Uberenv <https://github.com/LLNL/uberenv>`_ and
 `RADIUSS Spack Configs <https://github.com/LLNL/radiuss-spack-configs>`_. 
 *Uberenv* contains a Python script that helps automate building third-party
