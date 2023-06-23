@@ -53,6 +53,18 @@ corona-build-and-test:
   needs: [corona-up-check]
   extends: [.build-and-test]
 
+# PASCAL
+pascal-up-check:
+  variables:
+    CI_MACHINE: "pascal"
+  extends: [.machine-check]
+
+pascal-build-and-test:
+  variables:
+    CI_MACHINE: "pascal"
+  needs: [pascal-up-check]
+  extends: [.build-and-test]
+
 # TIOGA
 tioga-up-check:
   variables:
@@ -76,5 +88,3 @@ lassen-build-and-test:
     CI_MACHINE: "lassen"
   needs: [lassen-up-check]
   extends: [.build-and-test]
-
-
