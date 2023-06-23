@@ -94,9 +94,9 @@ status_pending:
     - export pipeline_status="pending"
     - *status_report
 
-rocmcc_5_4_1_hip:
+rocmcc_5_5_0_hip:
   variables:
-    SPEC: "${PROJECT_CORONA_VARIANTS} +rocm amdgpu_target=gfx906 %rocmcc@5.4.1 ^hip@5.4.1 ${PROJECT_CORONA_DEPS}"
+    SPEC: "${PROJECT_CORONA_VARIANTS} +rocm amdgpu_target=gfx906 %rocmcc@5.5.0 ^hip@5.5.0 ${PROJECT_CORONA_DEPS}"
   extends: .build_and_test_on_corona
 
 # In post-build phase, deallocate resources.
