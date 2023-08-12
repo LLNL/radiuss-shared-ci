@@ -23,11 +23,11 @@ ignore-draft-pr:
     GIT_STRATEGY: none
   script:
     - |
-      # Create a list of branch on which we always run.
-      # Note: the list can be overridden setting ALWAYS_RUN_LIST.
-      always_run_list="${ALWAYS_RUN_LIST:-"develop main master"}"
-      # If the current branch is not in the always run list
-      if ! ( echo ${always_run_list} | grep -w -q ${CI_COMMIT_REF_NAME} );
+      # Create a pattern of branch names on which we always run.
+      # Note: the pattern can be overridden setting ALWAYS_RUN_PATTERN.
+      always_run_pattern="${ALWAYS_RUN_PATTERN:-"develop|main|master"}"
+      # If the current branch is not in the always run pattern
+      if [[ ! "${CI_COMMIT_REF_NAME}" =~ ${always_run_pattern} ]];
       then
           curl --header "authorization: Bearer ${GITHUB_TOKEN}" -X POST -d " \
           { \
