@@ -8,8 +8,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## Next
 
-- Use a regex/pattern to describe the branches that should always be ignored by
+- BREAKING: Use a regex/pattern to describe the branches that should always be ignored by
   the draft pr filter job.
+  -> ALWAYS_RUN_LIST is now ALWAYS_RUN_PATTERN and takes a regex for string comparison in bash test.
+     typical example: `^develop$|^main$|^master$|^v[0-9.]*$|^releases/`
+     This will always run the CI for references "develop" "main" "master" and release tags or branches.
 
 ## [v2022.03.0 - 2023-04-12]
 
