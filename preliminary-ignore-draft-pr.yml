@@ -25,7 +25,7 @@ ignore-draft-pr:
     - |
       # Create a pattern of branch names on which we always run.
       # Note: the pattern can be overridden setting ALWAYS_RUN_PATTERN.
-      always_run_pattern="${ALWAYS_RUN_PATTERN:-"develop|main|master"}"
+      always_run_pattern="${ALWAYS_RUN_PATTERN:-"^develop$|^main$|^master$|^v[0-9.]*$"}"
       # If the current branch is not in the always run pattern
       if [[ ! "${CI_COMMIT_REF_NAME}" =~ ${always_run_pattern} ]];
       then
