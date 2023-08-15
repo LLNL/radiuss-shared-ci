@@ -1,0 +1,27 @@
+##############################################################################
+# Copyright (c) 2022, Lawrence Livermore National Security, LLC and RADIUSS
+# project contributors. See the COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: (MIT)
+##############################################################################
+
+intel_19_1_2_gcc_10_3_1:
+  variables:
+    SPEC: "${PROJECT_RUBY_VARIANTS} %intel@19.1.2.gcc.10.3.1 ${PROJECT_RUBY_DEPS}"
+  extends: .job_on_ruby
+
+intel_2022_1_0:
+  variables:
+    SPEC: "${PROJECT_RUBY_VARIANTS} %intel@2022.1.0 ${PROJECT_RUBY_DEPS}"
+  extends: .job_on_ruby
+
+clang_14_0_6:
+  variables:
+    SPEC: "${PROJECT_RUBY_VARIANTS} %clang@14.0.6 ${PROJECT_RUBY_DEPS}"
+  extends: .job_on_ruby
+
+gcc_10_3_1:
+  variables:
+    SPEC: "${PROJECT_RUBY_VARIANTS} %gcc@10.3.1 ${PROJECT_RUBY_DEPS}"
+  extends: .job_on_ruby
+

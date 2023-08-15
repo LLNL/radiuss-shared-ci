@@ -7,9 +7,11 @@
 
 stages:
   - is-machine-up
-  - allocate_resources
-  - build_and_test
-  - release_resources
+  - allocate-resources
+  - jobs-stage-1
+  - jobs-stage-2
+  - jobs-stage-3
+  - release-resources
 
 ##############################################################################
 # UTILITIES
@@ -54,12 +56,12 @@ stages:
       git fetch origin --depth=1 ${CI_COMMIT_SHA} \n
       git checkout ${CI_COMMIT_SHA} \n
       git submodule update --init --recursive \n
-      SPEC=\"${SPEC//\"/\\\"}\" MODULE_LIST=\"${MODULE_LIST}\" srun ${RUBY_BUILD_AND_TEST_JOB_ALLOC} ${BUILD_AND_TEST_CMD}"
+      SPEC=\"${SPEC//\"/\\\"}\" MODULE_LIST=\"${MODULE_LIST}\" srun ${RUBY_JOB_ALLOC} ${JOB_CMD}"
       echo -e "\e[7;32m### End of reproducer\e[0m"
 
-.build_and_test_on_ruby:
-  extends: [.custom_build_and_test, .on_ruby]
-  stage: build_and_test
+.job_on_ruby:
+  extends: [.custom_job, .on_ruby]
+  stage: jobs-stage-1
   script:
     # Allocation information
     - echo -e "### Allocation name is ${ALLOC_NAME}"
@@ -68,58 +70,38 @@ stages:
     # Print a reproducer
     - *print_ruby_reproducer
     # The actual launch command
-    - srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) ${RUBY_BUILD_AND_TEST_JOB_ALLOC} ${BUILD_AND_TEST_CMD}
+    - srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) ${RUBY_JOB_ALLOC} ${JOB_CMD}
 
 ##############################################################################
 # JOBS
 
 # In pre-build phase, allocate a node for builds.
 # TODO: make the resource configurable, not all projects will want the same.
-allocate_resources (on ruby):
+allocate_resources:
   variables:
     GIT_STRATEGY: none
   extends: .on_ruby
-  stage: allocate_resources
+  stage: allocate-resources
   script:
-    - salloc ${RUBY_BUILD_AND_TEST_SHARED_ALLOC} --no-shell --job-name=${ALLOC_NAME}
+    - salloc ${RUBY_SHARED_ALLOC} --no-shell --job-name=${ALLOC_NAME}
 
 status_pending:
   extends: [.on_ruby]
   variables:
     GIT_STRATEGY: none
-  stage: allocate_resources
+  stage: allocate-resources
   script:
     - export pipeline_status="pending"
     - *status_report
 
-intel_19_1_2_gcc_10_3_1:
-  variables:
-    SPEC: "${PROJECT_RUBY_VARIANTS} %intel@19.1.2.gcc.10.3.1 ${PROJECT_RUBY_DEPS}"
-  extends: .build_and_test_on_ruby
-
-intel_2022_1_0:
-  variables:
-    SPEC: "${PROJECT_RUBY_VARIANTS} %intel@2022.1.0 ${PROJECT_RUBY_DEPS}"
-  extends: .build_and_test_on_ruby
-
-clang_14_0_6:
-  variables:
-    SPEC: "${PROJECT_RUBY_VARIANTS} %clang@14.0.6 ${PROJECT_RUBY_DEPS}"
-  extends: .build_and_test_on_ruby
-
-gcc_10_3_1:
-  variables:
-    SPEC: "${PROJECT_RUBY_VARIANTS} %gcc@10.3.1 ${PROJECT_RUBY_DEPS}"
-  extends: .build_and_test_on_ruby
-
 # In post-build phase, deallocate resources.
 # Note : we make sure this is run even on build phase failure using a specific
 # rule in the template ".on_ruby".
-release_resources (on ruby):
+release_resources:
   variables:
     GIT_STRATEGY: none
   extends: .on_ruby
-  stage: release_resources
+  stage: release-resources
   script:
     - export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
     - ([[ -n "${JOBID}" ]] && scancel ${JOBID})
@@ -128,7 +110,7 @@ status_success:
   extends: [.on_ruby]
   variables:
     GIT_STRATEGY: none
-  stage: release_resources
+  stage: release-resources
   script:
     - export pipeline_status="success"
     - *status_report
@@ -138,7 +120,7 @@ status_failure:
   extends: [.on_ruby]
   variables:
     GIT_STRATEGY: none
-  stage: release_resources
+  stage: release-resources
   script:
     - export pipeline_status="failure"
     - *status_report
