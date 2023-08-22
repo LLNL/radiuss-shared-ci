@@ -6,6 +6,19 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2023.06.0 - 2023-06-23]
+
+- Update rocm to 5.5.1 on Tioga
+- Update rocm to 5.5.0 on Corona
+
+## [v2023.03.1 - 2023-05-25]
+
+- Improved documentation
+- Update to RHEL 8 on Ruby
+  - Replace gcc 8.3.1 with gcc 8.5.0 or remove it.
+  - Update gcc to 10.3.1
+  - Deactivate oneapi
+
 ## [v2022.03.0 - 2023-04-12]
 
 ### Added
