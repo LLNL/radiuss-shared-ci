@@ -12,18 +12,18 @@
 Use Spack to install dependencies and configure the project build
 *****************************************************************
 
-.. image:: images/UberenvWorkflowSpack.png
-   :scale: 32 %
-   :alt: Uberenv is integrated into a project to drive Spack to build the dependencies and produce a CMake cached configuration files
+.. image:: images/SharedCI_ProjectStructure.png
+   :scale: 18 %
    :align: center
 
-The first step in adopting RADIUSS CI infrastructure is to set up your project
-so that Spack can be used to install the dependencies and generate a
-configuration file for the build.
+   The Shared Build Infrastructure turns a specified target into installed
+   dependencies and a CMake cached configuration file. We chose spack as the
+   core tool to accomplish this task.
 
-The above figure illustrates how we use Uberenv to drive Spack, which is
-configured with custom packages and RADIUSS Spack Configs. The end product is
-a CMake Cached configuration file.
+We start with the Shared Build Infrastructure, where Spack is used to install
+the dependencies and generate a configuration file for the build. In RADIUSS
+projects, Uberenv drives Spack which itself is configured with RADIUSS Spack
+Configs.
 
 .. note::
    In Spack, packages that inherit from the CachedCMakePackage class generate a
@@ -168,6 +168,8 @@ you will find:
 * `modules.yaml` for modules creation by Spack.
 * One `compilers.yaml` and `packages.yaml` per system type, describing the
   installed toolchain on each machine.
+* a `packages` directory containing some Spack packages tuned for our
+  needs.
 
 Depending on the machine/system, we may or may not provide a spack
 configuration allowing you to use it right away. Please refer to

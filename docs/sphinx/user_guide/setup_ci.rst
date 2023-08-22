@@ -11,40 +11,34 @@
 Setup the CI using the shared template
 **************************************
 
-.. image:: images/UberenvWorkflowCI.png
-   :scale: 32 %
-   :alt: Once Spack and the build script setup, adopting the shared CI should be easy.
+.. image:: images/SharedCI_ProjectStructure.png
+   :scale: 18 %
    :align: center
 
-The third step in adopting RADIUSS Shared CI infrastructure is to setup the CI.
+   Once Spack and the build script setup, we focus of the Shared CI
+   Infrastructure itself.
 
-After you have implemented the first two steps :ref:`use_spack-label` and
-:ref:`build_and_test-label`, you should be able to use the shared CI 
-infrastructure. In more complex scenarios, you will always be able to use 
-the template as a starting point for a custom implementation.
+The third step in adopting RADIUSS CI infrastructure is to setup the CI.
 
-By sharing the CI definition, projects share the burden of maintaining it. In
-addition, with our shared CI, they also share a core set of Spack specs to
-ensure that they keep running tests with similar build configurations.
+After implementing the first two steps :ref:`use_spack-label` and
+:ref:`build_and_test-label`, you should be able to use the shared CI
+infrastructure. In more complex scenarios, you will always be able to use the
+template as a starting point for a custom implementation.
 
 =================
 RADIUSS Shared CI
 =================
 
-Initially, the RADIUSS effort developed a mechanism to 
-*share Spack configuration files* across projects. Then, we developed a 
-process to manage Spack and use it to generate CMake configuration files.
-The RADIUSS Shared CI project extends this by developing a CI implementation
-that can be shared across projects, which drive it with a ``build-and-test`` 
-script (described in :ref:`build_and_test-label`) that has the same inputs 
-across projects.
+By sharing the CI definition, projects share the burden of maintaining it. In
+addition, with our shared CI, they also share a core set of Spack specs to
+ensure that they keep running tests with similar build configurations.
 
-With a centralized CI configuration that is shared by projects, we create an 
-interface between local and shared configurations. We try to keep this 
-interface minimal, while allowing for project-specific customization. 
-Only a handful of modifications are required to get the CI to work for your 
-project, while files in the ``customization`` directory allow for finer tuning 
-and extensibility.
+With a centralized CI configuration that is shared by projects, we create an
+interface between local and shared configurations. We try to keep this
+interface minimal, while allowing for project-specific customization. Only a
+handful of modifications are required to get the CI to work for your project,
+while files in the ``customization`` directory allow for finer tuning and
+extensibility.
 
 .. note::
    GitLab allows projects to include external files to configure their CI. We
@@ -53,7 +47,7 @@ and extensibility.
 The short version
 =================
 
-The following sequence of steps and commands summarizes the process of 
+The following sequence of steps and commands summarizes the process of
 integrating the RADIUSS Shared CI infrastructure into your project.
 
 .. code-block:: bash
