@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## Next
 
+## [v2023.08.0 - 2023-08-22 ]
+
 - BREAKING: Use a regex/pattern to describe the branches that should always be
   ignored by the draft pr filter job.
   -> ALWAYS_RUN_LIST is now ALWAYS_RUN_PATTERN and takes a regex for string
@@ -15,6 +17,13 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
      `^develop$|^main$|^master$|^v[0-9.]*$|^releases/`
      This will always run the CI for references "develop" "main" "master" and
      release tags or branches.
+
+- Deprecated: flux mini run -> flux run
+- Update rocm to 5.6.0 on Tioga and Corona
+- Update cce to 16.0.0 on Tioga
+- Updates gcc to 10.3.1 when using intel 19.1.2
+- Remove unused xl 2022 combined with cuda 11.7
+- Switch to IBM clang 12 in one of the lassen jobs
 
 ## [v2023.06.0 - 2023-06-23]
 
