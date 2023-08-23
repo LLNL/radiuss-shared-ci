@@ -11,7 +11,7 @@
 Setup the CI using the shared template
 **************************************
 
-.. image:: images/SharedCI_ProjectStructure.png
+.. figure:: images/SharedCI_ProjectStructure.png
    :scale: 18 %
    :align: center
 
