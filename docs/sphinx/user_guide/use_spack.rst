@@ -13,7 +13,7 @@ Use Spack to install dependencies and configure the project build
 *****************************************************************
 
 .. figure:: images/SharedCI_ProjectStructure.png
-   :scale: 100 %
+   :scale: 18 %
 
    The Shared Build Infrastructure turns a specified target into installed
    dependencies and a CMake cached configuration file. We chose spack as the

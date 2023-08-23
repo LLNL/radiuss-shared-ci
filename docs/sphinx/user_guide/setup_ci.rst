@@ -15,12 +15,10 @@ Setup the CI using the shared template
    :scale: 18 %
    :align: center
 
-   Once Spack and the build script setup, we focus of the Shared CI
+   Once Spack and the build script set up, we focus of the Shared CI
    Infrastructure itself.
 
-The third step in adopting RADIUSS CI infrastructure is to setup the CI.
-
-After implementing the first two steps :ref:`use_spack-label` and
+After completing the first two steps :ref:`use_spack-label` and
 :ref:`build_and_test-label`, you should be able to use the shared CI
 infrastructure. In more complex scenarios, you will always be able to use the
 template as a starting point for a custom implementation.
@@ -44,6 +42,16 @@ extensibility.
    GitLab allows projects to include external files to configure their CI. We
    rely on this mechanism to share most of the CI configuration among projects.
 
+File structure
+==============
+
+.. figure:: images/SharedCI_RepositoryStructure.png
+   :scale: 30 %
+   :aligne: center
+
+   The RADIUSS Shared CI repository contains files that are used remotely as
+   well as templates that needs to be copied over and completed.
+
 The short version
 =================
 
@@ -53,9 +61,6 @@ integrating the RADIUSS Shared CI infrastructure into your project.
 .. code-block:: bash
 
    ### Prerequisites
-   cd my_project
-   mkdir -p scripts/gitlab
-   vim scripts/gitlab/build-and-test.sh
    # write CI script
 
    ### CI Setup
@@ -66,12 +71,13 @@ integrating the RADIUSS Shared CI infrastructure into your project.
    mkdir -p .gitlab
    cp ../radiuss-shared-ci/customization/subscribed-pipelines.yml .gitlab
    cp ../radiuss-shared-ci/customization/custom-jobs-and-variables.yml .gitlab
-   cp ../radiuss-shared-ci/example-extra-jobs/*-extra.yml .gitlab
+   cp ../radiuss-shared-ci/extra-jobs/*-extra.yml .gitlab
    vim .gitlab/subscription-pipelines.yml
+   # comment the jobs associted to <CI_MACHINE> you don’t want.
    vim .gitlab/custom-jobs-and-variables.yml
-   # customize CI
+   # set the variables according to your needs.
    vim .gitlab/*-extra.yml
-   # edit extra jobs
+   # Add jobs or override some of the shared ones.
 
    ### Non-RADIUSS projects
    open https://lc.llnl.gov/gitlab/<group>/<project>/-/settings/ci_cd
@@ -96,7 +102,7 @@ Setting up the CI consists of four corresponding steps.
 Write CI Script
 ---------------
 
-The first step is to provide a CI script, which you should already have 
+The first step is to provide a CI script, which you should already have
 after completing :ref:`write-ci-script` at Step 2.
 
 Once you have that script, you are ready to move on to the CI setup.
@@ -104,7 +110,7 @@ Once you have that script, you are ready to move on to the CI setup.
 Core CI implementation
 ----------------------
 
-Start by cloning the RADIUSS Shared CI project locally, for example next to 
+Start by cloning the RADIUSS Shared CI project locally, for example next to
 the project you intend to add CI to.
 
 .. code-block:: bash
@@ -122,33 +128,36 @@ that it has a dot (``.``) at the beginning of the name.
 
    cp ../radiuss-shared-ci/customization/gitlab-ci.yml .gitlab-ci.yml
 
-In the ``.gitlab-ci.yml`` file, there are some variables you need to adapt to 
+In the ``.gitlab-ci.yml`` file, there are some variables you need to adapt to
 your project. They are described in the following table:
 
  ========================================== ==========================================================================================================================
   Parameter                                  Description
  ========================================== ==========================================================================================================================
-  ``LLNL_SERVICE_USER``                      Project specific Service User Account used in CI
-  ``CUSTOM_CI_BUILD_DIR``                    Where to locate build directories (prevent exceeding your disk quota)
+  ``GITHUB_PROJECT_NAME``                    The Project name on GitHub, use to send status updates
+  ``GITHUB_PROJECT_ORG``                     The Project organization on GitHub, use to send status updates
+  ``LLNL_SERVICE_USER``                      Project specific Service User Account used in CI (optional but recommeded)
+  ``CUSTOM_CI_BUILD_DIR``                    If not using a service user, where to locate build directories (prevent exceeding your disk quota)
   ``GIT_SUBMODULES_STRATEGY``                Controls strategy for the clone performed by GitLab. Consider ``recursive`` if you have submodules, otherwise comment it.
   ``BUILD_ROOT``                             Location (path) where the projects should be built. We provide a sensible default.
+  ``BUILD_AND_TEST_CMD``                     The command that runs the build and test script. Lets you name and store that script however you like.
  ========================================== ==========================================================================================================================
 
 .. note::
    If a variable is blank in the template file, then it does not require a
-   value. If a variable has a value there, it does require one.
+   value. If a variable has a value there (even "..."), it does require one.
 
 .. warning::
-   We strongly recommend that you set your CI to use a service user account. 
-   This will enable you to add users to associated service user account group 
-   so that they can interact with GitLab runners to restart test pipelines, 
+   We strongly recommend that you set your CI to use a service user account.
+   This will enable you to add users to associated service user account group
+   so that they can interact with GitLab runners to restart test pipelines,
    for example.
 
 Your CI is now set up to include remote files from the GitLab mirror of the
 radiuss-shared-ci project.
 
-Lastly, we complete the interface with the shared CI configuration.
-In particular, the ``.gitlab-ci.yml`` file requires some files to be present 
+Lastly, we need to complete the interface with the shared CI configuration.
+In particular, the ``.gitlab-ci.yml`` file requires some files to be present
 in your Git repository. These are described in the next few sections.
 
 .. _customize-ci:

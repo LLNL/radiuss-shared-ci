@@ -20,7 +20,7 @@ and tested as usual and *most of the CI infrastructure is shared* to reduce
 duplicated effort and ease maintenance for individual projects.
 
 .. figure:: images/SharedCI_ProjectStructure.png
-   :scale: 5 %
+   :scale: 18 %
    :align: center
 
    RADIUSS CI infrastructure supposes the adoption of two components, a shared
