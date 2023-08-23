@@ -101,8 +101,15 @@ Update the CI configuration, Spack, Uberenv, or RADIUSS Spack Configs
 =====================================================================
 
 RADIUSS Shared CI relies on three other components to work properly: `Spack`_,
-`Uberenv`_ and `radiuss-spack-configs`_. As a general rule, an update of one
-may require an update of the others.
+`Uberenv`_ and `radiuss-spack-configs`_. The dependency scheme between those
+components is as follows:
+
+.. figure:: images/shared-ci-deps.pdf
+   :align: center
+
+   The dependency graphs helps anticipating the impact of a change. E.g., a
+   change in RADIUSS Spack configs will likely result in an update of both
+   RADIUSS Shared CI and the project.
 
 Updating RADIUSS Shared CI
 ==========================
