@@ -47,7 +47,7 @@ File structure
 
 .. figure:: images/SharedCI_RepositoryStructure.png
    :scale: 30 %
-   :aligne: center
+   :align: center
 
    The RADIUSS Shared CI repository contains files that are used remotely as
    well as templates that needs to be copied over and completed.
