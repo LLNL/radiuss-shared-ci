@@ -104,7 +104,7 @@ RADIUSS Shared CI relies on three other components to work properly: `Spack`_,
 `Uberenv`_ and `radiuss-spack-configs`_. The dependency scheme between those
 components is as follows:
 
-.. figure:: images/shared-ci-deps.pdf
+.. figure:: images/SharedCI_Dependencies.png
    :align: center
 
    The dependency graphs helps anticipating the impact of a change. E.g., a
