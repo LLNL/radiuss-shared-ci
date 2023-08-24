@@ -12,18 +12,17 @@
 Use Spack to install dependencies and configure the project build
 *****************************************************************
 
-.. image:: images/UberenvWorkflowSpack.png
-   :scale: 32 %
-   :alt: Uberenv is integrated into a project to drive Spack to build the dependencies and produce a CMake cached configuration files
-   :align: center
+.. figure:: images/SharedCI_ProjectStructure.png
+   :scale: 18 %
 
-The first step in adopting RADIUSS CI infrastructure is to set up your project
-so that Spack can be used to install the dependencies and generate a
-configuration file for the build.
+   The Shared Build Infrastructure turns a specified target into installed
+   dependencies and a CMake cached configuration file. We chose spack as the
+   core tool to accomplish this task.
 
-The above figure illustrates how we use Uberenv to drive Spack, which is
-configured with custom packages and RADIUSS Spack Configs. The end product is
-a CMake Cached configuration file.
+We start with the Shared Build Infrastructure, where Spack is used to install
+the dependencies and generate a configuration file for the build. In RADIUSS
+projects, Uberenv drives Spack which itself is configured with RADIUSS Spack
+Configs.
 
 .. note::
    In Spack, packages that inherit from the CachedCMakePackage class generate a
@@ -77,12 +76,12 @@ install your project dependencies and generate the configuration file.
 
    One common source of error when using Uberenv is when the ``uberenv_libs``
    folder is out of date after a Spack update. To resolve, make sure this
-   ``uberenv_libs`` is deleted before running it again for the first time
-   because it needs to be regenerated.
+   ``uberenv_libs`` is deleted before running uberenv for the first time after
+   an update because it needs to be regenerated.
 
 
-Getting Uberenv as a submodule (recommended)
-============================================
+Main steps
+==========
 
 #. Get ``uberenv.py`` script.
 
@@ -90,10 +89,10 @@ Getting Uberenv as a submodule (recommended)
 
 #. Edit the ``.uberenv_config.json`` file.
 
-    Create the ``.uberenv_config.json`` file in a directory that is a parent 
-    of the ``uberenv`` directory. A typical project places the file in the
-    top-level directory of its repository. Set your project package name, and 
-    other parameters like Spack reference commit/tag (we suggest the latest 
+    Create the ``.uberenv_config.json`` file in a directory that is a parent of
+    the ``uberenv`` directory. Projects typically place the file in the
+    top-level directory of its repository. Set your project package name, and
+    other parameters like Spack reference commit/tag (we suggest the latest
     release tag).
 
 #. Add RADIUSS Spack Configs submodule.
@@ -106,56 +105,29 @@ Getting Uberenv as a submodule (recommended)
 
 #. Add custom packages.
 
-    If you need to make local modifications to your project package or a
-    dependency package, you may put it in a corresponding directory:
+    Radiuss Spack Configs now gathers the RADIUSS custom spack packages.
+
+    If you need to make local modifications to your project package, we suggest
+    creating a branch in `RADIUSS Spack Configs`_ as it is likely your changes
+    will be need by projects depending on yours.
+
+    Then, in ``.uberenv_config.json``, set ``spack_packages_path`` to point to
+    ``<some_relative_path>/radiuss-spack-configs/packages``
+
+    However, you can still use packages defined locally instead of the RADIUSS
+    Spack Configs ones. Let’s say you place them in
     ``<some_relative_path>/packages/<package_name>/package.py``.
 
     Then, in ``.uberenv_config.json``, set ``spack_packages_path`` to point to
     ``<some_relative_path>/packages``
 
-#. Make sure that the ``package.py`` file for your project generates a CMake 
+#. Make sure that the ``package.py`` file for your project generates a CMake
    configuration file.
 
     This is usually done adding a specific stage to the package. In particular,
-    Spack now supports this for CMake build system with the CacheCMakePackages
+    Spack now supports this for CMake build system with the CachedCMakePackages
     class. (see :ref:`generate-config-file` for details, and Umpire, CHAI, RAJA
     for implementation examples).
-
-
-Getting Uberenv by clone/fetch/copy
-===================================
-
-#. Get ``uberenv.py`` script.
-
-    Clone/Fetch/Copy it from `Uberenv`_ repository.
-    into a ``uberenv`` directory, not as a submodule.
-
-#. Edit ``uberenv_config.json``.
-
-    Set your project package name, and other parameters like Spack reference
-    commit/tag (we suggest the latest release tag).
-
-#. Add RADIUSS Spack Configs submodule.
-
-    * Use ``git submodule add`` to get `RADIUSS Spack Configs`_.
-
-    * Create a symlink ``uberenv/spack_configs`` that points to
-      ``radiuss-spack-configs``.
-
-#. Add custom packages.
-
-    | If you need to make local modifications to your project package or a
-      dependency package, you may put it in a corresponding directory:
-    | ``uberenv/packages/<package_name>/package.py``.
-
-#. Make sure that the ``package.py`` file for your project generates a CMake 
-   configuration file.
-
-    This is usually done adding a specific stage to the package. In particular,
-    Spack now supports this for CMake build system with the CacheCMakePackages
-    class. (see :ref:`generate-config-file` for details, and Umpire, CHAI, RAJA
-    for implementation examples).
-
 
 ==================================
 Get the shared Spack configuration
@@ -168,6 +140,8 @@ you will find:
 * `modules.yaml` for modules creation by Spack.
 * One `compilers.yaml` and `packages.yaml` per system type, describing the
   installed toolchain on each machine.
+* a `packages` directory containing some Spack packages tuned for our
+  needs.
 
 Depending on the machine/system, we may or may not provide a spack
 configuration allowing you to use it right away. Please refer to
