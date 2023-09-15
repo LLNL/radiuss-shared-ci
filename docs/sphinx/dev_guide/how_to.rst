@@ -37,9 +37,9 @@ name.
 
 Then go to ``customization/custom-variables.yml`` and add the variables:
 
-* ``<MACHINE>_BUILD_AND_TEST_SHARED_ALLOC`` with allocation options sufficient
+* ``<MACHINE>_SHARED_ALLOC`` with allocation options sufficient
   for the shared allocation (salloc) to contain all the jobs.
-* ``<MACHINE>_BUILD_AND_TEST_JOB_ALLOC`` with allocation options for any of the
+* ``<MACHINE>_JOB_ALLOC`` with allocation options for any of the
   jobs (srun) the machine will take. The job will run under the shared
   allocation. Lastly, do not prescribe a number of cores here, as they should
   be defined at Spack and Make/CMake level.
@@ -57,7 +57,7 @@ name.
 
 Then go to ``customization/custom-variables.yml`` and add the variables:
 
-* ``<MACHINE>_BUILD_AND_TEST_JOB_ALLOC`` with allocation options for any of the
+* ``<MACHINE>_JOB_ALLOC`` with allocation options for any of the
   jobs the machine will take.
 
 .. note::

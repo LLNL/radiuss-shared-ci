@@ -140,7 +140,7 @@ your project. They are described in the following table:
   ``CUSTOM_CI_BUILD_DIR``                    If not using a service user, where to locate build directories (prevent exceeding your disk quota)
   ``GIT_SUBMODULES_STRATEGY``                Controls strategy for the clone performed by GitLab. Consider ``recursive`` if you have submodules, otherwise comment it.
   ``BUILD_ROOT``                             Location (path) where the projects should be built. We provide a sensible default.
-  ``BUILD_AND_TEST_CMD``                     The command that runs the build and test script. Lets you name and store that script however you like.
+  ``JOB_CMD``                     The command that runs the build and test script. Lets you name and store that script however you like.
  ========================================== ==========================================================================================================================
 
 .. note::
@@ -197,8 +197,8 @@ details can be found in the file itself.
   Parameter                                  Description
  ========================================== ==========================================================================================================================
   ``ALLOC_NAME``                             Name of the shared allocation. Should be unique, our default should be fine.
-  ``<MACHINE>_BUILD_AND_TEST_SHARED_ALLOC``  Parameters for the shared allocation. You may extend the resource and time.
-  ``<MACHINE>_BUILD_AND_TEST_JOB_ALLOC``     Parameters for the job allocation. You may extend the resource and time within the scope of the shared allocation.
+  ``<MACHINE>_SHARED_ALLOC``  Parameters for the shared allocation. You may extend the resource and time.
+  ``<MACHINE>_JOB_ALLOC``     Parameters for the job allocation. You may extend the resource and time within the scope of the shared allocation.
   ``PROJECT_<MACHINE>_VARIANTS``             Global variants to be added to all the shared specs.
   ``PROJECT_<MACHINE>_DEPS``                 Global dependencies to be added to all the shared specs.
  ========================================== ==========================================================================================================================
