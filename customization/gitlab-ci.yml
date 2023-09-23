@@ -1,5 +1,5 @@
 ###############################################################################
-# Copyright (c) 2022, Lawrence Livermore National Security, LLC and RADIUSS
+# Copyright (c) 2022-23, Lawrence Livermore National Security, LLC and RADIUSS
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -48,8 +48,8 @@ variables:
   GITHUB_PROJECT_ORG: "..."
 # Set the build-and-test command.
   JOB_CMD: "..."
-# Override the pattern describing branches that will skip the "draft PR test".
-# Add protected branches here. See default value in
+# Override the pattern describing branches that will skip the "draft PR filter
+# test".  Add protected branches here. See default value in
 # preliminary-ignore-draft-pr.yml.
 #  ALWAYS_RUN_PATTERN: ""
 
@@ -58,7 +58,7 @@ variables:
 
 # High level stages
 stages:
-  - machine-checks
+  - prerequisites
   - build-and-test
 
 # Template for jobs triggering a build-and-test sub-pipelines:
@@ -70,13 +70,13 @@ stages:
       - project: 'radiuss/radiuss-shared-ci'
         ref: '${SHARED_CI_REF}'
         file: 'pipelines/${CI_MACHINE}.yml'
-      - ... #Add your jobs
+      # Add your jobs
       # you can use a local file
-      # - local: 'some/path/${CI_MACHINE}-jobs.yml'
-      # or a file genarted in the previous steps
-      # - artifact: 'some/path/${CI_MACHINE}-jobs.yml'
+      - local: '.gitlab/jobs/${CI_MACHINE}.yml'
+      # or a file generated in the previous steps
+      # - artifact: '${CI_MACHINE}-jobs.yml'
       #   job: 'generate-job-file'
-      # (See Umpire for an example).
+      # (See Umpire CI setup for an example).
     strategy: depend
     forward:
       pipeline_variables: true
