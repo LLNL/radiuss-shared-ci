@@ -12,10 +12,6 @@
 User Guide
 ##########
 
-LLNL open-source projects are prevalently hosted on GitHub. However, for those
-meant to run on Livermore Computing (LC) systems, testing on LC GitLab instance
-on an automated manner is paramount.
-
 The RADIUSS Shared CI project provides a *templated CI infrastructure for
 GitLab* that we intend to be sufficiently flexible and general to be adopted
 and shared by any LLNL open-source projects hosted on GitHub.
@@ -23,14 +19,6 @@ and shared by any LLNL open-source projects hosted on GitHub.
 The infrustructure is project-agnostic. Each machine we support has a templated
 pipeline ready for use. Users only need to add jobs for machines of interest
 and set some variables according to their needs.
-
-Projects using the RADIUSS Shared CI infrastructure keep control other their
-build and test process. The pre-requisite being that this process can be
-invoked through a single command line.
-
-A project is then built and tested as usual and *most of the CI infrastructure
-is shared* to reduce duplicated effort and ease maintenance for individual
-projects.
 
 .. figure:: images/Shared-CI-Infrastructure.png
    :scale: 18 %
