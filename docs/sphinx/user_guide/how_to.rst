@@ -8,9 +8,9 @@
 
 .. _user_how_to-label:
 
-#########
+*********
 How To...
-#########
+*********
 
 This section describes how to perform various maintenance tasks once you have
 the RADIUSS Shared CI framework set up for your project.
@@ -47,7 +47,7 @@ Using RADIUSS Spack Configs allows projects to easily share the full context of
 their builds.
 
 .. figure:: images/Full-CI-Infrastructure.png
-   :scale: 18 %
+   :scale: 40 %
    :align: center
 
    The Shared CI Infrastructure is project agnostic. It is tuned for

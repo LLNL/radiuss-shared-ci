@@ -12,8 +12,8 @@
 Setup the CI using the shared template
 **************************************
 
-.. figure:: images/Shared-Build-Infrastructure.png
-   :scale: 18 %
+.. figure:: images/Shared-CI-Infrastructure.png
+   :scale: 40 %
    :align: center
 
    The Shared CI Infrastructure is project agnostic. It is tuned for
@@ -25,13 +25,13 @@ The pre-requisite for using the RADIUSS Shared CI Infrastructure, provided that
 your projects is hosted on GitHub, is that you can trigger your build and test
 process with one command line.
 
-Strict separation of the build and test process and the CI infrastructure
+Strict separation between the build and test process and the CI infrastructure
 greatly helps with maintenance: it is much easier to debug a standalone script,
 which can be run outside CI, than when the process is encoded in the CI YAML
 files.
 
 .. note::
-   In our own RADIUSS CI setups, we do not split the build and test phases
+   In our own RADIUSS CI setups, we do not split the build and the test phases
    because it adds complexity. This typically saves us from using artifacts.
    However, we do not prevent projects from implementing more complex
    workflows. Please refer to [LINK TO DEDICATED HOW TO] for more details on
@@ -71,7 +71,7 @@ File structure
    The RADIUSS Shared CI repository contains files that are included remotely
    as well as template files that needs to be copied over and completed. Each
    pipeline file also defines a job template (in the sense of GitLab CI YAML
-   syntax) that providing the core settings that your own jobs will extend.
+   syntax) providing the core settings that your own jobs will extend.
 
 The short version
 =================
@@ -107,7 +107,7 @@ integrating the RADIUSS Shared CI infrastructure into your project.
    # permissions.
 
 Jump to a corresponding section for details on :ref:`customize-ci`,
-:ref:`add-jobs` and :ref:`write-ci-script`.
+:ref:`add-jobs`.
 
 The detailed version
 ====================
@@ -124,8 +124,9 @@ Setting up the CI consists of four corresponding steps.
 Write CI Script
 ---------------
 
-The first step is to provide a CI script. Once you have that script, you are
-ready to move on to the CI setup.
+The first step is to prepare a CI script that will be called using the
+``JOB_CMD`` variable in the CI. Once you have that script, you are ready to
+move on to the CI setup.
 
 Core CI implementation
 ----------------------
@@ -155,12 +156,12 @@ to your project. They are described in the following table:
   Parameter                                  Description
  ========================================== ==========================================================================================================================
   ``LLNL_SERVICE_USER``                      Project specific Service User Account used in CI (optional but recommeded)
-  ``CUSTOM_CI_BUILD_DIR``                    If not using a service user, where to locate build directories (prevent exceeding your disk quota)
+  ``CUSTOM_CI_BUILD_DIR``                    If not using a service user, where to locate the CI working directories (prevent exceeding your disk quota)
   ``GIT_SUBMODULES_STRATEGY``                Controls strategy for the clone performed by GitLab. Consider ``recursive`` if you have submodules, otherwise comment it.
   ``BUILD_ROOT``                             Location (path) where the projects should be built. We provide a sensible default.
   ``SHARED_CI_REF``                          The reference (branch, tag) you would like to use in RADIUSS Shared CI repository
-  ``GITHUB_PROJECT_NAME``                    The Project name on GitHub, use to send status updates
-  ``GITHUB_PROJECT_ORG``                     The Project organization on GitHub, use to send status updates
+  ``GITHUB_PROJECT_NAME``                    The Project name on GitHub, used to send status updates
+  ``GITHUB_PROJECT_ORG``                     The Project organization on GitHub, used to send status updates
   ``JOB_CMD``                                The command that runs the build and test script. Lets you name and store that script however you like.
   ``ALWAYS_RUN_PATTERN``                     The regex pattern describing the branches that will skip the draft pull request filter test.
  ========================================== ==========================================================================================================================
@@ -171,24 +172,25 @@ to your project. They are described in the following table:
 
 .. warning::
    We strongly recommend that you set your CI to use a service user account.
-   This will enable you to add users to associated service user account group
-   so that they can interact with GitLab runners to restart test pipelines,
-   for example. It will also simplify permissions and allocations management.
+   This will enable you to add users to the associated service user account
+   group so that they can interact with GitLab runners to restart test
+   pipelines, for example. It will also simplify permissions and allocations
+   management.
 
 Your CI is now set up to include remote files from the GitLab mirror of the
 radiuss-shared-ci project.
 
-Lastly, we need to complete the interface with the shared CI configuration.
+We now need to complete the interface with the shared CI configuration.
 In particular, the ``.gitlab-ci.yml`` file requires some files to be present
 in your Git repository. These are described in the next few sections.
 
 .. _customize-ci:
 
-Customize CI
-------------
+Customize the CI
+----------------
 
 We provide templates for the required customization files. You need to have a
-``.gitlab`` subdirectory in the top-level directory of your Git repo. Then,
+``.gitlab`` subdirectory in the top-level of your Git repository. Then,
 you can copy the template files to that directory in your repo. For example:
 
 .. code-block:: bash
@@ -219,8 +221,8 @@ details can be found in the file itself.
   Parameter                                  Description
  ========================================== ==========================================================================================================================
   ``ALLOC_NAME``                             Name of the shared allocation. Should be unique, our default should be fine.
-  ``<MACHINE>_SHARED_ALLOC``  Parameters for the shared allocation. You may extend the resource and time.
-  ``<MACHINE>_JOB_ALLOC``     Parameters for the job allocation. You may extend the resource and time within the scope of the shared allocation.
+  ``<MACHINE>_SHARED_ALLOC``                 Parameters for the shared allocation. You may extend the resource and time.
+  ``<MACHINE>_JOB_ALLOC``                    Parameters for the job allocation. You may extend the resource and time within the scope of the shared allocation.
   ``PROJECT_<MACHINE>_VARIANTS``             Global variants to be added to all the shared specs.
   ``PROJECT_<MACHINE>_DEPS``                 Global dependencies to be added to all the shared specs.
  ========================================== ==========================================================================================================================

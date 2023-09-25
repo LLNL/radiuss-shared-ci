@@ -29,40 +29,36 @@ projects.
    and the open source community of a set of libraries and tools used for HPC
    scientific application development.
 
+
 ========
 Overview
 ========
 
-The steps necessary to adopt the RADIUSS Shared CI methodology are documented in the :doc:`RADIUSS Shared CI User Guide <sphinx/user_guide/index>`.
+RADIUSS Shared CI User Documentation
+=======================================
+
+The steps necessary to adopt the RADIUSS Shared CI methodology are documented
+in the :doc:`RADIUSS Shared CI User Guide <sphinx/user_guide/index>`.
+
+RADIUSS Shared CI Developer Documentation
+============================================
 
 In the  :doc:`RADIUSS Shared CI Developer Guide <sphinx/dev_guide/index>`,
 we discuss the layout of the RADIUSS Shared CI infrastructure and how the
 different pieces work together. Technical choices are also explained there.
 
-=======================================
-RADIUSS Shared CI User Documentation
-=======================================
-
-  * :doc:`RADIUSS Shared CI User Guide <sphinx/user_guide/index>`
-
-============================================
-RADIUSS Shared CI Developer Documentation
-============================================
-
-  * :doc:`RADIUSS Shared CI Developer Guide <sphinx/dev_guide/index>`
 
 =========================
 Background and Motivation
 =========================
 
 LLNL open-source projects are prevalently hosted on GitHub. However, for those
-meant to run on Livermore Computing (LC) systems, testing on LC GitLab instance
-on an automated manner is paramount.
+meant to run on Livermore Computing (LC) systems, testing automatically on LC
+GitLab instance is paramount.
 
-Initially, the RADIUSS Shared CI infrastructure was designed for RADIUSS
-projects also using Spack to describe the toolchain and build the dependencies.
-This "build infrastructure" is defined in `RADIUSS Spack Configs`_
-documentation.
+Initially, the RADIUSS Shared CI infrastructure was designed for projects also
+using Spack to describe the toolchain and build the dependencies. This "build
+infrastructure" is defined in `RADIUSS Spack Configs`_ documentation.
 
 ===========================================
 Cool features provided by RADIUSS Shared CI
@@ -70,9 +66,9 @@ Cool features provided by RADIUSS Shared CI
 
 * A shared configuration, for reduced maintenance.
 * Ability to define your jobs command and add as many jobs as desired.
-* Uses GitLab child pipelines to keep the pipeline readable.
-* Each child pipeline reports independently to GitHub.
-* Project can extend their pipeline at will with additional stages.
+* Leverage GitLab child pipelines to keep the pipeline readable.
+* Each child pipeline reports independently to GitHub: one status per machine.
+* Projects can extend their pipeline at will with additional stages.
 * Print an exact reproducer in the logs.
 * Optimize machine usage with shared allocation (optional).
 * Filter out pipelines coming from a mirrored draft Pull Request (optional).

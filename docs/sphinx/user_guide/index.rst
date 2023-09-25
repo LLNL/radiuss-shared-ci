@@ -21,19 +21,15 @@ pipeline ready for use. Users only need to add jobs for machines of interest
 and set some variables according to their needs.
 
 .. figure:: images/Shared-CI-Infrastructure.png
-   :scale: 18 %
+   :scale: 40 %
    :align: center
 
-   RADIUSS CI infrastructure provides a templated CI infrastructure. Pipeline
-   files should be included remotely to the projects CI configuration, while
-   templated configuration files should be copied over and filled.
+   RADIUSS Shared CI infrastructure provides a templated CI infrastructure.
+   Pipeline files should be included remotely to the projects CI configuration,
+   while templated configuration files should be copied over and filled.
 
 The figure illustrates the setup of a project using the RADIUSS Shared CI
 Infrastructure.
-
-The infrastructure is hosted on GitHub and mirrored on the Livermore Computing
-(LC) CZ GitLab instance. A project points to that GitLab mirror to access
-RADIUSS Shared CI configurations.
 
 In this documentation, we will describe how to set up RADIUSS Shared CI for
 your project.
