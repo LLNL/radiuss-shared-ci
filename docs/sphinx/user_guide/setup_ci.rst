@@ -34,7 +34,7 @@ files.
    In our own RADIUSS CI setups, we do not split the build and the test phases
    because it adds complexity. This typically saves us from using artifacts.
    However, we do not prevent projects from implementing more complex
-   workflows. Please refer to [LINK TO DEDICATED HOW TO] for more details on
+   workflows. Please refer to :ref:`complex-workflows` for more details on
    multi-steps workflow with RADIUSS Shared CI.
 
 Our RADIUSS projects typically leverage Spack to manage the installation of the
@@ -231,9 +231,9 @@ details can be found in the file itself.
    If a variable is blank in the template file, then it does not require a
    value. If a variable has a value there, it does require one.
 
-You may add modify to the ``.custom_job`` job that will then be included in all
-you CI jobs. This can be used to `export jUnit test reports`_, for example.
-Changes to that section are not mandatory.
+You may modify to the ``.custom_job`` job that will then be included in all you
+CI jobs. This can be used to `export jUnit test reports`_, for example. Changes
+to that section are not mandatory.
 
 .. _add-jobs:
 
@@ -241,9 +241,9 @@ Add jobs
 --------
 
 We provide a template file to add jobs to each machine. You should create one
-file per machine using this template. Typically, these files are included in
-your project's ``.gitlab/jobs`` subdirectory and named ``<machine>.yml``, where
-``<machine>`` is the machine name. Those files are required as soon as the
+file per machine using this template. These files may be place in your
+project's ``.gitlab/jobs`` subdirectory and named ``<machine>.yml``, where
+``<machine>`` is the machine name. They are required as soon as the
 associated machine has been activated (uncommented) in the
 ``.gitlab/subscribed-pipelines`` file.
 
@@ -255,12 +255,13 @@ duplicate the example job and complete it with the required information:
 
 .. warning::
    GitLab supports long and complex job names. Make sure to pick names that
-   are sufficiently unique so that your extra jobs do not override a shared job.
+   are unique so that your extra jobs do not override a shared job.
 
-.. notes::
+.. note::
    It is possible to import jobs from another repository. This is what we do in
    our RADIUSS projects to share some jobs and thus make sure we build with the
-   same toolchain. See the dedicated How-To section for more details (LINK).
+   same toolchains. See the dedicated How-To section for more details
+   :ref:`import-shared-jobs`.
 
 Non-RADIUSS Projects
 --------------------
