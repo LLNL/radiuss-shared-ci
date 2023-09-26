@@ -46,7 +46,7 @@ Using RADIUSS Spack Configs allows projects to easily share the full context of
 their builds.
 
 .. figure:: images/Full-CI-Infrastructure.png
-   :scale: 36 %
+   :scale: 30 %
    :align: center
 
    The Shared CI Infrastructure is project agnostic. It is tuned for
