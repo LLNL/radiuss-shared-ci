@@ -23,9 +23,9 @@ Updating RADIUSS Shared CI
 ==========================
 
 Updating RADIUSS shared CI is straightforward. The Shared CI version to use is
-defined by a the reference (``ref:`` section) in the remote includes. We
-recommend using a variable to set this reference only once, and then update
-radiuss-shared-ci easily.
+defined by a the reference (set by the ``ref:`` section) in the remote
+includes. We recommend using a variable to set this reference only once, and
+then update radiuss-shared-ci easily.
 
 .. _leverage-spack:
 
@@ -46,7 +46,7 @@ Using RADIUSS Spack Configs allows projects to easily share the full context of
 their builds.
 
 .. figure:: images/Full-CI-Infrastructure.png
-   :scale: 40 %
+   :scale: 36 %
    :align: center
 
    The Shared CI Infrastructure is project agnostic. It is tuned for
