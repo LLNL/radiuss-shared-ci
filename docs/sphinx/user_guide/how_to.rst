@@ -101,6 +101,17 @@ pipeline calls:
          - corona-jobs.yml
          - tioga-jobs.yml
 
+In this same file, you will need to specify that each sub-pipeline trigger job
+now "need" the ``generate-job-lists``. This is done in the ``needs`` section:
+
+.. code-block:: yaml
+
+   ruby-build-and-test:
+     variables:
+       CI_MACHINE: "ruby"
+     needs: [ruby-up-check, generate-job-lists]
+     extends: [.build-and-test]
+
 Then, the child pipeline template ``.build-and-test`` in ``.gitlab-ci.yml``
 becomes:
 
