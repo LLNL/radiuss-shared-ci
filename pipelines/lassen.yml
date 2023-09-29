@@ -7,27 +7,26 @@
 
 stages:
   - is-machine-up
-  - allocate_resources
-  - build_and_test
-  - release_resources
+  - status-initiate
+  - jobs-stage-1
+  - jobs-stage-2
+  - jobs-stage-3
+  - status-update
 
 ##############################################################################
 # UTILITIES
-.on_tioga:
+.on_lassen:
   tags:
     - shell
-    - tioga
+    - lassen
   rules:
-    # Runs except if we explicitly deactivate tioga by variable.
-    - if: '$ON_TIOGA == "OFF"'
+    # Runs except if we explicitly deactivate lassen by variable.
+    - if: '$ON_LASSEN == "OFF"'
       when: never
     # Advanced jobs can only run on master, develop or if ALL_TARGETS is ON.
     # Set ADVANCED_JOB to ON in the job definition to make it an advanced job.
     - if: '$ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH != "main" && $CI_COMMIT_BRANCH != "develop" && $ALL_TARGETS != "ON"'
       when: never
-    # We should always release resources allocated in the pipeline.
-    - if: '$CI_JOB_NAME =~ /release_resources/'
-      when: always
     # Only report failure if the pipeline failed.
     - if: '$CI_JOB_NAME =~ /status_failure/'
       when: on_failure
@@ -35,104 +34,64 @@ stages:
     - when: on_success
 
 .status_report: &status_report
-    - export context="tioga"
+    - export context="lassen"
     - |
       curl --url "https://api.github.com/repos/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
            --header 'Content-Type: application/json' \
            --header "authorization: Bearer ${GITHUB_TOKEN}" \
            --data "{ \"state\": \"${pipeline_status}\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab ${context} pipeline\", \"context\": \"ci/gitlab/${context}\" }"
 
-.print_tioga_reproducer: &print_tioga_reproducer
+.print_lassen_reproducer: &print_lassen_reproducer
     - |
-      echo -e "\e[7;32m### Tioga reproducer\e[0m"
+      echo -e "\e[7;32m### Lassen reproducer\e[0m"
       if [[ -n "${LLNL_SERVICE_USER}" ]]; then echo -e "xsu ${LLNL_SERVICE_USER}"; fi
       echo -e "
-      working_dir=\"/usr/workspace/\${USER}/${GITHUB_PROJECT_NAME}/${CI_COMMIT_REF_NAME//\//-}-${CI_PIPELINE_ID}-\$(date +%s)\"
+      working_dir=\"/usr/workspace/\${USER}/${GITHUB_PROJECT_NAME}/${CI_PIPELINE_ID}-\$(date +%s)\"
       mkdir -p \${working_dir} && cd \${working_dir} \n
       git clone https://github.com/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}.git --single-branch --depth=1 \n
       cd ${GITHUB_PROJECT_NAME}
       git fetch origin --depth=1 ${CI_COMMIT_SHA} \n
       git checkout ${CI_COMMIT_SHA} \n
       git submodule update --init --recursive \n
-      SPEC=\"${SPEC//\"/\\\"}\" MODULE_LIST=\"${MODULE_LIST}\" flux run ${TIOGA_BUILD_AND_TEST_JOB_ALLOC} ${BUILD_AND_TEST_CMD}"
+      SPEC=\"${SPEC//\"/\\\"}\" MODULE_LIST=\"${MODULE_LIST}\" lalloc ${LASSEN_JOB_ALLOC} ${JOB_CMD}"
       echo -e "\e[7;32m### End of reproducer\e[0m"
 
-.build_and_test_on_tioga:
-  extends: [.custom_build_and_test, .on_tioga]
-  stage: build_and_test
+.job_on_lassen:
+  extends: [.custom_job, .on_lassen]
+  stage: jobs-stage-1
   script:
-    # Allocation information
-    - |
-      echo ${ALLOC_NAME}
-      URI=$(flux jobs -o "{uri} {name}" | grep ${ALLOC_NAME} | awk '{print $1}') || echo "Empty URI"
-      echo ${URI}
     # Print a reproducer
-    - *print_tioga_reproducer
+    - *print_lassen_reproducer
     # The actual launch command
-    - $( [[ -n "${URI}" ]] && echo "flux proxy ${URI}" ) flux mini run ${TIOGA_BUILD_AND_TEST_JOB_ALLOC} ${BUILD_AND_TEST_CMD}
+    - lalloc ${LASSEN_JOB_ALLOC} ${JOB_CMD}
 
 ##############################################################################
 # JOBS
 
-# In pre-build phase, allocate a node for builds.
-allocate_resources:
-  variables:
-    GIT_STRATEGY: none
-  extends: .on_tioga
-  stage: allocate_resources
-  script:
-    - |
-      set -x
-      flux --parent mini alloc ${TIOGA_BUILD_AND_TEST_SHARED_ALLOC} --job-name=${ALLOC_NAME} --bg
-
 status_pending:
-  extends: .on_tioga
+  extends: [.on_lassen]
   variables:
     GIT_STRATEGY: none
-  stage: allocate_resources
+  stage: status-initiate
   script:
     - export pipeline_status="pending"
     - *status_report
 
-rocmcc_5_6_0_hip:
-  variables:
-    SPEC: "${PROJECT_TIOGA_VARIANTS} +rocm amdgpu_target=gfx90a %rocmcc@5.6.0 ^hip@5.6.0 ${PROJECT_TIOGA_DEPS}"
-  extends: .build_and_test_on_tioga
-
-cce_16_0_0:
-  variables:
-    SPEC: "${PROJECT_TIOGA_VARIANTS} %cce@16.0.0 ${PROJECT_TIOGA_DEPS}"
-  extends: .build_and_test_on_tioga
-
-# In post-build phase, deallocate resources.
-# Note : we make sure this is run even on build phase failure using a specific
-# rule in the template ".on_tioga".
-release_resources:
-  variables:
-    GIT_STRATEGY: none
-  extends: .on_tioga
-  stage: release_resources
-  script:
-    - |
-      set -x
-      export URI=$(flux jobs -o "{id} {name}" | grep ${ALLOC_NAME} | awk '{print $1}')
-      ([[ -n "${URI}" ]] && flux job kill ${URI})
-
 status_success:
-  extends: .on_tioga
+  extends: [.on_lassen]
   variables:
     GIT_STRATEGY: none
-  stage: release_resources
+  stage: status-update
   script:
     - export pipeline_status="success"
     - *status_report
   when: on_success
 
 status_failure:
-  extends: .on_tioga
+  extends: [.on_lassen]
   variables:
     GIT_STRATEGY: none
-  stage: release_resources
+  stage: status-update
   script:
     - export pipeline_status="failure"
     - *status_report

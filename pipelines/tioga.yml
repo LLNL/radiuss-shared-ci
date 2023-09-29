@@ -7,19 +7,21 @@
 
 stages:
   - is-machine-up
-  - allocate_resources
-  - build_and_test
-  - release_resources
+  - allocate-resources
+  - jobs-stage-1
+  - jobs-stage-2
+  - jobs-stage-3
+  - release-resources
 
 ##############################################################################
 # UTILITIES
-.on_corona:
+.on_tioga:
   tags:
     - shell
-    - corona
+    - tioga
   rules:
-    # Runs except if we explicitly deactivate corona by variable.
-    - if: '$ON_CORONA == "OFF"'
+    # Runs except if we explicitly deactivate tioga by variable.
+    - if: '$ON_TIOGA == "OFF"'
       when: never
     # Advanced jobs can only run on master, develop or if ALL_TARGETS is ON.
     # Set ADVANCED_JOB to ON in the job definition to make it an advanced job.
@@ -35,16 +37,16 @@ stages:
     - when: on_success
 
 .status_report: &status_report
-    - export context="corona"
+    - export context="tioga"
     - |
       curl --url "https://api.github.com/repos/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
            --header 'Content-Type: application/json' \
            --header "authorization: Bearer ${GITHUB_TOKEN}" \
            --data "{ \"state\": \"${pipeline_status}\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab ${context} pipeline\", \"context\": \"ci/gitlab/${context}\" }"
 
-.print_corona_reproducer: &print_corona_reproducer
+.print_tioga_reproducer: &print_tioga_reproducer
     - |
-      echo -e "\e[7;32m### Corona reproducer\e[0m"
+      echo -e "\e[7;32m### Tioga reproducer\e[0m"
       if [[ -n "${LLNL_SERVICE_USER}" ]]; then echo -e "xsu ${LLNL_SERVICE_USER}"; fi
       echo -e "
       working_dir=\"/usr/workspace/\${USER}/${GITHUB_PROJECT_NAME}/${CI_COMMIT_REF_NAME//\//-}-${CI_PIPELINE_ID}-\$(date +%s)\"
@@ -54,12 +56,12 @@ stages:
       git fetch origin --depth=1 ${CI_COMMIT_SHA} \n
       git checkout ${CI_COMMIT_SHA} \n
       git submodule update --init --recursive \n
-      SPEC=\"${SPEC//\"/\\\"}\" MODULE_LIST=\"${MODULE_LIST}\" flux run ${CORONA_BUILD_AND_TEST_JOB_ALLOC} ${BUILD_AND_TEST_CMD}"
+      SPEC=\"${SPEC//\"/\\\"}\" MODULE_LIST=\"${MODULE_LIST}\" flux run ${TIOGA_JOB_ALLOC} ${JOB_CMD}"
       echo -e "\e[7;32m### End of reproducer\e[0m"
 
-.build_and_test_on_corona:
-  extends: [.custom_build_and_test, .on_corona]
-  stage: build_and_test
+.job_on_tioga:
+  extends: [.custom_job, .on_tioga]
+  stage: jobs-stage-1
   script:
     # Allocation information
     - |
@@ -67,46 +69,41 @@ stages:
       URI=$(flux jobs -o "{uri} {name}" | grep ${ALLOC_NAME} | awk '{print $1}') || echo "Empty URI"
       echo ${URI}
     # Print a reproducer
-    - *print_corona_reproducer
+    - *print_tioga_reproducer
     # The actual launch command
-    - $( [[ -n "${URI}" ]] && echo "flux proxy ${URI}" ) flux mini run ${CORONA_BUILD_AND_TEST_JOB_ALLOC} ${BUILD_AND_TEST_CMD}
+    - $( [[ -n "${URI}" ]] && echo "flux proxy ${URI}" ) flux mini run ${TIOGA_JOB_ALLOC} ${JOB_CMD}
 
 ##############################################################################
 # JOBS
 
 # In pre-build phase, allocate a node for builds.
-allocate_resources (on corona):
+allocate_resources:
   variables:
     GIT_STRATEGY: none
-  extends: .on_corona
-  stage: allocate_resources
+  extends: .on_tioga
+  stage: allocate-resources
   script:
     - |
       set -x
-      flux --parent mini alloc ${CORONA_BUILD_AND_TEST_SHARED_ALLOC} --job-name=${ALLOC_NAME} --bg
+      flux --parent mini alloc ${TIOGA_SHARED_ALLOC} --job-name=${ALLOC_NAME} --bg
 
 status_pending:
-  extends: [.on_corona]
+  extends: .on_tioga
   variables:
     GIT_STRATEGY: none
-  stage: allocate_resources
+  stage: allocate-resources
   script:
     - export pipeline_status="pending"
     - *status_report
 
-rocmcc_5_6_0_hip:
-  variables:
-    SPEC: "${PROJECT_CORONA_VARIANTS} +rocm amdgpu_target=gfx906 %rocmcc@5.6.0 ^hip@5.6.0 ${PROJECT_CORONA_DEPS}"
-  extends: .build_and_test_on_corona
-
 # In post-build phase, deallocate resources.
 # Note : we make sure this is run even on build phase failure using a specific
-# rule in the template ".on_corona".
-release_resources (on corona):
+# rule in the template ".on_tioga".
+release_resources:
   variables:
     GIT_STRATEGY: none
-  extends: .on_corona
-  stage: release_resources
+  extends: .on_tioga
+  stage: release-resources
   script:
     - |
       set -x
@@ -114,20 +111,20 @@ release_resources (on corona):
       ([[ -n "${URI}" ]] && flux job kill ${URI})
 
 status_success:
-  extends: [.on_corona]
+  extends: .on_tioga
   variables:
     GIT_STRATEGY: none
-  stage: release_resources
+  stage: release-resources
   script:
     - export pipeline_status="success"
     - *status_report
   when: on_success
 
 status_failure:
-  extends: [.on_corona]
+  extends: .on_tioga
   variables:
     GIT_STRATEGY: none
-  stage: release_resources
+  stage: release-resources
   script:
     - export pipeline_status="failure"
     - *status_report

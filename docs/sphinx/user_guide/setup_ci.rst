@@ -1,6 +1,7 @@
 .. ##
-.. ## Copyright (c) 2022, Lawrence Livermore National Security, LLC and
-.. ## other RADIUSS Project Developers. See the top-level COPYRIGHT file for details.
+.. ## Copyright (c) 2022-2023, Lawrence Livermore National Security, LLC and
+.. ## other RADIUSS Project Developers. See the top-level COPYRIGHT file for
+.. ## details.
 .. ##
 .. ## SPDX-License-Identifier: (MIT)
 .. ##
@@ -11,32 +12,50 @@
 Setup the CI using the shared template
 **************************************
 
-.. figure:: images/SharedCI_ProjectStructure.png
-   :scale: 18 %
+.. figure:: images/Shared-CI-Infrastructure.png
+   :scale: 40 %
    :align: center
 
-   Once Spack and the build script set up, we focus of the Shared CI
-   Infrastructure itself.
+   The Shared CI Infrastructure is project agnostic. It is tuned for
+   open-source projects hosted on GitHub and willing to run CI on a GitLab
+   instance. It currently only supports a handful of Livermore Computing
+   machines, but more could be added without disrupting the design.
 
-After completing the first two steps :ref:`use_spack-label` and
-:ref:`build_and_test-label`, you should be able to use the shared CI
-infrastructure. In more complex scenarios, you will always be able to use the
-template as a starting point for a custom implementation.
+The pre-requisite for using the RADIUSS Shared CI Infrastructure, provided that
+your projects is hosted on GitHub, is that you can trigger your build and test
+process with one command line.
+
+Strict separation between the build and test process and the CI infrastructure
+greatly helps with maintenance: it is much easier to debug a standalone script,
+which can be run outside CI, than when the process is encoded in the CI YAML
+files.
+
+.. note::
+   In our own RADIUSS CI setups, we do not split the build and the test phases
+   because it adds complexity. This typically saves us from using artifacts.
+   However, we do not prevent projects from implementing more complex
+   workflows. Please refer to :ref:`complex-workflows` for more details on
+   multi-steps workflow with RADIUSS Shared CI.
+
+Our RADIUSS projects typically leverage Spack to manage the installation of the
+dependencies and configure the project. We describe this as a *Shared Build
+Infrastructure* documented in `RADIUSS Spack Configs`_. Then, building and
+testing is handled in custom scripts.
+
 
 =================
 RADIUSS Shared CI
 =================
 
-By sharing the CI definition, projects share the burden of maintaining it. In
-addition, with our shared CI, they also share a core set of Spack specs to
-ensure that they keep running tests with similar build configurations.
+By sharing the CI definition, projects share the burden of maintaining it.
 
 With a centralized CI configuration that is shared by projects, we create an
 interface between local and shared configurations. We try to keep this
-interface minimal, while allowing for project-specific customization. Only a
-handful of modifications are required to get the CI to work for your project,
-while files in the ``customization`` directory allow for finer tuning and
-extensibility.
+interface minimal, while allowing for project-specific customization.
+
+Projects only need to set some variables and add CI jobs instances (inheriting
+from the job template) to get the CI to work. Files in the ``customization``
+directory allow for fine tuning and extensibility.
 
 .. note::
    GitLab allows projects to include external files to configure their CI. We
@@ -45,12 +64,14 @@ extensibility.
 File structure
 ==============
 
-.. figure:: images/SharedCI_RepositoryStructure.png
+.. figure:: images/Shared-CI-File-Structure.png
    :scale: 30 %
    :align: center
 
-   The RADIUSS Shared CI repository contains files that are used remotely as
-   well as templates that needs to be copied over and completed.
+   The RADIUSS Shared CI repository contains files that are included remotely
+   as well as template files that needs to be copied over and completed. Each
+   pipeline file also defines a job template (in the sense of GitLab CI YAML
+   syntax) providing the core settings that your own jobs will extend.
 
 The short version
 =================
@@ -68,15 +89,16 @@ integrating the RADIUSS Shared CI infrastructure into your project.
    git clone https://github.com/LLNL/radiuss-shared-ci.git
    cd my_project
    cp ../radiuss-shared-ci/customization/gitlab-ci.yml .gitlab-ci.yml
-   mkdir -p .gitlab
+   mkdir -p .gitlab/jobs
    cp ../radiuss-shared-ci/customization/subscribed-pipelines.yml .gitlab
    cp ../radiuss-shared-ci/customization/custom-jobs-and-variables.yml .gitlab
-   cp ../radiuss-shared-ci/extra-jobs/*-extra.yml .gitlab
+   cp ../radiuss-shared-ci/jobs/\<machine\>.yml .gitlab/jobs/<machine>.yml
+   # You may use the <machine>.yml file as a starting point to add jobs.
    vim .gitlab/subscription-pipelines.yml
-   # comment the jobs associted to <CI_MACHINE> you don’t want.
+   # comment the jobs associted to <CI_MACHINE> you don't want.
    vim .gitlab/custom-jobs-and-variables.yml
    # set the variables according to your needs.
-   vim .gitlab/*-extra.yml
+   vim .gitlab/jobs/<machine>.yml
    # Add jobs or override some of the shared ones.
 
    ### Non-RADIUSS projects
@@ -85,7 +107,7 @@ integrating the RADIUSS Shared CI infrastructure into your project.
    # permissions.
 
 Jump to a corresponding section for details on :ref:`customize-ci`,
-:ref:`edit-extra-jobs` and :ref:`write-ci-script`.
+:ref:`add-jobs`.
 
 The detailed version
 ====================
@@ -95,17 +117,16 @@ Our CI implementation can be divided in four parts:
 * local build-and-test script
 * shared files
 * customization files
-* extra jobs
+* jobs
 
 Setting up the CI consists of four corresponding steps.
 
 Write CI Script
 ---------------
 
-The first step is to provide a CI script, which you should already have
-after completing :ref:`write-ci-script` at Step 2.
-
-Once you have that script, you are ready to move on to the CI setup.
+The first step is to prepare a CI script that will be called using the
+``JOB_CMD`` variable in the CI. Once you have that script, you are ready to
+move on to the CI setup.
 
 Core CI implementation
 ----------------------
@@ -120,27 +141,29 @@ the project you intend to add CI to.
    cd my_project
 
 By default, GitLab expects a ``.gitlab-ci.yml`` file to interpret the CI setup.
-We provide one in ``customization/gitlab-ci.yml`` that projects can copy-paste.
-Make sure to place the file in the top-level directory of your project, and
-that it has a dot (``.``) at the beginning of the name.
+We provide one in ``customization/gitlab-ci.yml`` that projects can copy over
+(don't forget to add a ``.``). Place the file in the top-level directory of
+your project.
 
 .. code-block:: bash
 
    cp ../radiuss-shared-ci/customization/gitlab-ci.yml .gitlab-ci.yml
 
-In the ``.gitlab-ci.yml`` file, there are some variables you need to adapt to
-your project. They are described in the following table:
+In the ``.gitlab-ci.yml`` file, there are some variables that you need to adapt
+to your project. They are described in the following table:
 
  ========================================== ==========================================================================================================================
   Parameter                                  Description
  ========================================== ==========================================================================================================================
-  ``GITHUB_PROJECT_NAME``                    The Project name on GitHub, use to send status updates
-  ``GITHUB_PROJECT_ORG``                     The Project organization on GitHub, use to send status updates
   ``LLNL_SERVICE_USER``                      Project specific Service User Account used in CI (optional but recommeded)
-  ``CUSTOM_CI_BUILD_DIR``                    If not using a service user, where to locate build directories (prevent exceeding your disk quota)
+  ``CUSTOM_CI_BUILD_DIR``                    If not using a service user, where to locate the CI working directories (prevent exceeding your disk quota)
   ``GIT_SUBMODULES_STRATEGY``                Controls strategy for the clone performed by GitLab. Consider ``recursive`` if you have submodules, otherwise comment it.
   ``BUILD_ROOT``                             Location (path) where the projects should be built. We provide a sensible default.
-  ``BUILD_AND_TEST_CMD``                     The command that runs the build and test script. Lets you name and store that script however you like.
+  ``SHARED_CI_REF``                          The reference (branch, tag) you would like to use in RADIUSS Shared CI repository
+  ``GITHUB_PROJECT_NAME``                    The Project name on GitHub, used to send status updates
+  ``GITHUB_PROJECT_ORG``                     The Project organization on GitHub, used to send status updates
+  ``JOB_CMD``                                The command that runs the build and test script. Lets you name and store that script however you like.
+  ``ALWAYS_RUN_PATTERN``                     The regex pattern describing the branches that will skip the draft pull request filter test.
  ========================================== ==========================================================================================================================
 
 .. note::
@@ -149,24 +172,25 @@ your project. They are described in the following table:
 
 .. warning::
    We strongly recommend that you set your CI to use a service user account.
-   This will enable you to add users to associated service user account group
-   so that they can interact with GitLab runners to restart test pipelines,
-   for example.
+   This will enable you to add users to the associated service user account
+   group so that they can interact with GitLab runners to restart test
+   pipelines, for example. It will also simplify permissions and allocations
+   management.
 
 Your CI is now set up to include remote files from the GitLab mirror of the
 radiuss-shared-ci project.
 
-Lastly, we need to complete the interface with the shared CI configuration.
+We now need to complete the interface with the shared CI configuration.
 In particular, the ``.gitlab-ci.yml`` file requires some files to be present
 in your Git repository. These are described in the next few sections.
 
 .. _customize-ci:
 
-Customize CI
-------------
+Customize the CI
+----------------
 
 We provide templates for the required customization files. You need to have a
-``.gitlab`` subdirectory in the top-level directory of your Git repo. Then,
+``.gitlab`` subdirectory in the top-level of your Git repository. Then,
 you can copy the template files to that directory in your repo. For example:
 
 .. code-block:: bash
@@ -181,13 +205,13 @@ needs.
 The ``.gitlab/subscribed-pipelines.yml`` file
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-In this file, you select the machines you want to run tests on. Comment out
-the jobs (sections) for machines you don't want, or don't have access to.
+In this file, you will select the machines you want to run tests on. Comment
+out the jobs (sections) for machines you don't want, or don't have access to.
 
 .. note::
    To add a new machine, please refer to :ref:`add-a-new-machine`.
 
-The ``.gitlab/custom-jobs-and-variables.yml`` file 
+The ``.gitlab/custom-jobs-and-variables.yml`` file
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Here is a table that describes each variable present in the file. More
@@ -197,8 +221,8 @@ details can be found in the file itself.
   Parameter                                  Description
  ========================================== ==========================================================================================================================
   ``ALLOC_NAME``                             Name of the shared allocation. Should be unique, our default should be fine.
-  ``<MACHINE>_BUILD_AND_TEST_SHARED_ALLOC``  Parameters for the shared allocation. You may extend the resource and time.
-  ``<MACHINE>_BUILD_AND_TEST_JOB_ALLOC``     Parameters for the job allocation. You may extend the resource and time within the scope of the shared allocation.
+  ``<MACHINE>_SHARED_ALLOC``                 Parameters for the shared allocation. You may extend the resource and time.
+  ``<MACHINE>_JOB_ALLOC``                    Parameters for the job allocation. You may extend the resource and time within the scope of the shared allocation.
   ``PROJECT_<MACHINE>_VARIANTS``             Global variants to be added to all the shared specs.
   ``PROJECT_<MACHINE>_DEPS``                 Global dependencies to be added to all the shared specs.
  ========================================== ==========================================================================================================================
@@ -207,41 +231,37 @@ details can be found in the file itself.
    If a variable is blank in the template file, then it does not require a
    value. If a variable has a value there, it does require one.
 
-You may add configurations to the ``.custom_build_and_test`` job that will then
-be included in all you CI jobs. This can be used to `export jUnit test reports`_,
-for example. Changes to that section are not mandatory.
+You may modify to the ``.custom_job`` job that will then be included in all you
+CI jobs. This can be used to `export jUnit test reports`_, for example. Changes
+to that section are not mandatory.
 
-.. _edit-extra-jobs:
+.. _add-jobs:
 
-Edit extra jobs
----------------
+Add jobs
+--------
 
-We provide templates for the extra jobs files. Typically, these files are 
-included in your project's ``.gitlab`` subdirectory and named 
-``<platform>-build-and-test-extra.yml``, where ``platform`` is the associated
-machine name. Those files are required as soon as the associated machine has 
-been activated in the ``.gitlab/subscribed-pipelines`` file.
+We provide a template file to add jobs to each machine. You should create one
+file per machine using this template. These files may be place in your
+project's ``.gitlab/jobs`` subdirectory and named ``<machine>.yml``, where
+``<machine>`` is the machine name. They are required as soon as the
+associated machine has been activated (uncommented) in the
+``.gitlab/subscribed-pipelines`` file.
 
-If no extra jobs are needed, for example if the shared jobs automatically 
-included are sufficient, then you should add the extra jobs files as-is, with 
-a simple variable definition to prevent it from being empty.
+In the provided template, you may remove the variable definition, uncomment and
+duplicate the example job and complete it with the required information:
 
-If you need to define extra jobs that are specific to your project, then you 
-may remove the variable definition, uncomment the template job and complete 
-it with the required information:
-
-* A unique job name that will appear in CI.
-* A Spack spec used by ``build-and-test`` to know what to build.
+* Unique job names that will appear in CI.
+* Custom variables that will make that job unique.
 
 .. warning::
    GitLab supports long and complex job names. Make sure to pick names that
-   are sufficiently unique so that your extra jobs do not override a shared job.
+   are unique so that your extra jobs do not override a shared job.
 
 .. note::
-   ``PROJECT_<MACHINE>_VARIANTS/DEPS`` apply to all the shared specs. If you
-   want to build a spec without them, you need to define an extra job, even if
-   this is a shared spec: in that case you can give the extra jobs the exact
-   same name as the shared one so that the latter will be overridden.
+   It is possible to import jobs from another repository. This is what we do in
+   our RADIUSS projects to share some jobs and thus make sure we build with the
+   same toolchains. See the dedicated How-To section for more details
+   :ref:`import-shared-jobs`.
 
 Non-RADIUSS Projects
 --------------------
@@ -260,3 +280,4 @@ create the variable once the token has been generated on GitHub.
 .. _Radiuss Shared CI: https://radiuss-shared-ci.readthedocs.io/en/latest/index.html
 .. _export jUnit test reports: https://github.com/LLNL/Umpire/blob/develop/.gitlab/custom-jobs-and-variables.yml
 .. _sharing spack configuration files: https://github.com/LLNL/radiuss-spack-configs
+.. _RADIUSS Spack Configs: https://radiuss-spack-configs.readthedocs.io/en/latest/index.html

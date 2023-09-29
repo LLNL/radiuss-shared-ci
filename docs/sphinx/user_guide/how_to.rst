@@ -1,352 +1,178 @@
 .. ##
-.. ## Copyright (c) 2022, Lawrence Livermore National Security, LLC and
-.. ## other RADIUSS Project Developers. See the top-level COPYRIGHT file for details.
+.. ## Copyright (c) 2022-23, Lawrence Livermore National Security, LLC and
+.. ## other RADIUSS Project Developers. See the top-level COPYRIGHT file for
+.. ## details.
 .. ##
 .. ## SPDX-License-Identifier: (MIT)
 .. ##
 
 .. _user_how_to-label:
 
-***********
+*********
 How To...
-***********
+*********
 
 This section describes how to perform various maintenance tasks once you have
 the RADIUSS Shared CI framework set up for your project.
 
-.. _compare_ci_configs:
-
-============================================
-Compare the CI configuration of two projects
-============================================
-
-Suppose you want to be in sync in terms of CI configuration with another
-project. We summarize here the steps you should follow to make sure both
-configurations are exactly the same, or find the difference between them.
-
-We don't want to duplicate the whole CI configuration but to check that the
-tested specs are the same.
-
-RADIUSS Shared CI reference used to import configuration
-========================================================
-
-In the ``.gitlab-ci.yml`` files for the projects, look for the reference used 
-for radiuss-shared-ci. For example::
-
-  .build-and-test:
-    stage: build-and-test
-    trigger:
-      include:
-        - local: '.gitlab/custom-jobs-and-variables.yml'
-        - project: 'radiuss/radiuss-shared-ci'
-          ref: v2022.09.0
-          file: '${CI_MACHINE}-build-and-test.yml'
-        - local: '.gitlab/${CI_MACHINE}-build-and-test-extra.yml'
-      strategy: depend
-      forward:
-        pipeline_variables: true
-
-Two different versions, indicated by the ``ref:`` item in the example may have 
-differences between the shared specs tested. You may also use Git to compare 
-files named ``<MACHINE>-build-and-test.yml`` between the two references.
-
-.. code-block:: bash
-
-   cd radiuss-shared-ci
-   git diff <ref1> <ref2> -- <MACHINE>-build-and-test.yml
-
-Extra jobs added by the projects
-================================
-
-Compare each ``.gitlab/<MACHINE>-build-and-test-extra.yml`` file between the two
-projects and look for:
-
-* differences between jobs with the same name.
-
-* overridden jobs: an "extra" job, if it has the same name as a shared job,
-  overrides the shared job.
-
-* jobs present only in one of the two projects.
-
-Reference used to import radiuss-spack-configs
-==============================================
-
-In the ``.uberenv_config.json`` file in the top-level directory of a project, 
-the entry ``spack_configs_path`` designates the directory receiving Spack 
-configuration. It should point to a submodule: a clone of the 
-`radiuss-spack-configs`_ project. Check the status of this submodule to look
-for differences.
-
-.. note::
-   The commit hash associated with a Git submodule in a project can be seen
-   by running the command ``git submodule status`` in the project.
-
-The Spack configuration can affect the external packages to use, the default
-versions for a dependencies to build, etc.
-
-Reference used by Uberenv to clone Spack
-========================================
-
-In the ``.uberenv_config.json`` file, the reference used to clone `Spack`_ can 
-be set with either ``spack_branch`` or ``spack_commit``.
-
-.. note::
-   It is nearly impossible to ensure identical builds if the Spack versions are
-   different between projects.
 
 .. _update-shared-ci:
 
-=====================================================================
-Update the CI configuration, Spack, Uberenv, or RADIUSS Spack Configs
-=====================================================================
-
-RADIUSS Shared CI relies on three other components to work properly: `Spack`_,
-`Uberenv`_ and `radiuss-spack-configs`_. The dependency scheme between those
-components is as follows:
-
-.. figure:: images/SharedCI_Dependencies.png
-   :align: center
-
-   The dependency graphs helps anticipating the impact of a change. E.g., a
-   change in RADIUSS Spack configs will likely result in an update of both
-   RADIUSS Shared CI and the project.
-
+==========================
 Updating RADIUSS Shared CI
 ==========================
 
-RADIUSS Shared CI is bound to the versions of `radiuss-spack-configs`_ and
-`Spack`_ because the shared specs requires the package versions to exist.
+Updating RADIUSS shared CI is straightforward. The Shared CI version to use is
+defined by a the reference (set by the ``ref:`` section) in the remote
+includes. We recommend using a variable to set this reference only once, and
+then update radiuss-shared-ci easily.
 
-If you have overridden shared specs in your extra jobs, you need to check for
-changes in the original shared spec after the update: Is the job still there?
-Has the spec changed? Is there still a need to override it?
+.. _leverage-spack:
 
-Updating Spack
+==============
+Leverage Spack
 ==============
 
-Spack may be updated without updating the radiuss-shared-ci project version.
-However, there are often changes in the Spack configuration formatting and 
-options that will require you to update `radiuss-spack-configs`_ and `Uberenv`_.
+Initially, the RADIUSS Shared CI infrastructure was designed for RADIUSS
+projects also using Spack to describe the toolchain and build the dependencies.
+This "build infrastructure" is defined in `RADIUSS Spack Configs`_
+documentation.
+
+Spack provides a unified context to express toolchains, machine setup, and
+build sequence. Spack is increasingly used to install dependency stacks of
+large simulation codes.
+
+Using RADIUSS Spack Configs allows projects to easily share the full context of
+their builds.
+
+.. figure:: images/Full-CI-Infrastructure.png
+   :scale: 30 %
+   :align: center
+
+   The Shared CI Infrastructure is project agnostic. It is tuned for
+   open-source projects hosted on GitHub and willing to run CI on a GitLab
+   instance. It currently only supports a handful of Livermore Computing
+   machines, but more could be added without disrupting the design.
+
+If you were to adopt the full infrastructure, setting up the build
+infrastructure would be done following two steps:
+
+1. **Use Spack to install dependencies and configure a project build.**
+2. **Setup your build system so that it accepts the configuration file
+   generated by Spack.**
+
+.. _import-shared-jobs:
+
+==================
+Import shared jobs
+==================
+
+In the :ref:`add-jobs` section of the CI setup chapter, we explained how to
+add jobs using a local file. Our projects using the full CI infrastructure,
+including RADIUSS Spack Configs, also share a set of jobs that correspond to
+toolchains they all care about.
+
+Those jobs are defined in RADIUSS Spack Configs, which is set as a submodule in
+our projects. While GitLab does not permit to include file from submodules, we
+work around this by generating the jobs YAML file, merging the local
+project-specific one with the shared one from the RADIUSS Spack Configs
+submodule.
+
+This translate into the addition of a new job in a stage preceeding the child
+pipeline calls:
+
+.. code-block:: yaml
+
+   generate-job-lists:
+     stage: prerequisites
+     tags: [shell, oslic]
+     variables:
+       RADIUSS_JOBS_PATH: "scripts/radiuss-spack-configs/gitlab/radiuss-jobs"
+       LOCAL_JOBS_PATH: ".gitlab/jobs"
+     script:
+       - cat ${RADIUSS_JOBS_PATH}/ruby.yml ${LOCAL_JOBS_PATH}/ruby.yml > ruby-jobs.yml
+       - cat ${RADIUSS_JOBS_PATH}/lassen.yml ${LOCAL_JOBS_PATH}/lassen.yml > lassen-jobs.yml
+       - cat ${RADIUSS_JOBS_PATH}/corona.yml ${LOCAL_JOBS_PATH}/corona.yml > corona-jobs.yml
+       - cat ${RADIUSS_JOBS_PATH}/tioga.yml ${LOCAL_JOBS_PATH}/tioga.yml > tioga-jobs.yml
+     artifacts:
+       paths:
+         - ruby-jobs.yml
+         - lassen-jobs.yml
+         - corona-jobs.yml
+         - tioga-jobs.yml
+
+In this same file, you will need to specify that each sub-pipeline trigger job
+now "need" the ``generate-job-lists``. This is done in the ``needs`` section:
+
+.. code-block:: yaml
+
+   ruby-build-and-test:
+     variables:
+       CI_MACHINE: "ruby"
+     needs: [ruby-up-check, generate-job-lists]
+     extends: [.build-and-test]
+
+Then, the child pipeline template ``.build-and-test`` in ``.gitlab-ci.yml``
+becomes:
+
+.. code-block:: yaml
+
+   .build-and-test:
+     stage: build-and-test
+     trigger:
+       include:
+         - local: '.gitlab/custom-jobs-and-variables.yml'
+         - project: 'radiuss/radiuss-shared-ci'
+           ref: '${SHARED_CI_REF}'
+           file: 'pipelines/${CI_MACHINE}.yml'
+         - artifact: '${CI_MACHINE}-jobs.yml'
+           job: 'generate-job-lists'
+       strategy: depend
+       forward:
+         pipeline_variables: true
+
+Local jobs are merged with shared jobs, still allowing projects to define their
+own jobs. Also, local jobs should be defined after the shared ones in the final
+file to preserve the capability to override the latter if needed.
 
-Updating Uberenv
-================
+.. _complex-workflows:
 
-In general, `Uberenv`_ lags behind in terms of compatibility with
-`Spack`_ and updating to a newer Spack version may require modifications to
-Uberenv. That's obviously not a guarantee.
+=============================
+Implement Complex CI Worflows
+=============================
 
-Updating radiuss-spack-configs
-==============================
+In the CI setup description, the resulting worflow gathers all the jobs withing
+one stage, with jobs calling only the ``JOB_CMD`` one-line command.
 
-Be aware of incompatibilities between `Spack`_ and `radiuss-spack-configs`_
-versions. In radiuss-spack-configs, we use tags to mark changes in the required
-version of Spack.
+Restricting the job command to a one-liner is required because we append it to
+an allocation call. In our opinion, it is not restrictive because it is a good
+practice to define your scripts outside the CI YAML files.
 
-===================================================
-Project specific variants and dependencies
-====================================================
+However, it may appear restrictive to only allow one-stage pipelines.
 
-Projects often have build variants they want to test, but it does not make
-sense to include them in the shared configurations since they may not apply to
-other projects. Also, we want to keep the default Spack specs simple. 
+In facts, the RADIUSS Shared CI defines 3 stages for you to use. They are named
+``jobs-stage-<1,2,3>``. They stand between the ``allocate-resources`` and the
+``release-resources`` stages, which means that jobs will run within the shared
+allocation as long as they inherit from the shared job template (``extends:
+.job_on_<machine>``).
 
-Example cases
-==============
+In your local jobs definition, you may pick the stage with the key
+``stages: jobs-stage-<1,2,3>``. This will override the default value set in the
+job template (``jobs-stage-1``).
 
-For example, in Umpire there is ``+fortran`` and ``+openmp`` for RAJA. Those 
-variants cannot be shared via the RADIUSS Shared CI project because they are 
-likely not implemented or relevant to other projects.
+It is also possible to go further in the customization and override the list of
+stages to add more. We only warn you that a good understanding of the Shared CI
+implementation is required before overridding it.
 
-Similarly, Umpire and RAJA may require a BLT version that depends on the system
-being tested. Such a requirement is not applicable to every project.
+.. warning::
+   GitLab YAML syntax allows you to override any section previously defined.
+   This opens to door to deep customization of the Shared CI implementation.
+   However it requires a good understanding of how the Shared CI works. In
+   general, we advise you to start by submitting a feature requests on GitHub:
+   we are open to suggestions and can help with your customization needs.
 
-The solution
-============
 
-Variables ``PROJECT_<MACHINE>_VARIANTS`` and ``PROJECT_<MACHINE>_DEPS`` can be
-set in the ``custom-variables.yml`` file to define a global variant or 
-dependency to apply to all the shared specs.
-
-The flip side
-=============
-
-If a you want to build a given shared spec without certain global variants
-or dependencies, you need to duplicate the original job from 
-the ``radiuss-shared-ci`` project and remove those variables from the spec.
-
-.. note::
-   You can keep the same job name and only the spec without global variants and
-   dependencies will be built. Or you can rename it to build both specs.
-
-===========================
-List the Spack specs tested
-===========================
-
-RADIUSS Shared CI uses Spack specs to express the types of builds to test.
-We aim at sharing those specs so that projects build with similar
-configurations. However we allow projects to add extra specs to test 
-project-specific configurations.
-
-Shared specs for machine ``ruby``, for example, can be listed directly in 
-radiuss-shared-ci:
-
-.. code-block:: bash
-
-  cd radiuss-shared-ci
-  git grep SPEC ruby-build-and-test.yml
-
-Extra ``ruby`` specs, specific to one project, are defined locally to the
-project in ``.gitlab/ruby-build-and-test-extra.yml``
-
-.. code-block:: bash
-
-  cd <project>
-  git grep SPEC .gitlab/ruby-build-and-test-extra.yml
-
-===========
-Use Uberenv
-===========
-
-.. code-block:: bash
-
-  $ ./scripts/uberenv/uberenv.py
-
-.. note::
-  On LC machines, it is following the *good neighbor* policy to do your build 
-  step on a compute node. Here is an example command: 
-  ``srun -ppdebug -N1 --exclusive ./scripts/uberenv/uberenv.py``
-
-Unless otherwise specified, Spack will default to a compiler. It is recommended
-to specify which compiler to use by adding the compiler spec to the ``--spec=``
-Uberenv command line option.
-
-Some options
-============
-
-``--spec=`` is used to define how your project will be built. It should be the
-same as a Spack spec, without the project name. For example:
-
-* ``--spec=%clang@9.0.0``
-* ``--spec=%clang@8.0.1+cuda``
-
-The directory that will hold the Spack instance and the installations can also
-be customized with ``--prefix=``. For example:
-
-* ``--prefix=<Path to uberenv build directory (defaults to ./uberenv_libs)>``
-
-Building dependencies can take a long time. If you already have a Spack instance
-you would like to reuse (supplementing the local one managed by Uberenv), you
-can do so with the ``--upstream=`` option:
-
-* ``--upstream=<path_to_my_spack>/opt/spack ...``
-
-===========================================
-Choose a Spack reference (commit or branch)
-===========================================
-
-Uberenv needs to know which version of Spack to clone locally. The Spack 
-version used by a project can be found in the ``.uberenv_config.json`` file
-in the top-level project directory.
-
-In general, using the latest Spack release should be the default strategy. 
-But things can quickly get complicated. Among the considerations for choosing 
-a Spack version are:
-
-* Need for a newer Spack feature / fix.
-
-* Need for a newer package version, for example supporting the latest release
-  of a given product.
-
-* Coherency with other projects.
-
-Let's consider the example of Umpire/RAJA/CHAI. Those projects work together 
-and have synchronized releases. They all use Uberenv for their CI.
-
-For those projects we try to:
-
-* Use the same Spack reference so testing behaves coherently across projects.
-
-* Use a Spack reference as new as possible, without changing it every month
-  (for now).
-
-* Limit local patching of Spack packages.
-
-Limiting local patching of Spack packages
-=========================================
-
-Uberenv allows projects to duplicate any Spack package locally and patch it.
-It is important to limit the amount of patching, however. Every local patch
-creates a divergence between the developer / CI configuration and the one a
-project gets from the Spack repo.
-
-Typical use cases for a local package patch include:
-
-* Test changes to the package that will be necessary for the next release.
-
-* Fix a bug, test a tweak in a toolchain configuration (we have seen the need
-  for flags, or HIP / CUDA tweaks in the past).
-
-In any case, those local changes should be pushed to upstream Spack as soon as
-possible. Typically, a project upstreams changes to its Spack package after
-a project release is done. This allows the new release tag/version to be 
-included in the Spack package update.
-
-Spack reference during the release process
-==========================================
-
-As mentioned above, when a projects does a release, the release has to
-happen before it can be added to Spack.
-
-Then, we want:
-
-* To limit the use of a local patch: after a release there should be no local
-  patching needed.
-
-* To make sure we keep testing our code as close as possible to the user
-  configuration: only the latest Spack package has the logic to build the
-  latest release. **(Most) users will want that.**
-
-For a project, that means we will have to update the Spack reference for
-Uberenv as soon as the Spack package has been updated.
-
-.. note::
-   Upstream of the release, we might want to test the upcoming Spack package
-   changes in spack@develop. In other words, we could anticipate the creation
-   of a pull request in Spack and use it as a reference in Uberenv. However, it
-   is not advised to create the release with this setting, because Uberenv now
-   points to a PR in Spack that may disappear in the future.
-
-In a nutshell
-=============
-
-The chosen Spack reference used in Uberenv should evolve in time as follows:
-
-* After a project release, when the upstream Spack package gets updated, and
-  Uberenv should point to the corresponding Spack merge commit.
-
-* Then, when a new Spack release comes out, it will have our latest changes and
-  should be used as a reference.
-
-* Approaching a new release, Uberenv should point to the latest Spack release,
-  but we might want to anticipate some testing with spack@develop, without
-  merging that change.
-
-======================================
-Allow failure for a spec known to fail
-======================================
-
-If a RADIUSS Shared CI pipeline comes with a particular spec that is known to
-fail, you may want to allow this spec to fail in CI.
-
-To do so, you will have to duplicate the job in the corresponding
-``.gitlab/<MACHINE>-build-and-test-extra.yaml`` keeping the exact same job name
-and then add ``allow_failure: true`` to the job definition.
-
-This is a job override. The flip side is that you will have to manually check
-for changes in the original shared job when updating RADIUSS Shared CI. See
-`update-shared-ci`_ for details.
-
-
+.. _RADIUSS Spack Configs: https://radiuss-spack-configs.readthedocs.io/en/latest/index.html
 .. _radiuss-spack-configs: https://github.com/LLNL/radiuss-spack-configs
 .. _Uberenv: https://github.com/LLNL/uberenv
 .. _Spack: https://github.com/spack/spack
