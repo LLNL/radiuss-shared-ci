@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2022, Lawrence Livermore National Security, LLC and RADIUSS
+# Copyright (c) 2022-23, Lawrence Livermore National Security, LLC and RADIUSS
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -7,19 +7,21 @@
 
 stages:
   - is-machine-up
-  - allocate_resources
-  - build_and_test
-  - release_resources
+  - allocate-resources
+  - jobs-stage-1
+  - jobs-stage-2
+  - jobs-stage-3
+  - release-resources
 
 ##############################################################################
 # UTILITIES
-.on_ruby:
+.on_tioga:
   tags:
     - shell
-    - ruby
+    - tioga
   rules:
-    # Runs except if we explicitly deactivate ruby by variable.
-    - if: '$ON_RUBY == "OFF"'
+    # Runs except if we explicitly deactivate tioga by variable.
+    - if: '$ON_TIOGA == "OFF"'
       when: never
     # Advanced jobs can only run on master, develop or if ALL_TARGETS is ON.
     # Set ADVANCED_JOB to ON in the job definition to make it an advanced job.
@@ -35,16 +37,16 @@ stages:
     - when: on_success
 
 .status_report: &status_report
-    - export context="ruby"
+    - export context="tioga"
     - |
       curl --url "https://api.github.com/repos/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
            --header 'Content-Type: application/json' \
            --header "authorization: Bearer ${GITHUB_TOKEN}" \
            --data "{ \"state\": \"${pipeline_status}\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab ${context} pipeline\", \"context\": \"ci/gitlab/${context}\" }"
 
-.print_ruby_reproducer: &print_ruby_reproducer
+.print_tioga_reproducer: &print_tioga_reproducer
     - |
-      echo -e "\e[7;32m### Ruby reproducer\e[0m"
+      echo -e "\e[7;32m### Tioga reproducer\e[0m"
       if [[ -n "${LLNL_SERVICE_USER}" ]]; then echo -e "xsu ${LLNL_SERVICE_USER}"; fi
       echo -e "
       working_dir=\"/usr/workspace/\${USER}/${GITHUB_PROJECT_NAME}/${CI_COMMIT_REF_NAME//\//-}-${CI_PIPELINE_ID}-\$(date +%s)\"
@@ -54,91 +56,75 @@ stages:
       git fetch origin --depth=1 ${CI_COMMIT_SHA} \n
       git checkout ${CI_COMMIT_SHA} \n
       git submodule update --init --recursive \n
-      SPEC=\"${SPEC//\"/\\\"}\" MODULE_LIST=\"${MODULE_LIST}\" srun ${RUBY_BUILD_AND_TEST_JOB_ALLOC} ${BUILD_AND_TEST_CMD}"
+      SPEC=\"${SPEC//\"/\\\"}\" MODULE_LIST=\"${MODULE_LIST}\" flux run ${TIOGA_JOB_ALLOC} ${JOB_CMD}"
       echo -e "\e[7;32m### End of reproducer\e[0m"
 
-.build_and_test_on_ruby:
-  extends: [.custom_build_and_test, .on_ruby]
-  stage: build_and_test
+.job_on_tioga:
+  extends: [.custom_job, .on_tioga]
+  stage: jobs-stage-1
   script:
     # Allocation information
-    - echo -e "### Allocation name is ${ALLOC_NAME}"
-    - export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
-    - echo -e "### Job ID is ${JOBID}"
+    - |
+      echo ${ALLOC_NAME}
+      URI=$(flux jobs -o "{uri} {name}" | grep ${ALLOC_NAME} | awk '{print $1}') || echo "Empty URI"
+      echo ${URI}
     # Print a reproducer
-    - *print_ruby_reproducer
+    - *print_tioga_reproducer
     # The actual launch command
-    - srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) ${RUBY_BUILD_AND_TEST_JOB_ALLOC} ${BUILD_AND_TEST_CMD}
+    - $( [[ -n "${URI}" ]] && echo "flux proxy ${URI}" ) flux mini run ${TIOGA_JOB_ALLOC} ${JOB_CMD}
 
 ##############################################################################
 # JOBS
 
 # In pre-build phase, allocate a node for builds.
-# TODO: make the resource configurable, not all projects will want the same.
-allocate_resources (on ruby):
+allocate_resources:
   variables:
     GIT_STRATEGY: none
-  extends: .on_ruby
-  stage: allocate_resources
+  extends: .on_tioga
+  stage: allocate-resources
   script:
-    - salloc ${RUBY_BUILD_AND_TEST_SHARED_ALLOC} --no-shell --job-name=${ALLOC_NAME}
+    - |
+      set -x
+      flux --parent mini alloc ${TIOGA_SHARED_ALLOC} --job-name=${ALLOC_NAME} --bg
 
 status_pending:
-  extends: [.on_ruby]
+  extends: .on_tioga
   variables:
     GIT_STRATEGY: none
-  stage: allocate_resources
+  stage: allocate-resources
   script:
     - export pipeline_status="pending"
     - *status_report
 
-intel_19_1_2_gcc_10_3_1:
-  variables:
-    SPEC: "${PROJECT_RUBY_VARIANTS} %intel@19.1.2.gcc.10.3.1 ${PROJECT_RUBY_DEPS}"
-  extends: .build_and_test_on_ruby
-
-intel_2022_1_0:
-  variables:
-    SPEC: "${PROJECT_RUBY_VARIANTS} %intel@2022.1.0 ${PROJECT_RUBY_DEPS}"
-  extends: .build_and_test_on_ruby
-
-clang_14_0_6:
-  variables:
-    SPEC: "${PROJECT_RUBY_VARIANTS} %clang@14.0.6 ${PROJECT_RUBY_DEPS}"
-  extends: .build_and_test_on_ruby
-
-gcc_10_3_1:
-  variables:
-    SPEC: "${PROJECT_RUBY_VARIANTS} %gcc@10.3.1 ${PROJECT_RUBY_DEPS}"
-  extends: .build_and_test_on_ruby
-
 # In post-build phase, deallocate resources.
 # Note : we make sure this is run even on build phase failure using a specific
-# rule in the template ".on_ruby".
-release_resources (on ruby):
+# rule in the template ".on_tioga".
+release_resources:
   variables:
     GIT_STRATEGY: none
-  extends: .on_ruby
-  stage: release_resources
+  extends: .on_tioga
+  stage: release-resources
   script:
-    - export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
-    - ([[ -n "${JOBID}" ]] && scancel ${JOBID})
+    - |
+      set -x
+      export URI=$(flux jobs -o "{id} {name}" | grep ${ALLOC_NAME} | awk '{print $1}')
+      ([[ -n "${URI}" ]] && flux job kill ${URI})
 
 status_success:
-  extends: [.on_ruby]
+  extends: .on_tioga
   variables:
     GIT_STRATEGY: none
-  stage: release_resources
+  stage: release-resources
   script:
     - export pipeline_status="success"
     - *status_report
   when: on_success
 
 status_failure:
-  extends: [.on_ruby]
+  extends: .on_tioga
   variables:
     GIT_STRATEGY: none
-  stage: release_resources
+  stage: release-resources
   script:
     - export pipeline_status="failure"
     - *status_report

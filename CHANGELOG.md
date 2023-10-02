@@ -6,7 +6,12 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next
+## [v2023.09.0 - ....-..-.. ]
+
+- BREAKING: Shared jobs have moved to RADIUSS Spack Configs.
+- BREAKING: Multiple changes in the naming of files, jobs, variables.
+
+- Adapted documentation
 
 ## [v2023.08.0 - 2023-08-22 ]
 
