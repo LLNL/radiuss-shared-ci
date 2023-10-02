@@ -44,8 +44,6 @@ variables:
   BUILD_ROOT: ${CI_PROJECT_DIR}
 
 ##### SHARED_CI CONFIGURATION
-# Shared CI reference to use
-  SHARED_CI_REF: "2023.08.0"
 # Required information about GitHub repository
   GITHUB_PROJECT_NAME: "..."
   GITHUB_PROJECT_ORG: "..."
@@ -71,7 +69,7 @@ stages:
     include:
       - local: '.gitlab/custom-jobs-and-variables.yml'
       - project: 'radiuss/radiuss-shared-ci'
-        ref: '${SHARED_CI_REF}'
+        ref: 'v2023.09.0'
         file: 'pipelines/${CI_MACHINE}.yml'
       # Add your jobs
       # you can use a local file
@@ -87,7 +85,7 @@ stages:
 include:
   # [Optional] checks preliminary to running the actual CI test
   - project: 'radiuss/radiuss-shared-ci'
-    ref: ${SHARED_CI_REF}
+    ref: 'v2023.09.0'
     file: 'preliminary-ignore-draft-pr.yml'
   # pipelines subscribed by the project
   - local: '.gitlab/subscribed-pipelines.yml'
