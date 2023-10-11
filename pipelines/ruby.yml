@@ -44,19 +44,34 @@ stages:
            --header "authorization: Bearer ${GITHUB_TOKEN}" \
            --data "{ \"state\": \"${pipeline_status}\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab ${context} pipeline\", \"context\": \"ci/gitlab/${context}\" }"
 
-.print_ruby_reproducer: &print_ruby_reproducer
+.ruby_reproducer_init: &ruby_reproducer_init
     - |
-      echo -e "\e[7;32m### Ruby reproducer\e[0m"
+      echo -e "\e[7;32m### CI job ${CI_JOB_ID} reproducer on ruby (${SYS_TYPE}) \e[0m"
       if [[ -n "${LLNL_SERVICE_USER}" ]]; then echo -e "xsu ${LLNL_SERVICE_USER}"; fi
       echo -e "
-      working_dir=\"/usr/workspace/\${USER}/${GITHUB_PROJECT_NAME}/${CI_COMMIT_REF_NAME//\//-}-${CI_PIPELINE_ID}-\$(date +%s)\"
+      working_dir=\"/usr/workspace/\${USER}/${GITHUB_PROJECT_NAME}/${CI_JOB_ID}-\$(date +%s)\" \n
       mkdir -p \${working_dir} && cd \${working_dir} \n
       git clone https://github.com/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}.git --single-branch --depth=1 \n
-      cd ${GITHUB_PROJECT_NAME}
+      cd ${GITHUB_PROJECT_NAME} \n
       git fetch origin --depth=1 ${CI_COMMIT_SHA} \n
       git checkout ${CI_COMMIT_SHA} \n
-      git submodule update --init --recursive \n
-      SPEC=\"${SPEC//\"/\\\"}\" MODULE_LIST=\"${MODULE_LIST}\" srun ${RUBY_JOB_ALLOC} ${JOB_CMD}"
+      git submodule update --init --recursive \n"
+
+# We require project to define their job command using a variable (JOB_CMD).
+# In customization/gitlab-ci.yml, we encourage to define this variable as
+# non-expandable, so that project can use nested variables to configure the job
+# command. The caveat is that the reproducer here cannot capture the
+# definition of these variables in a generic fashion. By overriding the
+# following section, projects can specify the variables to define in the
+# reproducer to exactly reproduce the CI build.
+.ruby_reproducer_vars: &ruby_reproducer_vars
+    - |
+      echo -e "# Define project specific variables here if any."
+      #echo -e "export <CUSTOM_VAR>=\"${<CUSTOM_VAR>}\""
+
+.ruby_reproducer_job: &ruby_reproducer_job
+    - |
+      echo -e "srun ${RUBY_JOB_ALLOC} ${JOB_CMD}"
       echo -e "\e[7;32m### End of reproducer\e[0m"
 
 .job_on_ruby:
@@ -68,7 +83,9 @@ stages:
     - export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
     - echo -e "### Job ID is ${JOBID}"
     # Print a reproducer
-    - *print_ruby_reproducer
+    - *ruby_reproducer_init
+    - *ruby_reproducer_vars
+    - *ruby_reproducer_job
     # The actual launch command
     - srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) ${RUBY_JOB_ALLOC} ${JOB_CMD}
 

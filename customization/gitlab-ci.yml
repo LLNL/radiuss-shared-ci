@@ -48,7 +48,11 @@ variables:
   GITHUB_PROJECT_NAME: "..."
   GITHUB_PROJECT_ORG: "..."
 # Set the build-and-test command.
-  JOB_CMD: "..."
+# Nested variables are allowed and useful to customize the job command. We
+# prevent variable expansion so that you can define them at job level.
+  JOB_CMD:
+    value: "<your/script> ${<CUSTOM_VAR>}"
+    expand: false
 # Override the pattern describing branches that will skip the "draft PR filter
 # test".  Add protected branches here. See default value in
 # preliminary-ignore-draft-pr.yml.

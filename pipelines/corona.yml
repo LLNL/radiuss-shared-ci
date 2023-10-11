@@ -44,19 +44,34 @@ stages:
            --header "authorization: Bearer ${GITHUB_TOKEN}" \
            --data "{ \"state\": \"${pipeline_status}\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab ${context} pipeline\", \"context\": \"ci/gitlab/${context}\" }"
 
-.print_corona_reproducer: &print_corona_reproducer
+.corona_reproducer_init: &corona_reproducer_init
     - |
-      echo -e "\e[7;32m### Corona reproducer\e[0m"
+      echo -e "\e[7;32m### CI job ${CI_JOB_ID} reproducer on corona (${SYS_TYPE}) \e[0m"
       if [[ -n "${LLNL_SERVICE_USER}" ]]; then echo -e "xsu ${LLNL_SERVICE_USER}"; fi
       echo -e "
-      working_dir=\"/usr/workspace/\${USER}/${GITHUB_PROJECT_NAME}/${CI_COMMIT_REF_NAME//\//-}-${CI_PIPELINE_ID}-\$(date +%s)\"
+      working_dir=\"/usr/workspace/\${USER}/${GITHUB_PROJECT_NAME}/${CI_JOB_ID}-\$(date +%s)\" \n
       mkdir -p \${working_dir} && cd \${working_dir} \n
       git clone https://github.com/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}.git --single-branch --depth=1 \n
-      cd ${GITHUB_PROJECT_NAME}
+      cd ${GITHUB_PROJECT_NAME} \n
       git fetch origin --depth=1 ${CI_COMMIT_SHA} \n
       git checkout ${CI_COMMIT_SHA} \n
-      git submodule update --init --recursive \n
-      SPEC=\"${SPEC//\"/\\\"}\" MODULE_LIST=\"${MODULE_LIST}\" flux run ${CORONA_JOB_ALLOC} ${JOB_CMD}"
+      git submodule update --init --recursive \n"
+
+# We require project to define their job command using a variable (JOB_CMD).
+# In customization/gitlab-ci.yml, we encourage to define this variable as
+# non-expandable, so that project can use nested variables to configure the job
+# command. The caveat is that the reproducer here cannot capture the
+# definition of these variables in a generic fashion. By overriding the
+# following section, projects can specify the variables to define in the
+# reproducer to exactly reproduce the CI build.
+.corona_reproducer_vars: &corona_reproducer_vars
+    - |
+      echo -e "# Define project specific variables here if any."
+      #echo -e "export <CUSTOM_VAR>=\"${<CUSTOM_VAR>}\""
+
+.corona_reproducer_job: &corona_reproducer_job
+    - |
+      echo -e "flux run ${CORONA_JOB_ALLOC} ${JOB_CMD}"
       echo -e "\e[7;32m### End of reproducer\e[0m"
 
 .job_on_corona:
@@ -69,7 +84,9 @@ stages:
       URI=$(flux jobs -o "{uri} {name}" | grep ${ALLOC_NAME} | awk '{print $1}') || echo "Empty URI"
       echo ${URI}
     # Print a reproducer
-    - *print_corona_reproducer
+    - *corona_reproducer_init
+    - *corona_reproducer_vars
+    - *corona_reproducer_job
     # The actual launch command
     - $( [[ -n "${URI}" ]] && echo "flux proxy ${URI}" ) flux run ${CORONA_JOB_ALLOC} ${JOB_CMD}
 
