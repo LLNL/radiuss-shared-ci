@@ -84,7 +84,9 @@ stages:
       URI=$(flux jobs -o "{uri} {name}" | grep ${ALLOC_NAME} | awk '{print $1}') || echo "Empty URI"
       echo ${URI}
     # Print a reproducer
-    - *print_tioga_reproducer
+    - *tioga_reproducer_init
+    - *tioga_reproducer_vars
+    - *tioga_reproducer_job
     # The actual launch command
     - $( [[ -n "${URI}" ]] && echo "flux proxy ${URI}" ) flux mini run ${TIOGA_JOB_ALLOC} ${JOB_CMD}
 
