@@ -71,7 +71,7 @@ stages:
     # Print a reproducer
     - *print_tioga_reproducer
     # The actual launch command
-    - $( [[ -n "${URI}" ]] && echo "flux proxy ${URI}" ) flux mini run ${TIOGA_JOB_ALLOC} ${JOB_CMD}
+    - $( [[ -n "${URI}" ]] && echo "flux proxy ${URI}" ) flux run ${TIOGA_JOB_ALLOC} ${JOB_CMD}
 
 ##############################################################################
 # JOBS
@@ -85,7 +85,7 @@ allocate_resources:
   script:
     - |
       set -x
-      flux --parent mini alloc ${TIOGA_SHARED_ALLOC} --job-name=${ALLOC_NAME} --bg
+      flux --parent alloc ${TIOGA_SHARED_ALLOC} --job-name=${ALLOC_NAME} --bg
 
 status_pending:
   extends: .on_tioga
