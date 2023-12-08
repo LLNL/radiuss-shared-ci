@@ -58,7 +58,7 @@ stages:
       git submodule update --init --recursive \n
       export SPEC=\"${SPEC//\"/\\\"}\" \n
       export MODULE_LIST=\"${MODULE_LIST}\" \n
-      flux watch $(flux batch -o output.stdout.type=kvs ${TIOGA_JOB_ALLOC} ${JOB_CMD}) \n
+      flux watch $(flux batch -o output.stdout.type=kvs ${TIOGA_JOB_ALLOC} ${JOB_CMD})"
       echo -e "\e[7;32m### End of reproducer\e[0m"
 
 .tioga_job_command: &tioga_job_command
