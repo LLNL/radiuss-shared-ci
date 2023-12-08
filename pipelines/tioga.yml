@@ -56,8 +56,13 @@ stages:
       git fetch origin --depth=1 ${CI_COMMIT_SHA} \n
       git checkout ${CI_COMMIT_SHA} \n
       git submodule update --init --recursive \n
-      SPEC=\"${SPEC//\"/\\\"}\" MODULE_LIST=\"${MODULE_LIST}\" flux run ${TIOGA_JOB_ALLOC} ${JOB_CMD}"
+      export SPEC=\"${SPEC//\"/\\\"}\" \n
+      export MODULE_LIST=\"${MODULE_LIST}\" \n
+      flux watch \$(flux batch -o output.stdout.type=kvs ${TIOGA_JOB_ALLOC} ${JOB_CMD})"
       echo -e "\e[7;32m### End of reproducer\e[0m"
+
+.tioga_job_command: &tioga_job_command
+    - ${PROXY} flux watch $( ${PROXY} flux batch -o output.stdout.type=kvs ${TIOGA_JOB_ALLOC} ${JOB_CMD})
 
 .job_on_tioga:
   extends: [.custom_job, .on_tioga]
@@ -65,13 +70,13 @@ stages:
   script:
     # Allocation information
     - |
-      echo ${ALLOC_NAME}
-      URI=$(flux jobs -o "{uri} {name}" | grep ${ALLOC_NAME} | awk '{print $1}') || echo "Empty URI"
-      echo ${URI}
+      ALLOC_ID=$(flux jobs --name="${ALLOC_NAME}" -n -o "{id}")
+      echo -e "[Information]: Shared allocation ID = ${ALLOC_ID}"
+      PROXY="$( [[ -n "${ALLOC_ID}" ]] && echo "flux proxy ${ALLOC_ID}" )"
     # Print a reproducer
     - *print_tioga_reproducer
     # The actual launch command
-    - $( [[ -n "${URI}" ]] && echo "flux proxy ${URI}" ) flux run ${TIOGA_JOB_ALLOC} ${JOB_CMD}
+    - *tioga_job_command
 
 ##############################################################################
 # JOBS

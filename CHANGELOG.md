@@ -6,7 +6,11 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v2023.10.0 - ....-..-.. ]
+## [v2023.12.0 - ....-..-.. ]
+
+- Update flux commands to allow controlled overlapping and MPI tests
+
+## [v2023.10.0 - never-released ]
 
 - Add support for poodle
 
