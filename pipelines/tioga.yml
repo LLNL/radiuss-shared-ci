@@ -56,8 +56,16 @@ stages:
       git fetch origin --depth=1 ${CI_COMMIT_SHA} \n
       git checkout ${CI_COMMIT_SHA} \n
       git submodule update --init --recursive \n
-      SPEC=\"${SPEC//\"/\\\"}\" MODULE_LIST=\"${MODULE_LIST}\" flux run ${TIOGA_JOB_ALLOC} ${JOB_CMD}"
+      export SPEC=\"${SPEC//\"/\\\"}\" \n
+      export MODULE_LIST=\"${MODULE_LIST}\" \n
+      BATCH_ID=$(flux batch -o output.stdout.type=kvs ${TIOGA_JOB_ALLOC} ${JOB_CMD}) \n
+      flux watch \"${BATCH_ID}\" "
       echo -e "\e[7;32m### End of reproducer\e[0m"
+
+.tioga_job_command: &tioga_job_command
+    - |
+      BATCH_ID=$($( [[ -n "${URI}" ]] && echo "flux proxy ${URI}" ) flux batch -o output.stdout.type=kvs ${TIOGA_JOB_ALLOC} ${JOB_CMD})
+      flux proxy "${URI}" flux watch "${BATCH_ID}"
 
 .job_on_tioga:
   extends: [.custom_job, .on_tioga]
@@ -71,7 +79,7 @@ stages:
     # Print a reproducer
     - *print_tioga_reproducer
     # The actual launch command
-    - $( [[ -n "${URI}" ]] && echo "flux proxy ${URI}" ) flux run ${TIOGA_JOB_ALLOC} ${JOB_CMD}
+    - *tioga_job_command
 
 ##############################################################################
 # JOBS
