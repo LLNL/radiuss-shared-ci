@@ -74,6 +74,9 @@ stages:
       echo -e "srun ${RUBY_JOB_ALLOC} ${JOB_CMD}"
       echo -e "\e[7;32m### End of reproducer\e[0m"
 
+.ruby_job_command: &ruby_job_command
+    - srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) ${RUBY_JOB_ALLOC} ${JOB_CMD}
+
 .job_on_ruby:
   extends: [.custom_job, .on_ruby]
   stage: jobs-stage-1
@@ -87,7 +90,7 @@ stages:
     - *ruby_reproducer_vars
     - *ruby_reproducer_job
     # The actual launch command
-    - srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) ${RUBY_JOB_ALLOC} ${JOB_CMD}
+    - *ruby_job_command
 
 ##############################################################################
 # JOBS

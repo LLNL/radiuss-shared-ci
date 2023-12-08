@@ -71,6 +71,9 @@ stages:
       echo -e "lalloc ${LASSEN_JOB_ALLOC} ${JOB_CMD}"
       echo -e "\e[7;32m### End of reproducer\e[0m"
 
+.lassen_job_command: &lassen_job_command
+    - lalloc ${LASSEN_JOB_ALLOC} ${JOB_CMD}
+
 .job_on_lassen:
   extends: [.custom_job, .on_lassen]
   stage: jobs-stage-1
@@ -80,7 +83,7 @@ stages:
     - *lassen_reproducer_vars
     - *lassen_reproducer_job
     # The actual launch command
-    - lalloc ${LASSEN_JOB_ALLOC} ${JOB_CMD}
+    - *lassen_job_command
 
 ##############################################################################
 # JOBS
