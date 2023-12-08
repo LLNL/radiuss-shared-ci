@@ -58,14 +58,11 @@ stages:
       git submodule update --init --recursive \n
       export SPEC=\"${SPEC//\"/\\\"}\" \n
       export MODULE_LIST=\"${MODULE_LIST}\" \n
-      BATCH_ID=$(flux batch -o output.stdout.type=kvs ${CORONA_JOB_ALLOC} ${JOB_CMD}) \n
-      flux watch \"${BATCH_ID}\" "
+      flux watch $(flux batch -o output.stdout.type=kvs ${CORONA_JOB_ALLOC} ${JOB_CMD}) \n
       echo -e "\e[7;32m### End of reproducer\e[0m"
 
 .corona_job_command: &corona_job_command
-    - |
-      BATCH_ID=$($( [[ -n "${URI}" ]] && echo "flux proxy ${URI}" ) flux batch -o output.stdout.type=kvs ${CORONA_JOB_ALLOC} ${JOB_CMD})
-      flux proxy "${URI}" flux watch "${BATCH_ID}"
+    - ${PROXY} flux watch $( ${PROXY} flux batch -o output.stdout.type=kvs ${CORONA_JOB_ALLOC} ${JOB_CMD})
 
 .job_on_corona:
   extends: [.custom_job, .on_corona]
@@ -73,9 +70,9 @@ stages:
   script:
     # Allocation information
     - |
-      echo ${ALLOC_NAME}
-      URI=$(flux jobs -o "{uri} {name}" | grep ${ALLOC_NAME} | awk '{print $1}') || echo "Empty URI"
-      echo ${URI}
+      ALLOC_ID=$(flux jobs --name="${ALLOC_NAME}" -n -o "{id}")
+      echo -e "[Information]: Shared allocation ID = ${ALLOC_ID}"
+      PROXY="$( [[ -n "${ALLOC_ID}" ]] && echo "flux proxy ${ALLOC_ID}" )"
     # Print a reproducer
     - *print_corona_reproducer
     # The actual launch command
