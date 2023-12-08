@@ -9,6 +9,12 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ## [v2023.12.0 - ....-..-.. ]
 
 - Update flux commands to allow controlled overlapping and MPI tests
+- BREAKING: Update reproducer logic to allow for customization. The reproducer
+  was tied to the "classic" RADIUSS workflow, implying Spack. Now, projects
+  can customize the reproducer so that it better reflect what they actually
+  run. In particular, there is no way in GitLab to automatically capture the
+  custom variable your JOB_CMD requires, .<machine_reproducer_vars> is meant to
+  remedy this.
 
 ## [v2023.10.0 - never-released ]
 
