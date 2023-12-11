@@ -85,7 +85,7 @@ stages:
     - |
       ALLOC_ID=$(flux jobs --name="${ALLOC_NAME}" -n -o "{id}")
       echo -e "[Information]: Shared allocation ID = ${ALLOC_ID}"
-      PROXY="$( [[ -n "${ALLOC_ID}" ]] && echo "flux proxy ${ALLOC_ID}" )"
+      PROXY="$( [[ -n "${ALLOC_ID}" ]] && echo "flux proxy ${ALLOC_ID}" || echo "" )"
     # Print a reproducer
     - *corona_reproducer_init
     - *corona_reproducer_vars
