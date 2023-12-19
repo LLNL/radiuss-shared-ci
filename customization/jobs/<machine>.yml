@@ -12,7 +12,8 @@
 # definition of these variables in a generic fashion. By overriding the
 # following section, projects can specify the variables to define in the
 # reproducer to exactly reproduce the CI build.
-.<machine>_reproducer_vars: &<machine>_reproducer_vars
+.<machine>_reproducer_vars:
+  script:
     - |
       echo -e "# Define project specific variables here if any."
       #echo -e "export <CUSTOM_VAR>=\"${<CUSTOM_VAR>}\""

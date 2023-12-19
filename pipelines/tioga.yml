@@ -44,7 +44,8 @@ stages:
            --header "authorization: Bearer ${GITHUB_TOKEN}" \
            --data "{ \"state\": \"${pipeline_status}\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab ${context} pipeline\", \"context\": \"ci/gitlab/${context}\" }"
 
-.tioga_reproducer_init: &tioga_reproducer_init
+.tioga_reproducer_init:
+  script:
     - |
       echo -e "\e[7;32m### CI job ${CI_JOB_ID} reproducer on tioga (${SYS_TYPE}) \e[0m"
       if [[ -n "${LLNL_SERVICE_USER}" ]]; then echo -e "xsu ${LLNL_SERVICE_USER}"; fi
@@ -57,12 +58,27 @@ stages:
       git checkout ${CI_COMMIT_SHA} \n
       git submodule update --init --recursive \n"
 
-.tioga_reproducer_job: &tioga_reproducer_job
+# We require project to define their job command using a variable (JOB_CMD).
+# In customization/gitlab-ci.yml, we encourage to define this variable as
+# non-expandable, so that project can use nested variables to configure the job
+# command. The caveat is that the reproducer here cannot capture the
+# definition of these variables in a generic fashion. By overriding the
+# following section, projects can specify the variables to define in the
+# reproducer to exactly reproduce the CI build.
+.tioga_reproducer_vars:
+  script:
+    - |
+      echo -e "# Define project specific variables here if any."
+      #echo -e "export <CUSTOM_VAR>=\"${<CUSTOM_VAR>}\""
+
+.tioga_reproducer_job:
+  script:
     - |
       echo -e "flux watch \$(flux batch -o output.stdout.type=kvs ${TIOGA_JOB_ALLOC} ${JOB_CMD})"
       echo -e "\e[7;32m### End of reproducer\e[0m"
 
-.tioga_job_command: &tioga_job_command
+.tioga_job_command:
+  script:
     - ${PROXY} flux watch $( ${PROXY} flux batch -o output.stdout.type=kvs ${TIOGA_JOB_ALLOC} ${JOB_CMD})
 
 .job_on_tioga:
@@ -75,11 +91,11 @@ stages:
       echo -e "[Information]: Shared allocation ID = ${ALLOC_ID}"
       PROXY="$( [[ -n "${ALLOC_ID}" ]] && echo "flux proxy ${ALLOC_ID}" || echo "" )"
     # Print a reproducer
-    - *tioga_reproducer_init
-    - *tioga_reproducer_vars
-    - *tioga_reproducer_job
+    - !reference [.tioga_reproducer_init, script]
+    - !reference [.tioga_reproducer_vars, script]
+    - !reference [.tioga_reproducer_job, script]
     # The actual launch command
-    - *tioga_job_command
+    - !reference [.tioga_job_command, script]
 
 ##############################################################################
 # JOBS
