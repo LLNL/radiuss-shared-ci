@@ -41,7 +41,8 @@ stages:
            --header "authorization: Bearer ${GITHUB_TOKEN}" \
            --data "{ \"state\": \"${pipeline_status}\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab ${context} pipeline\", \"context\": \"ci/gitlab/${context}\" }"
 
-.lassen_reproducer_init: &lassen_reproducer_init
+.lassen_reproducer_init:
+  script:
     - |
       echo -e "\e[7;32m### CI job ${CI_JOB_ID} reproducer on lassen (${SYS_TYPE}) \e[0m"
       if [[ -n "${LLNL_SERVICE_USER}" ]]; then echo -e "xsu ${LLNL_SERVICE_USER}"; fi
@@ -61,17 +62,20 @@ stages:
 # definition of these variables in a generic fashion. By overriding the
 # following section, projects can specify the variables to define in the
 # reproducer to exactly reproduce the CI build.
-.lassen_reproducer_vars: &lassen_reproducer_vars
+.lassen_reproducer_vars:
+  script:
     - |
       echo -e "# Define project specific variables here if any."
       #echo -e "export <CUSTOM_VAR>=\"${<CUSTOM_VAR>}\""
 
-.lassen_reproducer_job: &lassen_reproducer_job
+.lassen_reproducer_job:
+  script:
     - |
       echo -e "lalloc ${LASSEN_JOB_ALLOC} ${JOB_CMD}"
       echo -e "\e[7;32m### End of reproducer\e[0m"
 
-.lassen_job_command: &lassen_job_command
+.lassen_job_command:
+  script:
     - lalloc ${LASSEN_JOB_ALLOC} ${JOB_CMD}
 
 .job_on_lassen:
@@ -79,11 +83,11 @@ stages:
   stage: jobs-stage-1
   script:
     # Print a reproducer
-    - *lassen_reproducer_init
-    - *lassen_reproducer_vars
-    - *lassen_reproducer_job
+    - !reference [.lassen_reproducer_init]
+    - !reference [.lassen_reproducer_vars]
+    - !reference [.lassen_reproducer_job]
     # The actual launch command
-    - *lassen_job_command
+    - !reference [.lassen_job_command]
 
 ##############################################################################
 # JOBS

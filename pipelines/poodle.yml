@@ -44,7 +44,8 @@ stages:
            --header "authorization: Bearer ${GITHUB_TOKEN}" \
            --data "{ \"state\": \"${pipeline_status}\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab ${context} pipeline\", \"context\": \"ci/gitlab/${context}\" }"
 
-.poodle_reproducer_init: &poodle_reproducer_init
+.poodle_reproducer_init:
+  script:
     - |
       echo -e "\e[7;32m### CI job ${CI_JOB_ID} reproducer on poodle (${SYS_TYPE}) \e[0m"
       if [[ -n "${LLNL_SERVICE_USER}" ]]; then echo -e "xsu ${LLNL_SERVICE_USER}"; fi
@@ -64,17 +65,20 @@ stages:
 # definition of these variables in a generic fashion. By overriding the
 # following section, projects can specify the variables to define in the
 # reproducer to exactly reproduce the CI build.
-.poodle_reproducer_vars: &poodle_reproducer_vars
+.poodle_reproducer_vars:
+  script:
     - |
       echo -e "# Define project specific variables here if any."
       #echo -e "export <CUSTOM_VAR>=\"${<CUSTOM_VAR>}\""
 
-.poodle_reproducer_job: &poodle_reproducer_job
+.poodle_reproducer_job:
+  script:
     - |
       echo -e "srun ${POODLE_JOB_ALLOC} ${JOB_CMD}"
       echo -e "\e[7;32m### End of reproducer\e[0m"
 
-.poodle_job_command: &poodle_job_command
+.poodle_job_command:
+  script:
     - srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) ${POODLE_JOB_ALLOC} ${JOB_CMD}
 
 .job_on_poodle:
@@ -86,11 +90,11 @@ stages:
     - export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
     - echo -e "### Job ID is ${JOBID}"
     # Print a reproducer
-    - *poodle_reproducer_init
-    - *poodle_reproducer_vars
-    - *poodle_reproducer_job
+    - !reference [.poodle_reproducer_init]
+    - !reference [.poodle_reproducer_vars]
+    - !reference [.poodle_reproducer_job]
     # The actual launch command
-    - *poodle_job_command
+    - !reference [.poodle_job_command]
 
 ##############################################################################
 # JOBS
