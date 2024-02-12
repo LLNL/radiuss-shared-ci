@@ -83,11 +83,11 @@ stages:
   stage: jobs-stage-1
   script:
     # Print a reproducer
-    - !reference [.lassen_reproducer_init]
-    - !reference [.lassen_reproducer_vars]
-    - !reference [.lassen_reproducer_job]
+    - !reference [.lassen_reproducer_init, script]
+    - !reference [.lassen_reproducer_vars, script]
+    - !reference [.lassen_reproducer_job, script]
     # The actual launch command
-    - !reference [.lassen_job_command]
+    - !reference [.lassen_job_command, script]
 
 ##############################################################################
 # JOBS

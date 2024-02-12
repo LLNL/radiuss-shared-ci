@@ -90,11 +90,11 @@ stages:
     - export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
     - echo -e "### Job ID is ${JOBID}"
     # Print a reproducer
-    - !reference [.poodle_reproducer_init]
-    - !reference [.poodle_reproducer_vars]
-    - !reference [.poodle_reproducer_job]
+    - !reference [.poodle_reproducer_init, script]
+    - !reference [.poodle_reproducer_vars, script]
+    - !reference [.poodle_reproducer_job, script]
     # The actual launch command
-    - !reference [.poodle_job_command]
+    - !reference [.poodle_job_command, script]
 
 ##############################################################################
 # JOBS
