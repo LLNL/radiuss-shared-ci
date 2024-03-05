@@ -36,7 +36,8 @@ ignore-draft-pr:
       description="GitLab: Pull Request vetted for testing"
       status="success"
       return_code=0
-      if [[ ! "${CI_COMMIT_BRANCH}" =~ ${always_run_pattern} ]];
+      # CI_COMMIT_BRANCH is only empty for tags, we always run CI on tags.
+      if [[ ! "${CI_COMMIT_BRANCH}" =~ ${always_run_pattern} && -n "${CI_COMMIT_BRANCH}" ]];
       then
           curl --header "authorization: Bearer ${GITHUB_TOKEN}" -X POST -d " \
           { \
