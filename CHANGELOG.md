@@ -6,7 +6,20 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v2023.12.0 - ....-..-.. ]
+## [v2023.12.3 - 2024-03-06 ]
+
+- Fix draft PR filter mechanism: override failures with a success status when
+  PR is not a draft anymore, support pipelines running on tags.
+
+## [v2023.12.2 - 2024-02-12 ]
+
+- Fix reproducer logic: apply anchors to references migration everywhere
+
+## [v2023.12.1 - 2023-12-19 ]
+
+- Fix reproducer logic: move from YAML anchors to YAML references
+
+## [v2023.12.0 - 2023-12-11 ]
 
 - Update flux commands to allow controlled overlapping and MPI tests
 - BREAKING: Update reproducer logic to allow for customization. The reproducer
