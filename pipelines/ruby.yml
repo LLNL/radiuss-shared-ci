@@ -5,6 +5,10 @@
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
 
+include:
+  - project: 'lc-templates/id_tokens'
+    file: 'id_tokens.yml'
+
 stages:
   - is-machine-up
   - allocate-resources
