@@ -6,6 +6,19 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2024.06.0 - 2024-06-07 ]
+
+- Releasing an allocation will not fail anymore when the allocation did not
+  exist. This happened when restarting a single allocation (no shared alloc)
+  or when the allocation completed (job timeout).
+- Comment and improve the templates.
+
+## [v2024.04.0 - 2024-04-17 ]
+
+- Add changes required by LC to set ID tokens appropriately.
+- Suggest use of dedicated CI queues.
+- Do not suggest specifying allocation duration in sub-allocations.
+
 ## [v2023.12.3 - 2024-03-06 ]
 
 - Fix draft PR filter mechanism: override failures with a success status when
