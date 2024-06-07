@@ -133,7 +133,7 @@ release_resources:
   stage: release-resources
   script:
     - export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
-    - ([[ -n "${JOBID}" ]] && scancel ${JOBID})
+    - ([[ -n "${JOBID}" ]] && scancel ${JOBID} || exit 0)
 
 status_success:
   extends: [.on_poodle]
