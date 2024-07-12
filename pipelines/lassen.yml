@@ -12,11 +12,9 @@ include:
 
 stages:
   - is-machine-up
-  - status-initiate
   - jobs-stage-1
   - jobs-stage-2
   - jobs-stage-3
-  - status-update
 
 ##############################################################################
 # UTILITIES
@@ -32,19 +30,8 @@ stages:
     # Set ADVANCED_JOB to ON in the job definition to make it an advanced job.
     - if: '$ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH != "main" && $CI_COMMIT_BRANCH != "develop" && $ALL_TARGETS != "ON"'
       when: never
-    # Only report failure if the pipeline failed.
-    - if: '$CI_JOB_NAME =~ /status_failure/'
-      when: on_failure
     # A true statement is expected to allow jobs to run. Here is the default.
     - when: on_success
-
-.status_report: &status_report
-    - export context="lassen"
-    - |
-      curl --url "https://api.github.com/repos/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
-           --header 'Content-Type: application/json' \
-           --header "authorization: Bearer ${GITHUB_TOKEN}" \
-           --data "{ \"state\": \"${pipeline_status}\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab ${context} pipeline\", \"context\": \"ci/gitlab/${context}\" }"
 
 .lassen_reproducer_init:
   script:
@@ -96,32 +83,3 @@ stages:
 
 ##############################################################################
 # JOBS
-
-status_pending:
-  extends: [.on_lassen]
-  variables:
-    GIT_STRATEGY: none
-  stage: status-initiate
-  script:
-    - export pipeline_status="pending"
-    - *status_report
-
-status_success:
-  extends: [.on_lassen]
-  variables:
-    GIT_STRATEGY: none
-  stage: status-update
-  script:
-    - export pipeline_status="success"
-    - *status_report
-  when: on_success
-
-status_failure:
-  extends: [.on_lassen]
-  variables:
-    GIT_STRATEGY: none
-  stage: status-update
-  script:
-    - export pipeline_status="failure"
-    - *status_report
-  when: on_failure
