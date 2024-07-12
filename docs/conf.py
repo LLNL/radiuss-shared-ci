@@ -1,3 +1,11 @@
+##############################################################################
+# Copyright (c) 2021-24, Lawrence Livermore National Security, LLC and RADIUSS
+# project contributors. See the COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: (MIT)
+##############################################################################
+# -*- coding: utf-8 -*-
+#
 # Configuration file for the Sphinx documentation builder.
 #
 # This file only contains a selection of the most common options. For a full
@@ -15,16 +23,6 @@
 # sys.path.insert(0, os.path.abspath('.'))
 
 
-# -- Project information -----------------------------------------------------
-
-project = u'Radiuss Shared CI'
-copyright = u'2021, Adrien M. Bernede'
-author = u'Adrien M. Bernede'
-
-# The full version, including alpha/beta/rc tags
-release = u'0.1'
-
-
 # -- General configuration ---------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be
@@ -37,14 +35,26 @@ extensions = [
 templates_path = ['_templates']
 
 # The suffix(es) of source filenames.
+# You can specify multiple suffix as a list of string:
+#
+# source_suffix = ['.rst', '.md']
 source_suffix = '.rst'
 
 # The master toctree document.
 master_doc = 'index'
 
+# General information about the project.
+project = u'Radiuss Shared CI'
+copyright = u'2021, Adrien M. Bernede'
+author = u'Adrien M. Bernede'
+
+# The full version, including alpha/beta/rc tags
+release = u'0.1'
+
+
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-# This pattern also affects html_static_path and html_extra_path.
+# These patterns also affect html_static_path and html_extra_path.
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 # The name of the Pygments (syntax highlighting) style to use.
