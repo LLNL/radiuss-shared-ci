@@ -77,12 +77,12 @@ Cool features provided by RADIUSS Shared CI
    :hidden:
    :caption: User Documentation
 
-   sphinx/user_guide/index
+   user_guide/index
 
 .. toctree::
    :hidden:
    :caption: Developer Documentation
 
-   sphinx/dev_guide/index
+   dev_guide/index
 
 .. _RADIUSS Spack Configs: https://radiuss-spack-configs.readthedocs.io/en/latest/index.html
