@@ -73,7 +73,7 @@ stages:
 
 .poodle_job_command:
   script:
-    - srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) ${POODLE_JOB_ALLOC} ${JOB_CMD}
+    - echo -e ${JOB_CMD} | xargs srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) ${POODLE_JOB_ALLOC}
 
 .job_on_poodle:
   extends: [.custom_job, .on_poodle]

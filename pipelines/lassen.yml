@@ -68,7 +68,7 @@ stages:
 
 .lassen_job_command:
   script:
-    - lalloc ${LASSEN_JOB_ALLOC} ${JOB_CMD}
+    - echo -e ${JOB_CMD} | xargs lalloc ${LASSEN_JOB_ALLOC}
 
 .job_on_lassen:
   extends: [.custom_job, .on_lassen]
