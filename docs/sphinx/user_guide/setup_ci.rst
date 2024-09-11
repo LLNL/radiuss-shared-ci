@@ -92,7 +92,7 @@ integrating the RADIUSS Shared CI infrastructure into your project.
    mkdir -p .gitlab/jobs
    cp ../radiuss-shared-ci/customization/subscribed-pipelines.yml .gitlab
    cp ../radiuss-shared-ci/customization/custom-jobs-and-variables.yml .gitlab
-   cp ../radiuss-shared-ci/jobs/\<machine\>.yml .gitlab/jobs/<machine>.yml
+   cp ../radiuss-shared-ci/customization/jobs/\<machine\>.yml .gitlab/jobs/<machine>.yml
    # You may use the <machine>.yml file as a starting point to add jobs.
    vim .gitlab/subscription-pipelines.yml
    # comment the jobs associted to <CI_MACHINE> you don't want.
