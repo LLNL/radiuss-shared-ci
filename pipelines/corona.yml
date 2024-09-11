@@ -73,7 +73,7 @@ stages:
 
 .corona_job_command:
   script:
-    - ${PROXY} flux watch $( ${PROXY} flux batch -o output.stdout.type=kvs ${CORONA_JOB_ALLOC} ${JOB_CMD})
+    - ${PROXY} flux watch $( echo -e ${JOB_CMD} | xargs ${PROXY} flux batch -o output.stdout.type=kvs ${CORONA_JOB_ALLOC} )
 
 .job_on_corona:
   extends: [.custom_job, .on_corona]
