@@ -68,12 +68,12 @@ stages:
 .dane_reproducer_job:
   script:
     - |
-      echo -e "srun ${dane_JOB_ALLOC} ${JOB_CMD}"
+      echo -e "srun ${DANE_JOB_ALLOC} ${JOB_CMD}"
       echo -e "\e[7;32m### End of reproducer\e[0m"
 
 .dane_job_command:
   script:
-    - srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) ${dane_JOB_ALLOC} ${JOB_CMD}
+    - srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) ${DANE_JOB_ALLOC} ${JOB_CMD}
 
 .job_on_dane:
   extends: [.custom_job, .on_dane]
