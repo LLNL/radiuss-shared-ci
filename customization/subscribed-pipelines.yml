@@ -85,7 +85,7 @@ poodle-build-and-test:
   needs: [poodle-up-check]
   ## [Shared jobs scenario]
   ## (See Umpire CI setup for an example).
-  #needs: [ruby-up-check, generate-job-lists]
+  #needs: [poodle-up-check, generate-job-lists]
   extends: [.build-and-test]
 
 # CORONA
@@ -100,7 +100,7 @@ corona-build-and-test:
   needs: [corona-up-check]
   ## [Shared jobs scenario]
   ## (See Umpire CI setup for an example).
-  #needs: [ruby-up-check, generate-job-lists]
+  #needs: [corona-up-check, generate-job-lists]
   extends: [.build-and-test]
 
 # TIOGA
@@ -115,7 +115,7 @@ tioga-build-and-test:
   needs: [tioga-up-check]
   ## [Shared jobs scenario]
   ## (See Umpire CI setup for an example).
-  #needs: [ruby-up-check, generate-job-lists]
+  #needs: [tioga-up-check, generate-job-lists]
   extends: [.build-and-test]
 
 # LASSEN
@@ -130,7 +130,7 @@ lassen-build-and-test:
   needs: [lassen-up-check]
   ## [Shared jobs scenario]
   ## (See Umpire CI setup for an example).
-  #needs: [ruby-up-check, generate-job-lists]
+  #needs: [lassen-up-check, generate-job-lists]
   extends: [.build-and-test]
 
 
