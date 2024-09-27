@@ -26,7 +26,7 @@ stages:
     - dane
   rules:
     # Runs except if we explicitly deactivate dane by variable.
-    - if: '$ON_dane == "OFF"'
+    - if: '$ON_DANE == "OFF"'
       when: never
     # Advanced jobs can only run on master, develop or if ALL_TARGETS is ON.
     # Set ADVANCED_JOB to ON in the job definition to make it an advanced job.
@@ -101,7 +101,7 @@ allocate_resources:
   extends: .on_dane
   stage: allocate-resources
   script:
-    - salloc ${dane_SHARED_ALLOC} --no-shell --job-name=${ALLOC_NAME}
+    - salloc ${DANE_SHARED_ALLOC} --no-shell --job-name=${ALLOC_NAME}
 
 # In post-build phase, deallocate resources.
 # Note : we make sure this is run even on build phase failure using a specific
