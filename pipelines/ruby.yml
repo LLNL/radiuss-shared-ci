@@ -95,7 +95,6 @@ stages:
 # JOBS
 
 # In pre-build phase, allocate a node for builds.
-# TODO: make the resource configurable, not all projects will want the same.
 allocate_resources:
   variables:
     GIT_STRATEGY: none

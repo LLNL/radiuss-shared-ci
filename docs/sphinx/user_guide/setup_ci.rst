@@ -101,6 +101,9 @@ integrating the RADIUSS Shared CI infrastructure into your project.
    vim .gitlab/jobs/<machine>.yml
    # Add jobs or override some of the shared ones.
 
+   ### Mirroring Setup
+   https://docs.gitlab.com/ee/ci/ci_cd_for_external_repos/github_integration.html#connect-with-personal-access-token
+
    ### Non-RADIUSS projects
    open https://lc.llnl.gov/gitlab/<group>/<project>/-/settings/ci_cd
    # Set CI/CD variable GITHUB_TOKEN to hold token with repo:status
@@ -241,7 +244,7 @@ Add jobs
 --------
 
 We provide a template file to add jobs to each machine. You should create one
-file per machine using this template. These files may be place in your
+file per machine using this template. These files may be placed in your
 project's ``.gitlab/jobs`` subdirectory and named ``<machine>.yml``, where
 ``<machine>`` is the machine name. They are required as soon as the
 associated machine has been activated (uncommented) in the
@@ -263,15 +266,27 @@ duplicate the example job and complete it with the required information:
    same toolchains. See the dedicated How-To section for more details
    :ref:`import-shared-jobs`.
 
+Mirroring Setup
+---------------
+
+RADIUSS Shared CI is primarily intended for projects hosted on GitHub that need
+to run tests on LLNL Livermore Computing (LC) systems through the LC GitLab
+instance. GitLab provides a mirroring feature with GitHub integration that will
+automate the synchronisation of local source with the remote GitHub repository.
+
+The mirroring setup is described in detail in `GitLab documentation_`:
+
 Non-RADIUSS Projects
 --------------------
 
 RADIUSS Shared CI features a customized status report mechanism that reports to
-to GitHub the CI status of each sub-pipeline (one per machine).
+to GitHub when a machine is down, making it impossible to run the pipeline.
+This prevent users from having to connect to GitLab to find out.
 
-This feature requires the creation of a GitHub token with ``repo:status``
-permissions, and registering it as a CI/CD variable named ``GITHUB_TOKEN`` in
-the project (or the group) on GitLab.
+If your project hasn't been mirrored within the Radiuss group on LC GitLab,
+this feature will only work after you create a GitHub token with
+``repo:status`` permissions, and registering it as a CI/CD variable named
+``GITHUB_TOKEN`` in the project (or the group) on GitLab.
 
 Visit ``https://lc.llnl.gov/gitlab/<group>/<project>/-/settings/ci_cd`` to
 create the variable once the token has been generated on GitHub.
@@ -281,3 +296,4 @@ create the variable once the token has been generated on GitHub.
 .. _export jUnit test reports: https://github.com/LLNL/Umpire/blob/develop/.gitlab/custom-jobs-and-variables.yml
 .. _sharing spack configuration files: https://github.com/LLNL/radiuss-spack-configs
 .. _RADIUSS Spack Configs: https://radiuss-spack-configs.readthedocs.io/en/latest/index.html
+.. _GitLab documentation: https://docs.gitlab.com/ee/ci/ci_cd_for_external_repos/github_integration.html#connect-with-personal-access-token
