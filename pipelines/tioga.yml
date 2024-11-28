@@ -73,7 +73,7 @@ stages:
 
 .tioga_job_command:
   script:
-    - ${PROXY} flux watch $( ${PROXY} flux batch -o output.stdout.type=kvs ${TIOGA_JOB_ALLOC} ${JOB_CMD})
+    - ${PROXY} flux watch $( echo -e ${JOB_CMD} | xargs ${PROXY} flux batch -o output.stdout.type=kvs ${TIOGA_JOB_ALLOC} )
 
 .job_on_tioga:
   extends: [.custom_job, .on_tioga]
