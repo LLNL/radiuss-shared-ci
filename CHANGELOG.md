@@ -6,6 +6,17 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2024.12.0 - 2024-12-19 ]
+
+- Document sharing jobs (e.g. GH llnl/radiuss-spack-configs/gitlab/radiuss-jobs).
+- Point at GitLab documentation for mirroring setup.
+- Improve support for complex commands passed to scheduler using xargs.
+
+## [v2024.07.0 - 2024-07-15 ]
+
+- Fix documentation template.
+- Do not report child pipeline statuses to github (now handled by GitLab directly).
+
 ## [v2024.06.0 - 2024-06-07 ]
 
 - Releasing an allocation will not fail anymore when the allocation did not
