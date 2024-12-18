@@ -8,6 +8,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [v2024.12.0 - 2024-12-19 ]
 
+- Add new utility that prevent to run CI on branches that are not PRs.
 - Document sharing jobs (e.g. GH llnl/radiuss-spack-configs/gitlab/radiuss-jobs).
 - Point at GitLab documentation for mirroring setup.
 - Improve support for complex commands passed to scheduler using xargs.
