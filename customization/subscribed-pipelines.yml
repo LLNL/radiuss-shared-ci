@@ -24,6 +24,35 @@
         exit 1
       fi
 
+## [Shared jobs scenario]
+## The job list can be imported from the .gitlab/jobs/<machine>.yml file, which
+## is the default behavior of RADIUSS Shared CI. Or the list can be generated,
+## allowing more complex setups, like sharing a list of jobs like we do with
+## RADIUSS Spack Configs. Below is an example # job that concatenates jobs from
+## two sources.
+## (See Umpire CI setup for an example).
+#
+## One job to generate the job list for all the subpipelines
+#generate-job-lists:
+#  stage: prerequisites
+#  tags: [shell, oslic]
+#  variables:
+#    LOCAL_JOBS_PATH: ".gitlab/jobs"
+#    REMOTE_JOBS_PATH: "<remote/jobs/path>"
+#  script:
+#    - cat ${LOCAL_JOBS_PATH}/ruby.yml ${REMOTE_JOBS_PATH}/ruby.yml > ruby-jobs.yml
+#    - cat ${LOCAL_JOBS_PATH}/poodle.yml ${REMOTE_JOBS_PATH}/poodle.yml > poodle-jobs.yml
+#    - cat ${LOCAL_JOBS_PATH}/lassen.yml ${REMOTE_JOBS_PATH}/lassen.yml > lassen-jobs.yml
+#    - cat ${LOCAL_JOBS_PATH}/corona.yml ${REMOTE_JOBS_PATH}/corona.yml > corona-jobs.yml
+#    - cat ${LOCAL_JOBS_PATH}/tioga.yml ${REMOTE_JOBS_PATH}/tioga.yml > tioga-jobs.yml
+#  artifacts:
+#    paths:
+#      - ruby-jobs.yml
+#      - poodle-jobs.yml
+#      - lassen-jobs.yml
+#      - corona-jobs.yml
+#      - tioga-jobs.yml
+
 ###
 # Trigger a build-and-test pipeline for a machine.
 # Comment the jobs for machines you don’t need.
@@ -39,6 +68,9 @@ ruby-build-and-test:
   variables:
     CI_MACHINE: "ruby"
   needs: [ruby-up-check]
+  ## [Shared jobs scenario]
+  ## (See Umpire CI setup for an example).
+  #needs: [ruby-up-check, generate-job-lists]
   extends: [.build-and-test]
 
 # POODLE
@@ -51,6 +83,9 @@ poodle-build-and-test:
   variables:
     CI_MACHINE: "poodle"
   needs: [poodle-up-check]
+  ## [Shared jobs scenario]
+  ## (See Umpire CI setup for an example).
+  #needs: [poodle-up-check, generate-job-lists]
   extends: [.build-and-test]
 
 # CORONA
@@ -63,6 +98,9 @@ corona-build-and-test:
   variables:
     CI_MACHINE: "corona"
   needs: [corona-up-check]
+  ## [Shared jobs scenario]
+  ## (See Umpire CI setup for an example).
+  #needs: [corona-up-check, generate-job-lists]
   extends: [.build-and-test]
 
 # TIOGA
@@ -75,6 +113,9 @@ tioga-build-and-test:
   variables:
     CI_MACHINE: "tioga"
   needs: [tioga-up-check]
+  ## [Shared jobs scenario]
+  ## (See Umpire CI setup for an example).
+  #needs: [tioga-up-check, generate-job-lists]
   extends: [.build-and-test]
 
 # LASSEN
@@ -87,6 +128,9 @@ lassen-build-and-test:
   variables:
     CI_MACHINE: "lassen"
   needs: [lassen-up-check]
+  ## [Shared jobs scenario]
+  ## (See Umpire CI setup for an example).
+  #needs: [lassen-up-check, generate-job-lists]
   extends: [.build-and-test]
 
 

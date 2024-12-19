@@ -74,7 +74,7 @@ stages:
 
 .ruby_job_command:
   script:
-    - srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) ${RUBY_JOB_ALLOC} ${JOB_CMD}
+    - echo -e ${JOB_CMD} | xargs srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) ${RUBY_JOB_ALLOC}
 
 .job_on_ruby:
   extends: [.custom_job, .on_ruby]
@@ -95,7 +95,6 @@ stages:
 # JOBS
 
 # In pre-build phase, allocate a node for builds.
-# TODO: make the resource configurable, not all projects will want the same.
 allocate_resources:
   variables:
     GIT_STRATEGY: none

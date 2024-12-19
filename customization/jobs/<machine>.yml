@@ -14,9 +14,7 @@
 # reproducer to exactly reproduce the CI build.
 .<machine>_reproducer_vars:
   script:
-    - |
-      echo -e "# Define project specific variables here if any."
-      #echo -e "export <CUSTOM_VAR>=\"${<CUSTOM_VAR>}\""
+    - !reference [.reproducer_vars, script]
 
 # With GitLab CI, included files cannot be empty.
 # TODO: remove when you have at least on job defined.
