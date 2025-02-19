@@ -20,19 +20,37 @@ This project requires no installation.
 
 ## Contributing
 
-Please read [CONTRIBUTING.md](https://github.com/LLNL/radiuss-shared-ci/CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
+Please read [CONTRIBUTING.md](https://github.com/LLNL/radiuss-shared-ci/CONTRIBUTING.md) for details on our code of
+conduct, and the process for submitting pull requests to us.
 
 ## Versioning
 
-version: 1.0.0
+version: v2024.12.0
 
-TODO: Not even sure how to handle versioning here.
+When a new version of RADIUSS Shared CI is released, we use the current year and month to set the version number,
+followed by a "minor" index which we increase in case we need a hotfix.
+
+This is coherent with how most projects using RADIUSS Shared CI deal with versioning and helps syncing with other
+utilities, like [RADIUSS Spack configs](https://github.com/LLNL/radiuss-spack-configs).
+
+## List of users
+[AMS](https://gitlab.com/LLNL/AMS)
+[Caliper](https://gitlab.com/LLNL/Caliper)
+[CARE](https://gitlab.com/LLNL/CARE)
+[CHAI](https://gitlab.com/LLNL/CHAI)
+[mfem](https://gitlab.com/mfem/mfem)
+[RAJA](https://gitlab.com/LLNL/RAJA)
+[RAJAPerf](https://gitlab.com/LLNL/RAJAPerf)
+[SAMRAI](https://gitlab.com/LLNL/SAMRAI)
+[sundials](https://gitlab.com/LLNL/sundials)
+[Umpire](https://gitlab.com/LLNL/Umpire)
 
 ## Authors
 
-Adrien M Bernede
+Adrien M. Bernede
 
-See also the list of [contributors](https://github.com/LLNL/radiuss-shared-ci/contributors) who participated in this project.
+See also the list of [contributors](https://github.com/LLNL/radiuss-shared-ci/contributors) who participated in this
+project.
 
 ## License
 
