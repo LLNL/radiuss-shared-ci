@@ -31,7 +31,7 @@ When a new version of RADIUSS Shared CI is released, we use the current year and
 followed by a "minor" index which we increase in case we need a hotfix.
 
 This is coherent with how most projects using RADIUSS Shared CI deal with versioning and helps syncing with other
-utilities, like [RADIUSS Spack configs](https://gitlab.com/LLNL/radiuss-spack-configs).
+utilities, like [RADIUSS Spack configs](https://github.com/LLNL/radiuss-spack-configs).
 
 ## List of users
 [AMS](https://gitlab.com/LLNL/AMS)
