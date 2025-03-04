@@ -34,16 +34,16 @@ This is coherent with how most projects using RADIUSS Shared CI deal with versio
 utilities, like [RADIUSS Spack configs](https://github.com/LLNL/radiuss-spack-configs).
 
 ## List of users
-[AMS](https://gitlab.com/LLNL/AMS)
-[Caliper](https://gitlab.com/LLNL/Caliper)
-[CARE](https://gitlab.com/LLNL/CARE)
-[CHAI](https://gitlab.com/LLNL/CHAI)
-[mfem](https://gitlab.com/mfem/mfem)
-[RAJA](https://gitlab.com/LLNL/RAJA)
-[RAJAPerf](https://gitlab.com/LLNL/RAJAPerf)
-[SAMRAI](https://gitlab.com/LLNL/SAMRAI)
-[sundials](https://gitlab.com/LLNL/sundials)
-[Umpire](https://gitlab.com/LLNL/Umpire)
+[AMS](https://github.com/LLNL/AMS)
+[Caliper](https://github.com/LLNL/Caliper)
+[CARE](https://github.com/LLNL/CARE)
+[CHAI](https://github.com/LLNL/CHAI)
+[mfem](https://github.com/mfem/mfem)
+[RAJA](https://github.com/LLNL/RAJA)
+[RAJAPerf](https://github.com/LLNL/RAJAPerf)
+[SAMRAI](https://github.com/LLNL/SAMRAI)
+[sundials](https://github.com/LLNL/sundials)
+[Umpire](https://github.com/LLNL/Umpire)
 
 ## Authors
 
