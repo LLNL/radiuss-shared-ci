@@ -20,13 +20,13 @@ stages:
 
 ##############################################################################
 # UTILITIES
-.on_poodle:
+.on_tuo:
   tags:
     - shell
-    - poodle
+    - tuo
   rules:
-    # Runs except if we explicitly deactivate poodle by variable.
-    - if: '$ON_POODLE == "OFF"'
+    # Runs except if we explicitly deactivate tuo by variable.
+    - if: '$ON_TUO == "OFF"'
       when: never
     # Advanced jobs can only run on master, develop or if ALL_TARGETS is ON.
     # Set ADVANCED_JOB to ON in the job definition to make it an advanced job.
@@ -38,10 +38,10 @@ stages:
     # A true statement is expected to allow jobs to run. Here is the default.
     - when: on_success
 
-.poodle_reproducer_init:
+.tuo_reproducer_init:
   script:
     - |
-      echo -e "\e[7;32m### CI job ${CI_JOB_ID} reproducer on poodle (${SYS_TYPE}) \e[0m"
+      echo -e "\e[7;32m### CI job ${CI_JOB_ID} reproducer on tuo (${SYS_TYPE}) \e[0m"
       if [[ -n "${LLNL_SERVICE_USER}" ]]; then echo -e "xsu ${LLNL_SERVICE_USER}"; fi
       echo -e "
       working_dir=\"/usr/workspace/\${USER}/${GITHUB_PROJECT_NAME}/${CI_JOB_ID}-\$(date +%s)\" \n
@@ -59,58 +59,62 @@ stages:
 # definition of these variables in a generic fashion. By overriding the
 # following section, projects can specify the variables to define in the
 # reproducer to exactly reproduce the CI build.
-.poodle_reproducer_vars:
+.tuo_reproducer_vars:
   script:
     - |
       echo -e "# Define project specific variables here if any."
       #echo -e "export <CUSTOM_VAR>=\"${<CUSTOM_VAR>}\""
 
-.poodle_reproducer_job:
+.tuo_reproducer_job:
   script:
     - |
-      echo -e "srun ${POODLE_JOB_ALLOC} ${JOB_CMD}"
+      echo -e "flux watch \$(flux batch -o output.stdout.type=kvs ${TUO_JOB_ALLOC} ${JOB_CMD})"
       echo -e "\e[7;32m### End of reproducer\e[0m"
 
-.poodle_job_command:
+.tuo_job_command:
   script:
-    - echo -e ${JOB_CMD} | xargs srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) ${POODLE_JOB_ALLOC}
+    - ${PROXY} flux watch $( echo -e ${JOB_CMD} | xargs ${PROXY} flux batch -o output.stdout.type=kvs ${TUO_JOB_ALLOC} )
 
-.job_on_poodle:
-  extends: [.custom_job, .on_poodle]
+.job_on_tuo:
+  extends: [.custom_job, .on_tuo]
   stage: jobs-stage-1
   script:
     # Allocation information
-    - echo -e "### Allocation name is ${ALLOC_NAME}"
-    - export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
-    - echo -e "### Job ID is ${JOBID}"
+    - |
+      ALLOC_ID=$(flux jobs --name="${ALLOC_NAME}" -n -o "{id}")
+      echo -e "[Information]: Shared allocation ID = ${ALLOC_ID}"
+      PROXY="$( [[ -n "${ALLOC_ID}" ]] && echo "flux proxy ${ALLOC_ID}" || echo "" )"
     # Print a reproducer
-    - !reference [.poodle_reproducer_init, script]
-    - !reference [.poodle_reproducer_vars, script]
-    - !reference [.poodle_reproducer_job, script]
+    - !reference [.tuo_reproducer_init, script]
+    - !reference [.tuo_reproducer_vars, script]
+    - !reference [.tuo_reproducer_job, script]
     # The actual launch command
-    - !reference [.poodle_job_command, script]
+    - !reference [.tuo_job_command, script]
 
 ##############################################################################
 # JOBS
 
 # In pre-build phase, allocate a node for builds.
-# TODO: make the resource configurable, not all projects will want the same.
 allocate_resources:
   variables:
     GIT_STRATEGY: none
-  extends: .on_poodle
+  extends: .on_tuo
   stage: allocate-resources
   script:
-    - salloc ${POODLE_SHARED_ALLOC} --no-shell --job-name=${ALLOC_NAME}
+    - |
+      set -x
+      flux --parent alloc ${TUO_SHARED_ALLOC} --job-name=${ALLOC_NAME} --bg
 
 # In post-build phase, deallocate resources.
 # Note : we make sure this is run even on build phase failure using a specific
-# rule in the template ".on_poodle".
+# rule in the template ".on_tuo".
 release_resources:
   variables:
     GIT_STRATEGY: none
-  extends: .on_poodle
+  extends: .on_tuo
   stage: release-resources
   script:
-    - export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
-    - ([[ -n "${JOBID}" ]] && scancel ${JOBID} || exit 0)
+    - |
+      set -x
+      export URI=$(flux jobs -o "{id} {name}" | grep ${ALLOC_NAME} | awk '{print $1}')
+      ([[ -n "${URI}" ]] && flux job kill ${URI} || exit 0)

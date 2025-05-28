@@ -41,17 +41,18 @@
 #    REMOTE_JOBS_PATH: "<remote/jobs/path>"
 #  script:
 #    - cat ${LOCAL_JOBS_PATH}/ruby.yml ${REMOTE_JOBS_PATH}/ruby.yml > ruby-jobs.yml
-#    - cat ${LOCAL_JOBS_PATH}/poodle.yml ${REMOTE_JOBS_PATH}/poodle.yml > poodle-jobs.yml
+#    - cat ${LOCAL_JOBS_PATH}/dane.yml ${REMOTE_JOBS_PATH}/dane.yml > dane-jobs.yml
 #    - cat ${LOCAL_JOBS_PATH}/lassen.yml ${REMOTE_JOBS_PATH}/lassen.yml > lassen-jobs.yml
 #    - cat ${LOCAL_JOBS_PATH}/corona.yml ${REMOTE_JOBS_PATH}/corona.yml > corona-jobs.yml
 #    - cat ${LOCAL_JOBS_PATH}/tioga.yml ${REMOTE_JOBS_PATH}/tioga.yml > tioga-jobs.yml
+#    - cat ${LOCAL_JOBS_PATH}/tuo.yml ${REMOTE_JOBS_PATH}/tuo.yml > tuo-jobs.yml
 #  artifacts:
 #    paths:
 #      - ruby-jobs.yml
-#      - poodle-jobs.yml
+#      - dane-jobs.yml
 #      - lassen-jobs.yml
 #      - corona-jobs.yml
-#      - tioga-jobs.yml
+#      - tuo-jobs.yml
 
 ###
 # Trigger a build-and-test pipeline for a machine.
@@ -73,21 +74,6 @@ ruby-build-and-test:
   #needs: [ruby-up-check, generate-job-lists]
   extends: [.build-and-test]
 
-# POODLE
-poodle-up-check:
-  variables:
-    CI_MACHINE: "poodle"
-  extends: [.machine-check]
-
-poodle-build-and-test:
-  variables:
-    CI_MACHINE: "poodle"
-  needs: [poodle-up-check]
-  ## [Shared jobs scenario]
-  ## (See Umpire CI setup for an example).
-  #needs: [poodle-up-check, generate-job-lists]
-  extends: [.build-and-test]
-
 # DANE
 dane-up-check:
   variables:
@@ -97,7 +83,7 @@ dane-up-check:
 dane-build-and-test:
   variables:
     CI_MACHINE: "dane"
-  needs: [poodle-up-check]
+  needs: [dane-up-check]
   ## [Shared jobs scenario]
   ## (See Umpire CI setup for an example).
   #needs: [dane-up-check, generate-job-lists]
@@ -131,6 +117,21 @@ tioga-build-and-test:
   ## [Shared jobs scenario]
   ## (See Umpire CI setup for an example).
   #needs: [tioga-up-check, generate-job-lists]
+  extends: [.build-and-test]
+
+# TUO
+tuo-up-check:
+  variables:
+    CI_MACHINE: "tuo"
+  extends: [.machine-check]
+
+tuo-build-and-test:
+  variables:
+    CI_MACHINE: "tuo"
+  needs: [tuo-up-check]
+  ## [Shared jobs scenario]
+  ## (See Umpire CI setup for an example).
+  #needs: [tuo-up-check, generate-job-lists]
   extends: [.build-and-test]
 
 # LASSEN
