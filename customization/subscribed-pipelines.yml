@@ -45,14 +45,14 @@
 #    - cat ${LOCAL_JOBS_PATH}/lassen.yml ${REMOTE_JOBS_PATH}/lassen.yml > lassen-jobs.yml
 #    - cat ${LOCAL_JOBS_PATH}/corona.yml ${REMOTE_JOBS_PATH}/corona.yml > corona-jobs.yml
 #    - cat ${LOCAL_JOBS_PATH}/tioga.yml ${REMOTE_JOBS_PATH}/tioga.yml > tioga-jobs.yml
-#    - cat ${LOCAL_JOBS_PATH}/tuo.yml ${REMOTE_JOBS_PATH}/tuo.yml > tuo-jobs.yml
+#    - cat ${LOCAL_JOBS_PATH}/tuolumne.yml ${REMOTE_JOBS_PATH}/tuolumne.yml > tuolumne-jobs.yml
 #  artifacts:
 #    paths:
 #      - ruby-jobs.yml
 #      - dane-jobs.yml
 #      - lassen-jobs.yml
 #      - corona-jobs.yml
-#      - tuo-jobs.yml
+#      - tuolumne-jobs.yml
 
 ###
 # Trigger a build-and-test pipeline for a machine.
@@ -120,18 +120,18 @@ tioga-build-and-test:
   extends: [.build-and-test]
 
 # TUO
-tuo-up-check:
+tuolumne-up-check:
   variables:
-    CI_MACHINE: "tuo"
+    CI_MACHINE: "tuolumne"
   extends: [.machine-check]
 
-tuo-build-and-test:
+tuolumne-build-and-test:
   variables:
-    CI_MACHINE: "tuo"
-  needs: [tuo-up-check]
+    CI_MACHINE: "tuolumne"
+  needs: [tuolumne-up-check]
   ## [Shared jobs scenario]
   ## (See Umpire CI setup for an example).
-  #needs: [tuo-up-check, generate-job-lists]
+  #needs: [tuolumne-up-check, generate-job-lists]
   extends: [.build-and-test]
 
 # LASSEN

@@ -20,12 +20,12 @@ stages:
 
 ##############################################################################
 # UTILITIES
-.on_tuo:
+.on_tuolumne:
   tags:
     - shell
-    - tuo
+    - tuolumne
   rules:
-    # Runs except if we explicitly deactivate tuo by variable.
+    # Runs except if we explicitly deactivate tuolumne by variable.
     - if: '$ON_TUO == "OFF"'
       when: never
     # Advanced jobs can only run on master, develop or if ALL_TARGETS is ON.
@@ -38,10 +38,10 @@ stages:
     # A true statement is expected to allow jobs to run. Here is the default.
     - when: on_success
 
-.tuo_reproducer_init:
+.tuolumne_reproducer_init:
   script:
     - |
-      echo -e "\e[7;32m### CI job ${CI_JOB_ID} reproducer on tuo (${SYS_TYPE}) \e[0m"
+      echo -e "\e[7;32m### CI job ${CI_JOB_ID} reproducer on tuolumne (${SYS_TYPE}) \e[0m"
       if [[ -n "${LLNL_SERVICE_USER}" ]]; then echo -e "xsu ${LLNL_SERVICE_USER}"; fi
       echo -e "
       working_dir=\"/usr/workspace/\${USER}/${GITHUB_PROJECT_NAME}/${CI_JOB_ID}-\$(date +%s)\" \n
@@ -59,24 +59,24 @@ stages:
 # definition of these variables in a generic fashion. By overriding the
 # following section, projects can specify the variables to define in the
 # reproducer to exactly reproduce the CI build.
-.tuo_reproducer_vars:
+.tuolumne_reproducer_vars:
   script:
     - |
       echo -e "# Define project specific variables here if any."
       #echo -e "export <CUSTOM_VAR>=\"${<CUSTOM_VAR>}\""
 
-.tuo_reproducer_job:
+.tuolumne_reproducer_job:
   script:
     - |
       echo -e "flux watch \$(flux batch -o output.stdout.type=kvs ${TUO_JOB_ALLOC} ${JOB_CMD})"
       echo -e "\e[7;32m### End of reproducer\e[0m"
 
-.tuo_job_command:
+.tuolumne_job_command:
   script:
     - ${PROXY} flux watch $( echo -e ${JOB_CMD} | xargs ${PROXY} flux batch -o output.stdout.type=kvs ${TUO_JOB_ALLOC} )
 
-.job_on_tuo:
-  extends: [.custom_job, .on_tuo]
+.job_on_tuolumne:
+  extends: [.custom_job, .on_tuolumne]
   stage: jobs-stage-1
   script:
     # Allocation information
@@ -85,11 +85,11 @@ stages:
       echo -e "[Information]: Shared allocation ID = ${ALLOC_ID}"
       PROXY="$( [[ -n "${ALLOC_ID}" ]] && echo "flux proxy ${ALLOC_ID}" || echo "" )"
     # Print a reproducer
-    - !reference [.tuo_reproducer_init, script]
-    - !reference [.tuo_reproducer_vars, script]
-    - !reference [.tuo_reproducer_job, script]
+    - !reference [.tuolumne_reproducer_init, script]
+    - !reference [.tuolumne_reproducer_vars, script]
+    - !reference [.tuolumne_reproducer_job, script]
     # The actual launch command
-    - !reference [.tuo_job_command, script]
+    - !reference [.tuolumne_job_command, script]
 
 ##############################################################################
 # JOBS
@@ -98,7 +98,7 @@ stages:
 allocate_resources:
   variables:
     GIT_STRATEGY: none
-  extends: .on_tuo
+  extends: .on_tuolumne
   stage: allocate-resources
   script:
     - |
@@ -107,11 +107,11 @@ allocate_resources:
 
 # In post-build phase, deallocate resources.
 # Note : we make sure this is run even on build phase failure using a specific
-# rule in the template ".on_tuo".
+# rule in the template ".on_tuolumne".
 release_resources:
   variables:
     GIT_STRATEGY: none
-  extends: .on_tuo
+  extends: .on_tuolumne
   stage: release-resources
   script:
     - |
