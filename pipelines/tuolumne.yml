@@ -26,7 +26,7 @@ stages:
     - tuolumne
   rules:
     # Runs except if we explicitly deactivate tuolumne by variable.
-    - if: '$ON_TUO == "OFF"'
+    - if: '$ON_TUOLUMNE == "OFF"'
       when: never
     # Advanced jobs can only run on master, develop or if ALL_TARGETS is ON.
     # Set ADVANCED_JOB to ON in the job definition to make it an advanced job.
@@ -68,12 +68,12 @@ stages:
 .tuolumne_reproducer_job:
   script:
     - |
-      echo -e "flux watch \$(flux batch -o output.stdout.type=kvs ${TUO_JOB_ALLOC} ${JOB_CMD})"
+      echo -e "flux watch \$(flux batch -o output.stdout.type=kvs ${TUOLUMNE_JOB_ALLOC} ${JOB_CMD})"
       echo -e "\e[7;32m### End of reproducer\e[0m"
 
 .tuolumne_job_command:
   script:
-    - ${PROXY} flux watch $( echo -e ${JOB_CMD} | xargs ${PROXY} flux batch -o output.stdout.type=kvs ${TUO_JOB_ALLOC} )
+    - ${PROXY} flux watch $( echo -e ${JOB_CMD} | xargs ${PROXY} flux batch -o output.stdout.type=kvs ${TUOLUMNE_JOB_ALLOC} )
 
 .job_on_tuolumne:
   extends: [.custom_job, .on_tuolumne]
@@ -103,7 +103,7 @@ allocate_resources:
   script:
     - |
       set -x
-      flux --parent alloc ${TUO_SHARED_ALLOC} --job-name=${ALLOC_NAME} --bg
+      flux --parent alloc ${TUOLUMNE_SHARED_ALLOC} --job-name=${ALLOC_NAME} --bg
 
 # In post-build phase, deallocate resources.
 # Note : we make sure this is run even on build phase failure using a specific

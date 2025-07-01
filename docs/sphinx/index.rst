@@ -38,12 +38,12 @@ RADIUSS Shared CI User Documentation
 =======================================
 
 The steps necessary to adopt the RADIUSS Shared CI methodology are documented
-in the :doc:`RADIUSS Shared CI User Guide <sphinx/user_guide/index>`.
+in the :doc:`RADIUSS Shared CI User Guide <user_guide/index>`.
 
 RADIUSS Shared CI Developer Documentation
 ============================================
 
-In the  :doc:`RADIUSS Shared CI Developer Guide <sphinx/dev_guide/index>`,
+In the  :doc:`RADIUSS Shared CI Developer Guide <dev_guide/index>`,
 we discuss the layout of the RADIUSS Shared CI infrastructure and how the
 different pieces work together. Technical choices are also explained there.
 
