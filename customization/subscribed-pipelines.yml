@@ -41,17 +41,18 @@
 #    REMOTE_JOBS_PATH: "<remote/jobs/path>"
 #  script:
 #    - cat ${LOCAL_JOBS_PATH}/ruby.yml ${REMOTE_JOBS_PATH}/ruby.yml > ruby-jobs.yml
-#    - cat ${LOCAL_JOBS_PATH}/poodle.yml ${REMOTE_JOBS_PATH}/poodle.yml > poodle-jobs.yml
+#    - cat ${LOCAL_JOBS_PATH}/dane.yml ${REMOTE_JOBS_PATH}/dane.yml > dane-jobs.yml
 #    - cat ${LOCAL_JOBS_PATH}/lassen.yml ${REMOTE_JOBS_PATH}/lassen.yml > lassen-jobs.yml
 #    - cat ${LOCAL_JOBS_PATH}/corona.yml ${REMOTE_JOBS_PATH}/corona.yml > corona-jobs.yml
 #    - cat ${LOCAL_JOBS_PATH}/tioga.yml ${REMOTE_JOBS_PATH}/tioga.yml > tioga-jobs.yml
+#    - cat ${LOCAL_JOBS_PATH}/tuolumne.yml ${REMOTE_JOBS_PATH}/tuolumne.yml > tuolumne-jobs.yml
 #  artifacts:
 #    paths:
 #      - ruby-jobs.yml
-#      - poodle-jobs.yml
+#      - dane-jobs.yml
 #      - lassen-jobs.yml
 #      - corona-jobs.yml
-#      - tioga-jobs.yml
+#      - tuolumne-jobs.yml
 
 ###
 # Trigger a build-and-test pipeline for a machine.
@@ -73,19 +74,19 @@ ruby-build-and-test:
   #needs: [ruby-up-check, generate-job-lists]
   extends: [.build-and-test]
 
-# POODLE
-poodle-up-check:
+# DANE
+dane-up-check:
   variables:
-    CI_MACHINE: "poodle"
+    CI_MACHINE: "dane"
   extends: [.machine-check]
 
-poodle-build-and-test:
+dane-build-and-test:
   variables:
-    CI_MACHINE: "poodle"
-  needs: [poodle-up-check]
+    CI_MACHINE: "dane"
+  needs: [dane-up-check]
   ## [Shared jobs scenario]
   ## (See Umpire CI setup for an example).
-  #needs: [poodle-up-check, generate-job-lists]
+  #needs: [dane-up-check, generate-job-lists]
   extends: [.build-and-test]
 
 # CORONA
@@ -116,6 +117,21 @@ tioga-build-and-test:
   ## [Shared jobs scenario]
   ## (See Umpire CI setup for an example).
   #needs: [tioga-up-check, generate-job-lists]
+  extends: [.build-and-test]
+
+# TUOLUMNE
+tuolumne-up-check:
+  variables:
+    CI_MACHINE: "tuolumne"
+  extends: [.machine-check]
+
+tuolumne-build-and-test:
+  variables:
+    CI_MACHINE: "tuolumne"
+  needs: [tuolumne-up-check]
+  ## [Shared jobs scenario]
+  ## (See Umpire CI setup for an example).
+  #needs: [tuolumne-up-check, generate-job-lists]
   extends: [.build-and-test]
 
 # LASSEN
