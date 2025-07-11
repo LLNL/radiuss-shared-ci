@@ -274,7 +274,7 @@ to run tests on LLNL Livermore Computing (LC) systems through the LC GitLab
 instance. GitLab provides a mirroring feature with GitHub integration that will
 automate the synchronisation of local source with the remote GitHub repository.
 
-The mirroring setup is described in detail in `GitLab documentation_`:
+The mirroring setup is described in detail in `GitLab documentation`_:
 
 Non-RADIUSS Projects
 --------------------
