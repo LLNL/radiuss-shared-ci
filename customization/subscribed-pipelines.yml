@@ -119,7 +119,7 @@ tioga-build-and-test:
   #needs: [tioga-up-check, generate-job-lists]
   extends: [.build-and-test]
 
-# TUO
+# TUOLUMNE
 tuolumne-up-check:
   variables:
     CI_MACHINE: "tuolumne"
