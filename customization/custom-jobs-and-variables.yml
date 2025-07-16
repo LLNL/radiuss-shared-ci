@@ -69,6 +69,13 @@ variables:
   variables:
     JOB_TEMPLATE_CANNOT_BE_EMPTY: "True"
 
+# Configuration shared by performance jobs specific to this project.
+# Not all configuration can be shared. Here projects can fine tune the
+# CI behavior.
+.perf_job:
+  variables:
+    JOB_TEMPLATE_CANNOT_BE_EMPTY: "True"
+
 # This is how we print the variables necessary to reproduce a job. In
 # particular, we put here variables that are common for all the machines
 # (only values differ).

@@ -1,0 +1,93 @@
+##############################################################################
+# Copyright (c) 2025, Lawrence Livermore National Security, LLC and RADIUSS
+# project contributors. See the COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: (MIT)
+##############################################################################
+
+# Sets ID tokens for every job using `default:`
+include:
+  - project: 'lc-templates/id_tokens'
+    file: 'id_tokens.yml'
+
+stages:
+  - perf-runs
+
+.perf_on_ruby:
+  extends: [.perf_job]
+  stage: perf-runs
+  tags:
+    - shell
+    - ruby
+  rules:
+    # Runs except if we explicitly deactivate ruby by variable.
+    - if: '$ON_RUBY == "OFF"'
+      when: never
+    - when: on_success
+  script:
+    - srun ${RUBY_PERF_ALLOC} ${JOB_CMD}
+
+.perf_on_dane:
+  extends: [.perf_job]
+  stage: perf-runs
+  tags:
+    - shell
+    - dane
+  rules:
+    - if: '$ON_DANE == "OFF"'
+      when: never
+    - when: on_success
+  script:
+    - srun ${DANE_PERF_ALLOC} ${JOB_CMD}
+
+.perf_on_corona:
+  extends: [.perf_job]
+  stage: perf-runs
+  tags:
+    - shell
+    - corona
+  rules:
+    - if: '$ON_CORONA == "OFF"'
+      when: never
+    - when: on_success
+  script:
+    - srun ${CORONA_PERF_ALLOC} ${JOB_CMD}
+
+.perf_on_tioga:
+  extends: [.perf_job]
+  stage: perf-runs
+  tags:
+    - shell
+    - tioga
+  rules:
+    - if: '$ON_TIOGA == "OFF"'
+      when: never
+    - when: on_success
+  script:
+    - flux run ${TIOGA_PERF_ALLOC} ${JOB_CMD}
+
+.perf_on_tuolumne:
+  extends: [.perf_job]
+  stage: perf-runs
+  tags:
+    - shell
+    - tuolumne
+  rules:
+    - if: '$ON_TUOLUMNE == "OFF"'
+      when: never
+    - when: on_success
+  script:
+    - flux run ${TUOLUMNE_PERF_ALLOC} ${JOB_CMD}
+
+.perf_on_lassen:
+  extends: [.perf_job]
+  stage: perf-runs
+  tags:
+    - shell
+    - lassen
+  rules:
+    - if: '$ON_LASSEN == "OFF"'
+      when: never
+    - when: on_success
+  script:
+    - lalloc ${LASSEN_PERF_ALLOC} ${JOB_CMD}
