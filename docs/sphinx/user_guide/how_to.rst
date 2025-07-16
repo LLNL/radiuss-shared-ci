@@ -1,5 +1,5 @@
 .. ##
-.. ## Copyright (c) 2022-23, Lawrence Livermore National Security, LLC and
+.. ## Copyright (c) 2022-25, Lawrence Livermore National Security, LLC and
 .. ## other RADIUSS Project Developers. See the top-level COPYRIGHT file for
 .. ## details.
 .. ##
