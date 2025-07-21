@@ -88,6 +88,9 @@ stages:
     forward:
       pipeline_variables: true
 
+# Performance pipeline.
+# Assumes existence of a local file with performance jobs.
+# Remove or comment this section to remove the pipeline.
 performance-measurements:
   stage: performance-measurements
   trigger:
