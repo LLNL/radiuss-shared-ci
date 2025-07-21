@@ -1,4 +1,4 @@
-.. ## Copyright (c) 2019-2022, Lawrence Livermore National Security, LLC and
+.. ## Copyright (c) 2019-2025, Lawrence Livermore National Security, LLC and
 .. ## other RADIUSS Project Developers. See the top-level COPYRIGHT file for details.
 .. ##
 .. ## SPDX-License-Identifier: (MIT)
@@ -16,7 +16,7 @@ The infrastructure is project-agnostic. Each machine we support has a templated
 pipeline ready for use. Users only need to add jobs for machines of interest
 and set some variables according to their needs.
 
-Projects using the RADIUSS Shared CI infrastructure keep control other their
+Projects using the RADIUSS Shared CI infrastructure keep control over their
 build and test process. The pre-requisite being that this process can be
 invoked through a single command line.
 
@@ -34,16 +34,30 @@ projects.
 Overview
 ========
 
-*In a hurry? Quickstart instructions can be found in* :ref:`instructions`.
+Who is this for?
+================
 
-RADIUSS Shared CI User Documentation
-=======================================
+Your project is hosted on GitHub and you want to run tests on Livermore
+Computing (LC) systems through the LC GitLab instance. You want to use a
+templated CI infrastructure that is flexible enough to be adapted to your
+needs, but general enough to be shared with other projects.
+
+System requirements/prerequisites
+=================================
+
+All you need is an account on LC GitLab instance and a project hosted in
+the LLNL organization on GitHub that can be built and tested with a single command line.
+
+Getting started
+===============
 
 The steps necessary to adopt the RADIUSS Shared CI methodology are documented
 in the :doc:`RADIUSS Shared CI User Guide <user_guide/index>`.
 
-RADIUSS Shared CI Developer Documentation
-============================================
+*In a hurry? Quickstart instructions can be found in* :ref:`instructions`.
+
+Contributing
+============
 
 In the  :doc:`RADIUSS Shared CI Developer Guide <dev_guide/index>`,
 we discuss the layout of the RADIUSS Shared CI infrastructure and how the
