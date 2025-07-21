@@ -6,7 +6,7 @@
 .. ## SPDX-License-Identifier: (MIT)
 .. ##
 
-.. _setup_ci-label:
+.. _setup_ci:
 
 **************************************
 Setup the CI using the shared template
@@ -73,6 +73,8 @@ File structure
    pipeline file also defines a job template (in the sense of GitLab CI YAML
    syntax) providing the core settings that your own jobs will extend.
 
+.. _instructions:
+
 The short version
 =================
 
@@ -95,7 +97,7 @@ integrating the RADIUSS Shared CI infrastructure into your project.
    cp ../radiuss-shared-ci/customization/jobs/\<machine\>.yml .gitlab/jobs/<machine>.yml
    # You may use the <machine>.yml file as a starting point to add jobs.
    vim .gitlab/subscription-pipelines.yml
-   # comment the jobs associted to <CI_MACHINE> you don't want.
+   # comment the jobs associated to <CI_MACHINE> you don't want.
    vim .gitlab/custom-jobs-and-variables.yml
    # set the variables according to your needs.
    vim .gitlab/jobs/<machine>.yml
@@ -272,7 +274,7 @@ Mirroring Setup
 RADIUSS Shared CI is primarily intended for projects hosted on GitHub that need
 to run tests on LLNL Livermore Computing (LC) systems through the LC GitLab
 instance. GitLab provides a mirroring feature with GitHub integration that will
-automate the synchronisation of local source with the remote GitHub repository.
+automate the synchronization of local source with the remote GitHub repository.
 
 The mirroring setup is described in detail in `GitLab documentation`_:
 

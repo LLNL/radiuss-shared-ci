@@ -12,7 +12,7 @@ The RADIUSS Shared CI project provides a *templated CI infrastructure for
 GitLab* that we intend to be sufficiently flexible and general to be adopted
 and shared by any LLNL open-source projects hosted on GitHub.
 
-The infrustructure is project-agnostic. Each machine we support has a templated
+The infrastructure is project-agnostic. Each machine we support has a templated
 pipeline ready for use. Users only need to add jobs for machines of interest
 and set some variables according to their needs.
 
@@ -33,6 +33,8 @@ projects.
 ========
 Overview
 ========
+
+*In a hurry? Quickstart instructions can be found in* :ref:`instructions`.
 
 RADIUSS Shared CI User Documentation
 =======================================
@@ -70,6 +72,7 @@ Cool features provided by RADIUSS Shared CI
 * Each child pipeline reports independently to GitHub: one status per machine.
 * Projects can extend their pipeline at will with additional stages.
 * Print an exact reproducer in the logs.
+* Provide a template for a pipeline dedicated to performance measurements.
 * Optimize machine usage with shared allocation (optional).
 * Filter out pipelines coming from a mirrored draft Pull Request (optional).
 
