@@ -47,13 +47,6 @@ We also provide "How To" sections to perform various usage tasks.
 
    how_to
 
-.. warning::
-   radiuss-shared-ci is meant to live on the LC GitLab instance. The main repo
-   is hosted on GitHub for accessibility and visibility and is mirrored on LC
-   GitLab. To include files from radiuss-shared-ci, we recommend pointing to
-   the mirror repo on GitLab rather than the GitHub projects. We only document
-   the former.
-
 .. _RADIUSS Spack Configs: https://radiuss-spack-configs.readthedocs.io/en/latest/index.html
 .. _radiuss-spack-configs: https://github.com/LLNL/radiuss-spack-configs
 .. _radiuss-shared-ci: https://github.com/LLNL/radiuss-shared-ci

@@ -7,9 +7,9 @@
 
 .. _dev_common_issues-label:
 
-*************
-Common Issues
-*************
+***************
+Troubleshooting
+***************
 
 =====================================================================
 Project ``radiuss/radiuss-shared-ci`` reference [...] does not exist!

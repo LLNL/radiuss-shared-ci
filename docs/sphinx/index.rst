@@ -38,28 +38,42 @@ Who is this for?
 ================
 
 Your project is hosted on GitHub and you want to run tests on Livermore
-Computing (LC) systems through the LC GitLab instance. You want to use a
-templated CI infrastructure that is flexible enough to be adapted to your
-needs, but general enough to be shared with other projects.
+Computing (LC) systems through the LC GitLab instance. You don't have the
+bandwidth to train your team on the intricacies of GitLab CI/CD or you don't
+want to reinvent the wheel by writing your own CI/CD configuration from
+scratch.
+
+RADIUSS Shared CI gets you started shortly with a templated CI infrastructure
+that is flexible enough to be adapted to your needs, but general enough to be
+shared with other projects.
 
 System requirements/prerequisites
 =================================
 
-All you need is an account on LC GitLab instance and a project hosted in
-the LLNL organization on GitHub that can be built and tested with a single command line.
+You'll need an account on LC GitLab instance and a project hosted in the LLNL
+organization on GitHub that can be built and tested with a single command line.
+
+More specifically:
+
+- At least one team member must have an account on the LC GitLab instance.
+
+- You will need a script to drive the builds and tests of your project. We
+  enforce this recommendation for technical reasons, but it also guarantees
+  that the CI behavior can be reproduced locally and keeps the yaml files
+  readable.
 
 Getting started
 ===============
 
 The steps necessary to adopt the RADIUSS Shared CI methodology are documented
-in the :doc:`RADIUSS Shared CI User Guide <user_guide/index>`.
+in the :doc:`RADIUSS Shared CI User Guide <user_guide/setup_ci>`.
 
 *In a hurry? Quickstart instructions can be found in* :ref:`instructions`.
 
 Contributing
 ============
 
-In the  :doc:`RADIUSS Shared CI Developer Guide <dev_guide/index>`,
+In the  :doc:`RADIUSS Shared CI Developer Guide <dev_guide/radiuss_ci_explained>`,
 we discuss the layout of the RADIUSS Shared CI infrastructure and how the
 different pieces work together. Technical choices are also explained there.
 
@@ -91,15 +105,18 @@ Cool features provided by RADIUSS Shared CI
 * Filter out pipelines coming from a mirrored draft Pull Request (optional).
 
 .. toctree::
-   :hidden:
+   :maxdepth: 3
    :caption: User Documentation
 
-   user_guide/index
+   user_guide/setup_ci
+   user_guide/how_to
 
 .. toctree::
-   :hidden:
+   :maxdepth: 3
    :caption: Developer Documentation
 
-   dev_guide/index
+   dev_guide/radiuss_ci_explained
+   dev_guide/how_to
+   dev_guide/troubleshooting
 
 .. _RADIUSS Spack Configs: https://radiuss-spack-configs.readthedocs.io/en/latest/index.html
