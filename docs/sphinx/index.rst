@@ -34,6 +34,8 @@ projects.
 Overview
 ========
 
+*In a hurry? Quickstart instructions can be found in* :ref:`instructions`.
+
 Who is this for?
 ================
 
@@ -67,8 +69,6 @@ Getting started
 
 The steps necessary to adopt the RADIUSS Shared CI methodology are documented
 in the :doc:`RADIUSS Shared CI User Guide <user_guide/setup_ci>`.
-
-*In a hurry? Quickstart instructions can be found in* :ref:`instructions`.
 
 Contributing
 ============
