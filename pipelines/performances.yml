@@ -13,8 +13,15 @@ include:
 stages:
   - perf-runs
 
+.perf_job:
+  variables:
+    PERF_ARTIFACT_DIR: "performance-results"
+  artifacts:
+    paths:
+      - $PERF_ARTIFACT_DIR/
+
 .perf_on_ruby:
-  extends: [.perf_job]
+  extends: [.perf_job, .perf_custom]
   stage: perf-runs
   tags:
     - shell
@@ -25,10 +32,13 @@ stages:
       when: never
     - when: on_success
   script:
+    - mkdir -p ${PERF_ARTIFACT_DIR}
+    # We expect the ${JOB_CMD} to populate ${PERF_ARTIFACT_DIR} with
+    # performance results.
     - srun ${RUBY_PERF_ALLOC} ${JOB_CMD}
 
 .perf_on_dane:
-  extends: [.perf_job]
+  extends: [.perf_job, .perf_custom]
   stage: perf-runs
   tags:
     - shell
@@ -38,10 +48,11 @@ stages:
       when: never
     - when: on_success
   script:
+    - mkdir -p ${PERF_ARTIFACT_DIR}
     - srun ${DANE_PERF_ALLOC} ${JOB_CMD}
 
 .perf_on_corona:
-  extends: [.perf_job]
+  extends: [.perf_job, .perf_custom]
   stage: perf-runs
   tags:
     - shell
@@ -51,10 +62,11 @@ stages:
       when: never
     - when: on_success
   script:
+    - mkdir -p ${PERF_ARTIFACT_DIR}
     - srun ${CORONA_PERF_ALLOC} ${JOB_CMD}
 
 .perf_on_tioga:
-  extends: [.perf_job]
+  extends: [.perf_job, .perf_custom]
   stage: perf-runs
   tags:
     - shell
@@ -64,10 +76,11 @@ stages:
       when: never
     - when: on_success
   script:
+    - mkdir -p ${PERF_ARTIFACT_DIR}
     - flux run ${TIOGA_PERF_ALLOC} ${JOB_CMD}
 
 .perf_on_tuolumne:
-  extends: [.perf_job]
+  extends: [.perf_job, .perf_custom]
   stage: perf-runs
   tags:
     - shell
@@ -77,10 +90,11 @@ stages:
       when: never
     - when: on_success
   script:
+    - mkdir -p ${PERF_ARTIFACT_DIR}
     - flux run ${TUOLUMNE_PERF_ALLOC} ${JOB_CMD}
 
 .perf_on_lassen:
-  extends: [.perf_job]
+  extends: [.perf_job, .perf_custom]
   stage: perf-runs
   tags:
     - shell
@@ -90,4 +104,5 @@ stages:
       when: never
     - when: on_success
   script:
+    - mkdir -p ${PERF_ARTIFACT_DIR}
     - lalloc ${LASSEN_PERF_ALLOC} ${JOB_CMD}
