@@ -10,12 +10,15 @@ include:
   - project: 'lc-templates/id_tokens'
     file: 'id_tokens.yml'
 
+variables:
+  PERF_ARTIFACT_DIR: "performance-results"
+  PERF_RESULTS_FILE: "benchmark_results.json"
+  PERF_PROCESSED_FILE: "processed_results.json"
+
 stages:
   - perf-runs
 
 .perf_job:
-  variables:
-    PERF_ARTIFACT_DIR: "performance-results"
   artifacts:
     paths:
       - $PERF_ARTIFACT_DIR/
@@ -32,6 +35,7 @@ stages:
       when: never
     - when: on_success
   script:
+    - export PERF_ARTIFACT_DIR=${PERF_ARTIFACT_DIR}/${CI_JOB_NAME}
     - mkdir -p ${PERF_ARTIFACT_DIR}
     # We expect the ${JOB_CMD} to populate ${PERF_ARTIFACT_DIR} with
     # performance results.
@@ -48,6 +52,7 @@ stages:
       when: never
     - when: on_success
   script:
+    - export PERF_ARTIFACT_DIR=${PERF_ARTIFACT_DIR}/${CI_JOB_NAME}
     - mkdir -p ${PERF_ARTIFACT_DIR}
     - srun ${DANE_PERF_ALLOC} ${JOB_CMD}
 
@@ -62,6 +67,7 @@ stages:
       when: never
     - when: on_success
   script:
+    - export PERF_ARTIFACT_DIR=${PERF_ARTIFACT_DIR}/${CI_JOB_NAME}
     - mkdir -p ${PERF_ARTIFACT_DIR}
     - srun ${CORONA_PERF_ALLOC} ${JOB_CMD}
 
@@ -76,6 +82,7 @@ stages:
       when: never
     - when: on_success
   script:
+    - export PERF_ARTIFACT_DIR=${PERF_ARTIFACT_DIR}/${CI_JOB_NAME}
     - mkdir -p ${PERF_ARTIFACT_DIR}
     - flux run ${TIOGA_PERF_ALLOC} ${JOB_CMD}
 
@@ -90,6 +97,7 @@ stages:
       when: never
     - when: on_success
   script:
+    - export PERF_ARTIFACT_DIR=${PERF_ARTIFACT_DIR}/${CI_JOB_NAME}
     - mkdir -p ${PERF_ARTIFACT_DIR}
     - flux run ${TUOLUMNE_PERF_ALLOC} ${JOB_CMD}
 
@@ -104,5 +112,111 @@ stages:
       when: never
     - when: on_success
   script:
+    - export PERF_ARTIFACT_DIR=${PERF_ARTIFACT_DIR}/${CI_JOB_NAME}
     - mkdir -p ${PERF_ARTIFACT_DIR}
     - lalloc ${LASSEN_PERF_ALLOC} ${JOB_CMD}
+
+# Github Benchmark templates:
+# customSmallerIsBetter format
+.pytest_to_gh_benchmark:
+  tags:
+    - shell
+    - oslic
+  image: python:3.9
+  script:
+    - |
+      cat > pytest_to_gh_benchmark.py << 'EOF'
+      import argparse
+      import json
+      import sys
+      from typing import Dict, List, Any
+      
+      def convert_to_custom_format(pytest_data: Dict[str, Any]) -> List[Dict[str, Any]]:
+          """
+          Convert pytest-benchmark JSON data to customSmallerIsBetter format.
+          Creates separate entries for time and memory metrics.
+          """
+          custom_benchmarks = []
+      
+          for benchmark in pytest_data.get("benchmarks", []):
+              name = benchmark.get("name", "")
+      
+              # Time benchmark entry
+              time_value = benchmark.get("stats", {}).get("median", 0)
+              time_stddev = benchmark.get("stats", {}).get("stddev", 0)
+              custom_benchmarks.append({
+                  "name": f"{name} - Time",
+                  "value": time_value,
+                  "unit": "seconds",
+                  "range": str(time_stddev),
+              })
+      
+              # Memory benchmark entry (from extra_info)
+              memory_mb = benchmark.get("extra_info", {}).get("memory_mb", 0)
+              custom_benchmarks.append({
+                  "name": f"{name} - Memory",
+                  "value": memory_mb,
+                  "unit": "MB",
+              })
+      
+          return custom_benchmarks
+      
+      
+      def main():
+          parser = argparse.ArgumentParser(
+              description="Convert pytest-benchmark JSON to customSmallerIsBetter format"
+          )
+          parser.add_argument("input_file", help="Input JSON file (pytest-benchmark format)")
+          parser.add_argument("output_file", help="Output JSON file (customSmallerIsBetter format)")
+      
+          args = parser.parse_args()
+      
+          try:
+              with open(args.input_file, "r") as f:
+                  pytest_data = json.load(f)
+      
+              custom_data = convert_to_custom_format(pytest_data)
+      
+              with open(args.output_file, "w") as f:
+                  json.dump(custom_data, f, indent=2)
+      
+              print(f"Successfully converted {args.input_file} to {args.output_file}")
+      
+          except Exception as e:
+              print(f"Error converting benchmark format: {e}", file=sys.stderr)
+              sys.exit(1)
+      
+      
+      if __name__ == "__main__":
+          main()
+
+      EOF
+    - |
+      for file in ${PERF_ARTIFACT_DIR}/*/${PERF_RESULTS_FILE}; do
+        if [ -f "$file" ]; then
+        echo "Processing file: $file"
+        python3 pytest_to_gh_benchmark.py "$file" "${file%/*}/${PERF_PROCESSED_FILE}"
+        else
+          echo "File not found: $file"
+        fi
+
+.report_to_gh_benchmark:
+  tags:
+    - shell
+    - oslic
+  script:
+    - | 
+      for file in ${PERF_ARTIFACT_DIR}/*/${PERF_PROCESSED_FILE}; do
+        if [ -f "$file" ]; then
+          echo "Sending benchmark results to GitHub..."
+          BENCHMARK_DATA=$(base64 -w 0 "$file")
+          curl -X POST \
+          -H "Authorization: token $GITHUB_TOKEN" \
+          -H "Accept: application/vnd.github.v3+json" \
+          https://api.github.com/repos/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}/actions/workflows/benchmark.yml/dispatches \
+          -d "{\"ref\":\"${CI_COMMIT_REF_NAME}\",\"inputs\":{\"benchmark_data\":\"$BENCHMARK_DATA\"}}"
+        else
+          echo "$file not found, skipping GitHub API integration."
+        fi
+      done
+
