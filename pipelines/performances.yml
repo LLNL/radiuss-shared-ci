@@ -26,7 +26,7 @@ stages:
       - $PERF_ARTIFACT_DIR/
 
 .perf_on_ruby:
-  extends: [.perf_job, .perf_custom]
+  extends: [.perf_job, .custom_perf]
   stage: perf-runs
   tags:
     - shell
@@ -44,7 +44,7 @@ stages:
     - srun ${RUBY_PERF_ALLOC} ${JOB_CMD}
 
 .perf_on_dane:
-  extends: [.perf_job, .perf_custom]
+  extends: [.perf_job, .custom_perf]
   stage: perf-runs
   tags:
     - shell
@@ -59,7 +59,7 @@ stages:
     - srun ${DANE_PERF_ALLOC} ${JOB_CMD}
 
 .perf_on_corona:
-  extends: [.perf_job, .perf_custom]
+  extends: [.perf_job, .custom_perf]
   stage: perf-runs
   tags:
     - shell
@@ -74,7 +74,7 @@ stages:
     - srun ${CORONA_PERF_ALLOC} ${JOB_CMD}
 
 .perf_on_tioga:
-  extends: [.perf_job, .perf_custom]
+  extends: [.perf_job, .custom_perf]
   stage: perf-runs
   tags:
     - shell
@@ -89,7 +89,7 @@ stages:
     - flux run ${TIOGA_PERF_ALLOC} ${JOB_CMD}
 
 .perf_on_tuolumne:
-  extends: [.perf_job, .perf_custom]
+  extends: [.perf_job, .custom_perf]
   stage: perf-runs
   tags:
     - shell
@@ -104,7 +104,7 @@ stages:
     - flux run ${TUOLUMNE_PERF_ALLOC} ${JOB_CMD}
 
 .perf_on_lassen:
-  extends: [.perf_job, .perf_custom]
+  extends: [.perf_job, .custom_perf]
   stage: perf-runs
   tags:
     - shell
