@@ -120,13 +120,13 @@ stages:
 
 # Minimal templates for performance processing and reporting jobs
 # Those should be used by projects implementing such jobs.
-.results_process:
+.results_processing:
   stage: perf-processing
   tags:
     - shell
     - oslic
 
-.results_report:
+.results_reporting:
   stage: perf-reporting
   tags:
     - shell
@@ -139,7 +139,7 @@ stages:
 # that will prepare the data from pytest to github benchmark as this step is
 # likely to depend on each project.
 .pytest_to_gh_benchmark:
-  extends: .results_process
+  extends: .results_processing
   image: python:3.9
   script:
     - |
@@ -157,7 +157,7 @@ stages:
 # To report to GitHub, don’t forget to create an appropriate token and specify
 # it as a hidden variable in your GitLab mirror settings.
 .report_to_gh_benchmark:
-  extends: .results_report
+  extends: .results_reporting
   script:
     - |
       for file in ${PERF_ARTIFACT_DIR}/*/${PERF_PROCESSED_FILE}; do
