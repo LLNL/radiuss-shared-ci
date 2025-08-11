@@ -18,6 +18,10 @@ stages:
   - jobs-stage-3
   - release-resources
 
+variables:
+  # default "ci-build-${CI_PIPELINE_ID}"
+  JACAMAR_SCHEDULER_JOB_KEY: ${ALLOC_NAME}
+
 ##############################################################################
 # UTILITIES
 .on_ruby:
@@ -74,16 +78,16 @@ stages:
 
 .ruby_job_command:
   script:
-    - echo -e ${JOB_CMD} | xargs srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) ${RUBY_JOB_ALLOC}
+    - ${JOB_CMD}
 
 .job_on_ruby:
   extends: [.custom_job, .on_ruby]
+  # the stage has a default value that can be overridden by project jobs.
   stage: jobs-stage-1
+  variables:
+    JACAMAR_SCHEDULER_ACTION: reattach
+    SCHEDULER_PARAMETERS: "${RUBY_JOB_ALLOC}"
   script:
-    # Allocation information
-    - echo -e "### Allocation name is ${ALLOC_NAME}"
-    - export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
-    - echo -e "### Job ID is ${JOBID}"
     # Print a reproducer
     - !reference [.ruby_reproducer_init, script]
     - !reference [.ruby_reproducer_vars, script]
@@ -96,21 +100,23 @@ stages:
 
 # In pre-build phase, allocate a node for builds.
 allocate_resources:
+  stage: allocate-resources
+  extends: .on_ruby
   variables:
     GIT_STRATEGY: none
-  extends: .on_ruby
-  stage: allocate-resources
+    JACAMAR_SCHEDULER_ACTION: allocate
+    SCHEDULER_PARAMETERS: "${RUBY_SHARED_ALLOC}"
   script:
-    - salloc ${RUBY_SHARED_ALLOC} --no-shell --job-name=${ALLOC_NAME}
+    - placeholder
 
 # In post-build phase, deallocate resources.
 # Note : we make sure this is run even on build phase failure using a specific
 # rule in the template ".on_ruby".
 release_resources:
+  stage: release-resources
+  extends: .on_ruby
   variables:
     GIT_STRATEGY: none
-  extends: .on_ruby
-  stage: release-resources
+    JACAMAR_SCHEDULER_ACTION: cancel
   script:
-    - export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
-    - ([[ -n "${JOBID}" ]] && scancel ${JOBID} || exit 0)
+    - placeholder

@@ -18,6 +18,10 @@ stages:
   - jobs-stage-3
   - release-resources
 
+variables:
+  # default "ci-build-${CI_PIPELINE_ID}"
+  JACAMAR_SCHEDULER_JOB_KEY: ${ALLOC_NAME}
+
 ##############################################################################
 # UTILITIES
 .on_dane:
@@ -44,6 +48,7 @@ stages:
       echo -e "\e[7;32m### CI job ${CI_JOB_ID} reproducer on dane (${SYS_TYPE}) \e[0m"
       if [[ -n "${LLNL_SERVICE_USER}" ]]; then echo -e "xsu ${LLNL_SERVICE_USER}"; fi
       echo -e "
+      # Repository setup \n
       working_dir=\"/usr/workspace/\${USER}/${GITHUB_PROJECT_NAME}/${CI_JOB_ID}-\$(date +%s)\" \n
       mkdir -p \${working_dir} && cd \${working_dir} \n
       git clone https://github.com/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}.git --single-branch --depth=1 \n
@@ -73,16 +78,16 @@ stages:
 
 .dane_job_command:
   script:
-    - echo -e ${JOB_CMD} | xargs srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) ${DANE_JOB_ALLOC}
+    - ${JOB_CMD}
 
 .job_on_dane:
   extends: [.custom_job, .on_dane]
+  # the stage has a default value that can be overridden by project jobs.
   stage: jobs-stage-1
+  variables:
+    JACAMAR_SCHEDULER_ACTION: reattach
+    SCHEDULER_PARAMETERS: "${DANE_JOB_ALLOC}"
   script:
-    # Allocation information
-    - echo -e "### Allocation name is ${ALLOC_NAME}"
-    - export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
-    - echo -e "### Job ID is ${JOBID}"
     # Print a reproducer
     - !reference [.dane_reproducer_init, script]
     - !reference [.dane_reproducer_vars, script]
@@ -94,23 +99,24 @@ stages:
 # JOBS
 
 # In pre-build phase, allocate a node for builds.
-# TODO: make the resource configurable, not all projects will want the same.
 allocate_resources:
+  stage: allocate-resources
+  extends: .on_dane
   variables:
     GIT_STRATEGY: none
-  extends: .on_dane
-  stage: allocate-resources
+    JACAMAR_SCHEDULER_ACTION: allocate
+    SCHEDULER_PARAMETERS: "${DANE_SHARED_ALLOC}"
   script:
-    - salloc ${DANE_SHARED_ALLOC} --no-shell --job-name=${ALLOC_NAME}
+    - placeholder
 
 # In post-build phase, deallocate resources.
 # Note : we make sure this is run even on build phase failure using a specific
 # rule in the template ".on_dane".
 release_resources:
+  stage: release-resources
+  extends: .on_dane
   variables:
     GIT_STRATEGY: none
-  extends: .on_dane
-  stage: release-resources
+    JACAMAR_SCHEDULER_ACTION: cancel
   script:
-    - export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
-    - ([[ -n "${JOBID}" ]] && scancel ${JOBID} || exit 0)
+    - placeholder

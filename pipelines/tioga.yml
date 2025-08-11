@@ -18,6 +18,10 @@ stages:
   - jobs-stage-3
   - release-resources
 
+variables:
+  # default "ci-build-${CI_PIPELINE_ID}"
+  JACAMAR_SCHEDULER_JOB_KEY: ${ALLOC_NAME}
+
 ##############################################################################
 # UTILITIES
 .on_tioga:
@@ -44,6 +48,7 @@ stages:
       echo -e "\e[7;32m### CI job ${CI_JOB_ID} reproducer on tioga (${SYS_TYPE}) \e[0m"
       if [[ -n "${LLNL_SERVICE_USER}" ]]; then echo -e "xsu ${LLNL_SERVICE_USER}"; fi
       echo -e "
+      # Repository setup \n
       working_dir=\"/usr/workspace/\${USER}/${GITHUB_PROJECT_NAME}/${CI_JOB_ID}-\$(date +%s)\" \n
       mkdir -p \${working_dir} && cd \${working_dir} \n
       git clone https://github.com/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}.git --single-branch --depth=1 \n
@@ -73,17 +78,16 @@ stages:
 
 .tioga_job_command:
   script:
-    - ${PROXY} flux watch $( echo -e ${JOB_CMD} | xargs ${PROXY} flux batch -o output.stdout.type=kvs ${TIOGA_JOB_ALLOC} )
+    - ${JOB_CMD}
 
 .job_on_tioga:
   extends: [.custom_job, .on_tioga]
+  # the stage has a default value that can be overridden by project jobs.
   stage: jobs-stage-1
+  variables:
+    JACAMAR_SCHEDULER_ACTION: reattach
+    SCHEDULER_PARAMETERS: "${TIOGA_JOB_ALLOC}"
   script:
-    # Allocation information
-    - |
-      ALLOC_ID=$(flux jobs --name="${ALLOC_NAME}" -n -o "{id}")
-      echo -e "[Information]: Shared allocation ID = ${ALLOC_ID}"
-      PROXY="$( [[ -n "${ALLOC_ID}" ]] && echo "flux proxy ${ALLOC_ID}" || echo "" )"
     # Print a reproducer
     - !reference [.tioga_reproducer_init, script]
     - !reference [.tioga_reproducer_vars, script]
@@ -96,25 +100,23 @@ stages:
 
 # In pre-build phase, allocate a node for builds.
 allocate_resources:
+  stage: allocate-resources
+  extends: .on_tioga
   variables:
     GIT_STRATEGY: none
-  extends: .on_tioga
-  stage: allocate-resources
+    JACAMAR_SCHEDULER_ACTION: allocate
+    SCHEDULER_PARAMETERS: "${TIOGA_SHARED_ALLOC}"
   script:
-    - |
-      set -x
-      flux --parent alloc ${TIOGA_SHARED_ALLOC} --job-name=${ALLOC_NAME} --bg
+    - placeholder
 
 # In post-build phase, deallocate resources.
 # Note : we make sure this is run even on build phase failure using a specific
 # rule in the template ".on_tioga".
 release_resources:
+  stage: release-resources
+  extends: .on_tioga
   variables:
     GIT_STRATEGY: none
-  extends: .on_tioga
-  stage: release-resources
+    JACAMAR_SCHEDULER_ACTION: cancel
   script:
-    - |
-      set -x
-      export URI=$(flux jobs -o "{id} {name}" | grep ${ALLOC_NAME} | awk '{print $1}')
-      ([[ -n "${URI}" ]] && flux job kill ${URI} || exit 0)
+    - placeholder
