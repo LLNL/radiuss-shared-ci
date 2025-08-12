@@ -26,7 +26,7 @@ variables:
 # UTILITIES
 .on_tioga:
   tags:
-    - shell
+    - batch
     - tioga
   rules:
     # Runs except if we explicitly deactivate tioga by variable.

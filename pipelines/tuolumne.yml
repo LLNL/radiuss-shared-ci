@@ -26,7 +26,7 @@ variables:
 # UTILITIES
 .on_tuolumne:
   tags:
-    - shell
+    - batch
     - tuolumne
   rules:
     # Runs except if we explicitly deactivate tuolumne by variable.

@@ -26,7 +26,7 @@ variables:
 # UTILITIES
 .on_dane:
   tags:
-    - shell
+    - batch
     - dane
   rules:
     # Runs except if we explicitly deactivate dane by variable.
