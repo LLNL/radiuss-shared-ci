@@ -30,8 +30,8 @@ Slurm/Flux or LSF Spectrum as a scheduler.
 Machines using Slurm/Flux scheduler
 -----------------------------------
 
-For machines using Slurm (or Flux) scheduler, use ``ruby`` (or ``corona``) as a
-starting point. Then replace all the instances of "RUBY" and "ruby" with the
+For machines using Slurm (or Flux) scheduler, use ``dane`` (or ``corona``) as a
+starting point. Then replace all the instances of "DANE" and "dane" with the
 new machine name.
 
 Then go to ``customization/custom-jobs-and-variables.yml`` and add the
@@ -45,7 +45,7 @@ variables:
   be defined at Spack and Make/CMake level.
 
 .. note::
-   Use the values we have for ruby and corona as guides, but adapt the
+   Use the values we have for dane and corona as guides, but adapt the
    partition, number of cpus per task and duration coherently with the machine.
    The job allocation specied should cover for most job. If you have only a few
    jobs that need longer allocation, you should override them in your local

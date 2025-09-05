@@ -40,7 +40,6 @@
 #    LOCAL_JOBS_PATH: ".gitlab/jobs"
 #    REMOTE_JOBS_PATH: "<remote/jobs/path>"
 #  script:
-#    - cat ${LOCAL_JOBS_PATH}/ruby.yml ${REMOTE_JOBS_PATH}/ruby.yml > ruby-jobs.yml
 #    - cat ${LOCAL_JOBS_PATH}/dane.yml ${REMOTE_JOBS_PATH}/dane.yml > dane-jobs.yml
 #    - cat ${LOCAL_JOBS_PATH}/lassen.yml ${REMOTE_JOBS_PATH}/lassen.yml > lassen-jobs.yml
 #    - cat ${LOCAL_JOBS_PATH}/corona.yml ${REMOTE_JOBS_PATH}/corona.yml > corona-jobs.yml
@@ -48,7 +47,6 @@
 #    - cat ${LOCAL_JOBS_PATH}/tuolumne.yml ${REMOTE_JOBS_PATH}/tuolumne.yml > tuolumne-jobs.yml
 #  artifacts:
 #    paths:
-#      - ruby-jobs.yml
 #      - dane-jobs.yml
 #      - lassen-jobs.yml
 #      - corona-jobs.yml
@@ -59,26 +57,16 @@
 # Comment the jobs for machines you don’t need.
 ###
 
-# RUBY
-ruby-up-check:
-  variables:
-    CI_MACHINE: "ruby"
-  extends: [.machine-check]
-
-ruby-build-and-test:
-  variables:
-    CI_MACHINE: "ruby"
-  needs: [ruby-up-check]
-  ## [Shared jobs scenario]
-  ## (See Umpire CI setup for an example).
-  #needs: [ruby-up-check, generate-job-lists]
-  extends: [.build-and-test]
-
 # DANE
 dane-up-check:
   variables:
     CI_MACHINE: "dane"
   extends: [.machine-check]
+  rules:
+    # Runs except if we explicitly deactivate dane by variable.
+    - if: '$ON_DANE == "OFF"'
+      when: never
+    - when: on_success
 
 dane-build-and-test:
   variables:
@@ -88,12 +76,21 @@ dane-build-and-test:
   ## (See Umpire CI setup for an example).
   #needs: [dane-up-check, generate-job-lists]
   extends: [.build-and-test]
+  rules:
+    # Runs except if we explicitly deactivate dane by variable.
+    - if: '$ON_DANE == "OFF"'
+      when: never
+    - when: on_success
 
 # CORONA
 corona-up-check:
   variables:
     CI_MACHINE: "corona"
   extends: [.machine-check]
+  rules:
+    - if: '$ON_CORONA == "OFF"'
+      when: never
+    - when: on_success
 
 corona-build-and-test:
   variables:
@@ -103,12 +100,20 @@ corona-build-and-test:
   ## (See Umpire CI setup for an example).
   #needs: [corona-up-check, generate-job-lists]
   extends: [.build-and-test]
+  rules:
+    - if: '$ON_CORONA == "OFF"'
+      when: never
+    - when: on_success
 
 # TIOGA
 tioga-up-check:
   variables:
     CI_MACHINE: "tioga"
   extends: [.machine-check]
+  rules:
+    - if: '$ON_TIOGA == "OFF"'
+      when: never
+    - when: on_success
 
 tioga-build-and-test:
   variables:
@@ -118,12 +123,20 @@ tioga-build-and-test:
   ## (See Umpire CI setup for an example).
   #needs: [tioga-up-check, generate-job-lists]
   extends: [.build-and-test]
+  rules:
+    - if: '$ON_TIOGA == "OFF"'
+      when: never
+    - when: on_success
 
 # TUOLUMNE
 tuolumne-up-check:
   variables:
     CI_MACHINE: "tuolumne"
   extends: [.machine-check]
+  rules:
+    - if: '$ON_TUOLUMNE == "OFF"'
+      when: never
+    - when: on_success
 
 tuolumne-build-and-test:
   variables:
@@ -133,12 +146,20 @@ tuolumne-build-and-test:
   ## (See Umpire CI setup for an example).
   #needs: [tuolumne-up-check, generate-job-lists]
   extends: [.build-and-test]
+  rules:
+    - if: '$ON_TUOLUMNE == "OFF"'
+      when: never
+    - when: on_success
 
 # LASSEN
 lassen-up-check:
   variables:
     CI_MACHINE: "lassen"
   extends: [.machine-check]
+  rules:
+    - if: '$ON_LASSEN == "OFF"'
+      when: never
+    - when: on_success
 
 lassen-build-and-test:
   variables:
@@ -148,5 +169,7 @@ lassen-build-and-test:
   ## (See Umpire CI setup for an example).
   #needs: [lassen-up-check, generate-job-lists]
   extends: [.build-and-test]
-
-
+  rules:
+    - if: '$ON_LASSEN == "OFF"'
+      when: never
+    - when: on_success
