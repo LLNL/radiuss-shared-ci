@@ -140,7 +140,8 @@ stages:
 # likely to depend on each project.
 .pytest_to_gh_benchmark:
   extends: .results_processing
-  image: python:3.9
+  # TODO: getting errors using image:, but python is present on oslic, so remove this?
+  # image: python:3.9
   script:
     - |
       for file in ${PERF_ARTIFACT_DIR}/*/${PERF_RESULTS_FILE}; do
