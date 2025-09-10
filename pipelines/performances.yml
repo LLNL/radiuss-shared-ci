@@ -125,6 +125,9 @@ stages:
   tags:
     - shell
     - oslic
+  artifacts:
+    paths:
+      - $PERF_ARTIFACT_DIR/
 
 .results_reporting:
   stage: perf-reporting
