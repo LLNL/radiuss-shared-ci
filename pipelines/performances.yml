@@ -164,7 +164,9 @@ stages:
     - |
       for file in ${PERF_ARTIFACT_DIR}/*/${PERF_PROCESSED_FILE}; do
         if [ -f "$file" ]; then
-          echo "Sending benchmark results to GitHub..."
+          # Send job name as the benchmark name
+          BENCHMARK_NAME=$(basename "$(dirname "$file")")
+          echo "Sending benchmark results to GitHub for ${BENCHMARK_NAME}..."
           BENCHMARK_DATA=$(base64 -w 0 "$file")
           curl -X POST \
                --url "https://api.github.com/repos/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}/actions/workflows/benchmark.yml/dispatches" \
@@ -175,6 +177,7 @@ stages:
                  \"ref\": \"${CI_COMMIT_REF_NAME}\",
                  \"inputs\": \
                    { \
+                     \"benchmark_name\": \"${BENCHMARK_NAME}\",
                      \"benchmark_data\": \"${BENCHMARK_DATA}\"
                    } \
                }" \
