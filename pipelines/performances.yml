@@ -134,11 +134,11 @@ stages:
 
 # More elaborate templates for specific use cases
 
-# Pytest to Github Benchmark templates:
+# Convert to Github Benchmark templates:
 # We still require project to provide their own ${PERF_PROCESSING_CMD} script
-# that will prepare the data from pytest to github benchmark as this step is
+# that will convert the data to github benchmark as this step is
 # likely to depend on each project.
-.pytest_to_gh_benchmark:
+.convert_to_gh_benchmark:
   extends: .results_processing
   # TODO: getting errors using image:, but python is present on oslic, so remove this?
   # image: python:3.9
