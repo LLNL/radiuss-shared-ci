@@ -147,13 +147,14 @@ stages:
       for file in ${PERF_ARTIFACT_DIR}/*/${PERF_RESULTS_FILE}; do
         if [ -n ${PERF_PROCESSING_CMD} ]; then
           if [ -f "$file" ]; then
-          ${PERF_PROCESSING_CMD} "${file}" "${file%/*}/${PERF_PROCESSED_FILE}"
+            ${PERF_PROCESSING_CMD} "${file}" "${file%/*}/${PERF_PROCESSED_FILE}"
           else
             echo "[Warning] File not found: $file"
           fi
         else
           echo "[Warning] Unless processing is not required, PERF_PROCESSING_CMD should be defined."
         fi
+      done
 
 # To report to GitHub, don’t forget to create an appropriate token and specify
 # it as a hidden variable in your GitLab mirror settings.
