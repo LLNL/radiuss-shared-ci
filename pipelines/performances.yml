@@ -147,12 +147,13 @@ stages:
   # image: python:3.9
   script:
     - |
-      for file in ${PERF_ARTIFACT_DIR}/*/${PERF_RESULTS_FILE}; do
+      for dir in ${PERF_ARTIFACT_DIR}/*/; do
         if [ -n ${PERF_PROCESSING_CMD} ]; then
-          if [ -f "$file" ]; then
-            ${PERF_PROCESSING_CMD} "${file}" "${file%/*}/${PERF_PROCESSED_FILE}"
-          else
-            echo "[Warning] File not found: $file"
+          if [ -d "$dir" ]; then
+            echo "Processing results in ${dir}"
+            cd ${dir}
+            ${PERF_PROCESSING_CMD} "${PERF_RESULTS_FILE}" "${PERF_PROCESSED_FILE}"
+            cd -
           fi
         else
           echo "[Warning] Unless processing is not required, PERF_PROCESSING_CMD should be defined."
