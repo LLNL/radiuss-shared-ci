@@ -183,15 +183,7 @@ stages:
                --url "https://api.github.com/repos/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}/actions/workflows/benchmark.yml/dispatches" \
                --header "Authorization: token $GITHUB_TOKEN" \
                --header "Accept: application/vnd.github.v3+json" \
-               --data \
-               "{ \
-                 \"ref\": \"${CI_COMMIT_REF_NAME}\",
-                 \"inputs\": \
-                   { \
-                     \"benchmark_name\": \"${BENCHMARK_NAME}\",
-                     \"benchmark_data\": \"${BENCHMARK_DATA}\"
-                   } \
-               }" \
+               --data "{ \"ref\": \"${CI_COMMIT_REF_NAME}\", \"inputs\": { \"benchmark_name\": \"${BENCHMARK_NAME}\", \"benchmark_data\": \"${BENCHMARK_DATA}\" } }"
         else
           echo "$file not found, skipping GitHub API integration."
         fi
