@@ -160,11 +160,22 @@ stages:
           BENCHMARK_NAME=$(basename "$(dirname "$file")")
           echo "Sending benchmark results to GitHub for ${BENCHMARK_NAME}..."
           BENCHMARK_DATA=$(base64 -w 0 "$file")
-          curl -X POST \
+          RESPONSE=$(curl -X POST \
                --url "https://api.github.com/repos/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}/actions/workflows/benchmark.yml/dispatches" \
                --header "Authorization: token $GITHUB_TOKEN" \
                --header "Accept: application/vnd.github.v3+json" \
-               --data "{ \"ref\": \"${CI_COMMIT_REF_NAME}\", \"inputs\": { \"benchmark_name\": \"${BENCHMARK_NAME}\", \"benchmark_data\": \"${BENCHMARK_DATA}\" } }"
+               --data "{ \"ref\": \"${CI_COMMIT_REF_NAME}\", \"inputs\": { \"benchmark_name\": \"${BENCHMARK_NAME}\", \"benchmark_data\": \"${BENCHMARK_DATA}\" } }" \
+               --write-out "%{http_code}" \
+               --silent \
+               --show-error)
+
+          echo "GitHub API response code: $RESPONSE"
+          if [ "$RESPONSE" -eq 204 ]; then
+            echo "Successfully triggered GitHub workflow for ${BENCHMARK_NAME}"
+          else
+            echo "Failed to trigger GitHub workflow for ${BENCHMARK_NAME}. HTTP status: $RESPONSE"
+            exit 1
+          fi
         else
           echo "$file not found, skipping GitHub API integration."
         fi
