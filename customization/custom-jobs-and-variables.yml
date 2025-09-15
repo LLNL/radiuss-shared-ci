@@ -12,18 +12,9 @@ variables:
 # named so that we are sure to retrieve it and avoid collisions.
   ALLOC_NAME: ${CI_PROJECT_NAME}_ci_${CI_PIPELINE_ID}
 
-# Ruby
-# Arguments for top level allocation
-  RUBY_SHARED_ALLOC: "--exclusive --reservation=ci --time=10 --nodes=1"
-# Arguments for job level allocation
-  RUBY_JOB_ALLOC: "--reservation=ci --nodes=1"
-# Arguments for performance job allocation (dedicated allocation with no overlapping).
-  RUBY_PERF_ALLOC: "--exclusive --reservation=ci --time=10 --nodes=1"
-# Add variables that should apply to all the jobs on a machine:
-#  RUBY_MY_VAR: "..."
-
 # Dane
 # Arguments for top level allocation
+# Note: can be set to "OFF" to prevent allocation sharing.
   DANE_SHARED_ALLOC: "--exclusive --reservation=ci --time=10 --nodes=1"
 # Arguments for job level allocation
   DANE_JOB_ALLOC: "--nodes=1"
@@ -34,6 +25,7 @@ variables:
 
 # Corona
 # Arguments for top level allocation
+# Note: can be set to "OFF" to prevent allocation sharing.
 # OPTIONAL: "-o per-resource.count=2" allows to get 2 jobs running on each node.
   CORONA_SHARED_ALLOC: "--exclusive --time-limit=15m --nodes=1 -o per-resource.count=2"
 # Arguments for job level allocation
@@ -45,6 +37,7 @@ variables:
 
 # Tioga
 # Arguments for top level allocation
+# Note: can be set to "OFF" to prevent allocation sharing.
 # OPTIONAL: "-o per-resource.count=2" allows to get 2 jobs running on each node.
   TIOGA_SHARED_ALLOC: "--queue=pci --exclusive --time-limit=15m --nodes=1 -o per-resource.count=2"
 # Arguments for job level allocation
@@ -54,8 +47,9 @@ variables:
 # Add variables that should apply to all the jobs on a machine:
 #  TIOGA_MY_VAR: "..."
 
-# Tuo
+# Tuolumne
 # Arguments for top level allocation
+# Note: can be set to "OFF" to prevent allocation sharing.
 # OPTIONAL: "-o per-resource.count=2" allows to get 2 jobs running on each node.
   TUOLUMNE_SHARED_ALLOC: "--queue=pci --exclusive --time-limit=15m --nodes=1 -o per-resource.count=2"
 # Arguments for job level allocation

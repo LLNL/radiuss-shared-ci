@@ -89,13 +89,13 @@ pipeline calls:
        RADIUSS_JOBS_PATH: "scripts/radiuss-spack-configs/gitlab/radiuss-jobs"
        LOCAL_JOBS_PATH: ".gitlab/jobs"
      script:
-       - cat ${RADIUSS_JOBS_PATH}/ruby.yml ${LOCAL_JOBS_PATH}/ruby.yml > ruby-jobs.yml
+       - cat ${RADIUSS_JOBS_PATH}/dane.yml ${LOCAL_JOBS_PATH}/dane.yml > dane-jobs.yml
        - cat ${RADIUSS_JOBS_PATH}/lassen.yml ${LOCAL_JOBS_PATH}/lassen.yml > lassen-jobs.yml
        - cat ${RADIUSS_JOBS_PATH}/corona.yml ${LOCAL_JOBS_PATH}/corona.yml > corona-jobs.yml
        - cat ${RADIUSS_JOBS_PATH}/tioga.yml ${LOCAL_JOBS_PATH}/tioga.yml > tioga-jobs.yml
      artifacts:
        paths:
-         - ruby-jobs.yml
+         - dane-jobs.yml
          - lassen-jobs.yml
          - corona-jobs.yml
          - tioga-jobs.yml
@@ -105,10 +105,10 @@ now "need" the ``generate-job-lists``. This is done in the ``needs`` section:
 
 .. code-block:: yaml
 
-   ruby-build-and-test:
+   dane-build-and-test:
      variables:
-       CI_MACHINE: "ruby"
-     needs: [ruby-up-check, generate-job-lists]
+       CI_MACHINE: "dane"
+     needs: [dane-up-check, generate-job-lists]
      extends: [.build-and-test]
 
 Then, the child pipeline template ``.build-and-test`` in ``.gitlab-ci.yml``
