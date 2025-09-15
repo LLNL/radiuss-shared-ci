@@ -125,6 +125,9 @@ stages:
   tags:
     - shell
     - oslic
+  artifacts:
+    paths:
+      - $PERF_ARTIFACT_DIR/
 
 .results_reporting:
   stage: perf-reporting
@@ -134,25 +137,34 @@ stages:
 
 # More elaborate templates for specific use cases
 
-# Pytest to Github Benchmark templates:
+# Convert to Github Benchmark templates:
 # We still require project to provide their own ${PERF_PROCESSING_CMD} script
-# that will prepare the data from pytest to github benchmark as this step is
+# that will convert the data to github benchmark as this step is
 # likely to depend on each project.
-.pytest_to_gh_benchmark:
+.convert_to_gh_benchmark:
   extends: .results_processing
-  image: python:3.9
   script:
     - |
-      for file in ${PERF_ARTIFACT_DIR}/*/${PERF_RESULTS_FILE}; do
+      for dir in ${PERF_ARTIFACT_DIR}/*/; do
         if [ -n ${PERF_PROCESSING_CMD} ]; then
-          if [ -f "$file" ]; then
-          ${PERF_PROCESSING_CMD} "${file}" "${file%/*}/${PERF_PROCESSED_FILE}"
-          else
-            echo "[Warning] File not found: $file"
+          if [ -d "$dir" ]; then
+            echo "Processing results in ${dir}"
+            cd ${dir}
+            ${PERF_PROCESSING_CMD} "${PERF_RESULTS_FILE}" "${PERF_PROCESSED_FILE}"
+            cd -
           fi
         else
           echo "[Warning] Unless processing is not required, PERF_PROCESSING_CMD should be defined."
         fi
+      done
+
+.caliper_to_gh_benchmark:
+  extends: .convert_to_gh_benchmark
+  before_script:
+    - |
+      python3 -m venv caliper-env
+      source caliper-env/bin/activate
+      pip install caliper-reader
 
 # To report to GitHub, don’t forget to create an appropriate token and specify
 # it as a hidden variable in your GitLab mirror settings.
@@ -162,20 +174,15 @@ stages:
     - |
       for file in ${PERF_ARTIFACT_DIR}/*/${PERF_PROCESSED_FILE}; do
         if [ -f "$file" ]; then
-          echo "Sending benchmark results to GitHub..."
+          # Send job name as the benchmark name
+          BENCHMARK_NAME=$(basename "$(dirname "$file")")
+          echo "Sending benchmark results to GitHub for ${BENCHMARK_NAME}..."
           BENCHMARK_DATA=$(base64 -w 0 "$file")
           curl -X POST \
                --url "https://api.github.com/repos/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}/actions/workflows/benchmark.yml/dispatches" \
                --header "Authorization: token $GITHUB_TOKEN" \
                --header "Accept: application/vnd.github.v3+json" \
-               --data \
-               "{ \
-                 \"ref\": \"${CI_COMMIT_REF_NAME}\",
-                 \"inputs\": \
-                   { \
-                     \"benchmark_data\": \"${BENCHMARK_DATA}\"
-                   } \
-               }" \
+               --data "{ \"ref\": \"${CI_COMMIT_REF_NAME}\", \"inputs\": { \"benchmark_name\": \"${BENCHMARK_NAME}\", \"benchmark_data\": \"${BENCHMARK_DATA}\" } }"
         else
           echo "$file not found, skipping GitHub API integration."
         fi
