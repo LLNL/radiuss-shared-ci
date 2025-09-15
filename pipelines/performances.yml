@@ -25,24 +25,6 @@ stages:
     paths:
       - $PERF_ARTIFACT_DIR/
 
-.perf_on_ruby:
-  extends: [.perf_job, .custom_perf]
-  stage: perf-runs
-  tags:
-    - shell
-    - ruby
-  rules:
-    # Runs except if we explicitly deactivate ruby by variable.
-    - if: '$ON_RUBY == "OFF"'
-      when: never
-    - when: on_success
-  script:
-    - export PERF_ARTIFACT_DIR=${PERF_ARTIFACT_DIR}/${CI_JOB_NAME}
-    - mkdir -p ${PERF_ARTIFACT_DIR}
-    # We expect the ${JOB_CMD} to populate ${PERF_ARTIFACT_DIR} with
-    # performance results.
-    - srun ${RUBY_PERF_ALLOC} ${JOB_CMD}
-
 .perf_on_dane:
   extends: [.perf_job, .custom_perf]
   stage: perf-runs
