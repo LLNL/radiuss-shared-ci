@@ -6,11 +6,11 @@
 .. ## SPDX-License-Identifier: (MIT)
 .. ##
 
-.. _setup_ci-label:
+.. _setup_ci:
 
-**************************************
-Setup the CI using the shared template
-**************************************
+************
+Setup the CI
+************
 
 .. figure:: images/Shared-CI-Infrastructure.png
    :scale: 40 %
@@ -24,6 +24,13 @@ Setup the CI using the shared template
 The pre-requisite for using the RADIUSS Shared CI Infrastructure, provided that
 your projects is hosted on GitHub, is that you can trigger your build and test
 process with one command line.
+
+.. warning::
+   radiuss-shared-ci is meant to live on the LC GitLab instance. The main repo
+   is hosted on GitHub for accessibility and visibility and is mirrored on LC
+   GitLab. To include files from radiuss-shared-ci, we recommend pointing to
+   the mirror repo on GitLab rather than the GitHub projects. We only document
+   the former.
 
 Strict separation between the build and test process and the CI infrastructure
 greatly helps with maintenance: it is much easier to debug a standalone script,
@@ -43,9 +50,9 @@ Infrastructure* documented in `RADIUSS Spack Configs`_. Then, building and
 testing is handled in custom scripts.
 
 
-=================
-RADIUSS Shared CI
-=================
+========
+Overview
+========
 
 By sharing the CI definition, projects share the burden of maintaining it.
 
@@ -61,6 +68,7 @@ directory allow for fine tuning and extensibility.
    GitLab allows projects to include external files to configure their CI. We
    rely on this mechanism to share most of the CI configuration among projects.
 
+==============
 File structure
 ==============
 
@@ -73,6 +81,9 @@ File structure
    pipeline file also defines a job template (in the sense of GitLab CI YAML
    syntax) providing the core settings that your own jobs will extend.
 
+.. _instructions:
+
+=================
 The short version
 =================
 
@@ -95,7 +106,7 @@ integrating the RADIUSS Shared CI infrastructure into your project.
    cp ../radiuss-shared-ci/customization/jobs/\<machine\>.yml .gitlab/jobs/<machine>.yml
    # You may use the <machine>.yml file as a starting point to add jobs.
    vim .gitlab/subscription-pipelines.yml
-   # comment the jobs associted to <CI_MACHINE> you don't want.
+   # comment the jobs associated to <CI_MACHINE> you don't want.
    vim .gitlab/custom-jobs-and-variables.yml
    # set the variables according to your needs.
    vim .gitlab/jobs/<machine>.yml
@@ -112,6 +123,7 @@ integrating the RADIUSS Shared CI infrastructure into your project.
 Jump to a corresponding section for details on :ref:`customize-ci`,
 :ref:`add-jobs`.
 
+====================
 The detailed version
 ====================
 
@@ -125,14 +137,14 @@ Our CI implementation can be divided in four parts:
 Setting up the CI consists of four corresponding steps.
 
 Write CI Script
----------------
+===============
 
 The first step is to prepare a CI script that will be called using the
 ``JOB_CMD`` variable in the CI. Once you have that script, you are ready to
 move on to the CI setup.
 
 Core CI implementation
-----------------------
+======================
 
 Start by cloning the RADIUSS Shared CI project locally, for example next to
 the project you intend to add CI to.
@@ -190,7 +202,7 @@ in your Git repository. These are described in the next few sections.
 .. _customize-ci:
 
 Customize the CI
-----------------
+================
 
 We provide templates for the required customization files. You need to have a
 ``.gitlab`` subdirectory in the top-level of your Git repository. Then,
@@ -206,7 +218,7 @@ We will now browse the files to see what changes they may require to suit your
 needs.
 
 The ``.gitlab/subscribed-pipelines.yml`` file
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+---------------------------------------------
 
 In this file, you will select the machines you want to run tests on. Comment
 out the jobs (sections) for machines you don't want, or don't have access to.
@@ -215,7 +227,7 @@ out the jobs (sections) for machines you don't want, or don't have access to.
    To add a new machine, please refer to :ref:`add-a-new-machine`.
 
 The ``.gitlab/custom-jobs-and-variables.yml`` file
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------------------
 
 Here is a table that describes each variable present in the file. More
 details can be found in the file itself.
@@ -241,7 +253,7 @@ to that section are not mandatory.
 .. _add-jobs:
 
 Add jobs
---------
+========
 
 We provide a template file to add jobs to each machine. You should create one
 file per machine using this template. These files may be placed in your
@@ -267,17 +279,17 @@ duplicate the example job and complete it with the required information:
    :ref:`import-shared-jobs`.
 
 Mirroring Setup
----------------
+===============
 
 RADIUSS Shared CI is primarily intended for projects hosted on GitHub that need
 to run tests on LLNL Livermore Computing (LC) systems through the LC GitLab
 instance. GitLab provides a mirroring feature with GitHub integration that will
-automate the synchronisation of local source with the remote GitHub repository.
+automate the synchronization of local source with the remote GitHub repository.
 
 The mirroring setup is described in detail in `GitLab documentation`_:
 
 Non-RADIUSS Projects
---------------------
+====================
 
 RADIUSS Shared CI features a customized status report mechanism that reports to
 to GitHub when a machine is down, making it impossible to run the pipeline.

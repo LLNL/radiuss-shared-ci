@@ -8,13 +8,12 @@
 
 .. _user_how_to-label:
 
-*********
-How To...
-*********
+******
+How To
+******
 
 This section describes how to perform various maintenance tasks once you have
 the RADIUSS Shared CI framework set up for your project.
-
 
 .. _update-shared-ci:
 

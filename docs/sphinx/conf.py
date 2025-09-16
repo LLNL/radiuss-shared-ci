@@ -45,11 +45,11 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Radiuss Shared CI'
-copyright = u'2021, Adrien M. Bernede'
+copyright = u'2021-25, Adrien M. Bernede'
 author = u'Adrien M. Bernede'
 
 # The full version, including alpha/beta/rc tags
-release = u'0.1'
+release = u'2025.06.0'
 
 
 # List of patterns, relative to source directory, that match files and
@@ -90,7 +90,7 @@ else:
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = []
 
 
 # -- Options for HTMLHelp output ------------------------------------------

@@ -1,0 +1,182 @@
+##############################################################################
+# Copyright (c) 2025, Lawrence Livermore National Security, LLC and RADIUSS
+# project contributors. See the COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: (MIT)
+##############################################################################
+
+# Sets ID tokens for every job using `default:`
+include:
+  - project: 'lc-templates/id_tokens'
+    file: 'id_tokens.yml'
+
+variables:
+  PERF_ARTIFACT_DIR: "performance-results"
+  PERF_RESULTS_FILE: "benchmark_results.json"
+  PERF_PROCESSED_FILE: "processed_results.json"
+
+stages:
+  - perf-runs
+  - perf-processing
+  - perf-reporting
+
+.perf_job:
+  artifacts:
+    paths:
+      - $PERF_ARTIFACT_DIR/
+
+.perf_on_dane:
+  extends: [.perf_job, .custom_perf]
+  stage: perf-runs
+  tags:
+    - shell
+    - dane
+  rules:
+    - if: '$ON_DANE == "OFF"'
+      when: never
+    - when: on_success
+  script:
+    - export PERF_ARTIFACT_DIR=${PERF_ARTIFACT_DIR}/${CI_JOB_NAME}
+    - mkdir -p ${PERF_ARTIFACT_DIR}
+    - srun ${DANE_PERF_ALLOC} ${JOB_CMD}
+
+.perf_on_corona:
+  extends: [.perf_job, .custom_perf]
+  stage: perf-runs
+  tags:
+    - shell
+    - corona
+  rules:
+    - if: '$ON_CORONA == "OFF"'
+      when: never
+    - when: on_success
+  script:
+    - export PERF_ARTIFACT_DIR=${PERF_ARTIFACT_DIR}/${CI_JOB_NAME}
+    - mkdir -p ${PERF_ARTIFACT_DIR}
+    - srun ${CORONA_PERF_ALLOC} ${JOB_CMD}
+
+.perf_on_tioga:
+  extends: [.perf_job, .custom_perf]
+  stage: perf-runs
+  tags:
+    - shell
+    - tioga
+  rules:
+    - if: '$ON_TIOGA == "OFF"'
+      when: never
+    - when: on_success
+  script:
+    - export PERF_ARTIFACT_DIR=${PERF_ARTIFACT_DIR}/${CI_JOB_NAME}
+    - mkdir -p ${PERF_ARTIFACT_DIR}
+    - flux run ${TIOGA_PERF_ALLOC} ${JOB_CMD}
+
+.perf_on_tuolumne:
+  extends: [.perf_job, .custom_perf]
+  stage: perf-runs
+  tags:
+    - shell
+    - tuolumne
+  rules:
+    - if: '$ON_TUOLUMNE == "OFF"'
+      when: never
+    - when: on_success
+  script:
+    - export PERF_ARTIFACT_DIR=${PERF_ARTIFACT_DIR}/${CI_JOB_NAME}
+    - mkdir -p ${PERF_ARTIFACT_DIR}
+    - flux run ${TUOLUMNE_PERF_ALLOC} ${JOB_CMD}
+
+.perf_on_lassen:
+  extends: [.perf_job, .custom_perf]
+  stage: perf-runs
+  tags:
+    - shell
+    - lassen
+  rules:
+    - if: '$ON_LASSEN == "OFF"'
+      when: never
+    - when: on_success
+  script:
+    - export PERF_ARTIFACT_DIR=${PERF_ARTIFACT_DIR}/${CI_JOB_NAME}
+    - mkdir -p ${PERF_ARTIFACT_DIR}
+    - lalloc ${LASSEN_PERF_ALLOC} ${JOB_CMD}
+
+# Minimal templates for performance processing and reporting jobs
+# Those should be used by projects implementing such jobs.
+.results_processing:
+  stage: perf-processing
+  tags:
+    - shell
+    - oslic
+  artifacts:
+    paths:
+      - $PERF_ARTIFACT_DIR/
+
+.results_reporting:
+  stage: perf-reporting
+  tags:
+    - shell
+    - oslic
+
+# More elaborate templates for specific use cases
+
+# Convert to Github Benchmark templates:
+# We still require project to provide their own ${PERF_PROCESSING_CMD} script
+# that will convert the data to github benchmark as this step is
+# likely to depend on each project.
+.convert_to_gh_benchmark:
+  extends: .results_processing
+  script:
+    - |
+      for dir in ${PERF_ARTIFACT_DIR}/*/; do
+        if [ -n ${PERF_PROCESSING_CMD} ]; then
+          if [ -d "$dir" ]; then
+            echo "Processing results in ${dir}"
+            cd ${dir}
+            ${PERF_PROCESSING_CMD} "${PERF_RESULTS_FILE}" "${PERF_PROCESSED_FILE}"
+            cd -
+          fi
+        else
+          echo "[Warning] Unless processing is not required, PERF_PROCESSING_CMD should be defined."
+        fi
+      done
+
+.caliper_to_gh_benchmark:
+  extends: .convert_to_gh_benchmark
+  before_script:
+    - |
+      python3 -m venv caliper-env
+      source caliper-env/bin/activate
+      pip install caliper-reader
+
+# To report to GitHub, don’t forget to create an appropriate token and specify
+# it as a hidden variable in your GitLab mirror settings.
+.report_to_gh_benchmark:
+  extends: .results_reporting
+  script:
+    - |
+      for file in ${PERF_ARTIFACT_DIR}/*/${PERF_PROCESSED_FILE}; do
+        if [ -f "$file" ]; then
+          # Send job name as the benchmark name
+          BENCHMARK_NAME=$(basename "$(dirname "$file")")
+          echo "Sending benchmark results to GitHub for ${BENCHMARK_NAME}..."
+          BENCHMARK_DATA=$(base64 -w 0 "$file")
+          RESPONSE=$(curl -X POST \
+               --url "https://api.github.com/repos/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}/actions/workflows/benchmark.yml/dispatches" \
+               --header "Authorization: token $GITHUB_TOKEN" \
+               --header "Accept: application/vnd.github.v3+json" \
+               --data "{ \"ref\": \"${CI_COMMIT_REF_NAME}\", \"inputs\": { \"benchmark_name\": \"${BENCHMARK_NAME}\", \"benchmark_data\": \"${BENCHMARK_DATA}\" } }" \
+               --write-out "%{http_code}" \
+               --silent \
+               --show-error)
+
+          echo "GitHub API response code: $RESPONSE"
+          if [ "$RESPONSE" -eq 204 ]; then
+            echo "Successfully triggered GitHub workflow for ${BENCHMARK_NAME}"
+          else
+            echo "Failed to trigger GitHub workflow for ${BENCHMARK_NAME}. HTTP status: $RESPONSE"
+            exit 1
+          fi
+        else
+          echo "$file not found, skipping GitHub API integration."
+        fi
+      done
