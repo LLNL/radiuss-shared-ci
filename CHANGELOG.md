@@ -6,7 +6,7 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v2025.06.0 - 2025-09-XX ]
+## [v2025.09.0 - 2025-09-16 ]
 
 - Add performance pipeline for any machine.
 - Improve mechanism to turn off CI on a given machine by variable (e.g. during outage).
