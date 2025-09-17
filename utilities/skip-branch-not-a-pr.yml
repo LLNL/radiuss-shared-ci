@@ -28,7 +28,7 @@ ignore-branches-not-a-pr:
       always_run_pattern="${ALWAYS_RUN_PATTERN:-"^develop$|^main$|^master$|^v[0-9.]*$"}"
       # If the current branch is not in the always run pattern
       echo ""
-      echo "### Draft filter parameters ###"
+      echo "### Branch PR filter parameters ###"
       echo "# CI_COMMIT_BRANCH = ${CI_COMMIT_BRANCH}"
       echo "# ALWAYS_RUN_PATTERN = ${ALWAYS_RUN_PATTERN}"
       echo "# CI_COMMIT_SHA = ${CI_COMMIT_SHA}"
@@ -36,33 +36,78 @@ ignore-branches-not-a-pr:
       description="GitLab: Pull Request vetted for testing"
       status="success"
       return_code=0
+      
       # CI_COMMIT_BRANCH is only empty for tags, we always run CI on tags.
       if [[ ! "${CI_COMMIT_BRANCH}" =~ ${always_run_pattern} && -n "${CI_COMMIT_BRANCH}" ]];
       then
-          curl --header "authorization: Bearer ${GITHUB_TOKEN}" -X POST -d " \
-          { \
-            \"query\": \"query { \
-                                 repository(name: \\\"${GITHUB_PROJECT_NAME}\\\", owner: \\\"${GITHUB_PROJECT_ORG}\\\") { \
-                                   pullRequests(last: 1, headRefName: \\\"${CI_COMMIT_BRANCH}\\\") { \
-                                     nodes { \
-                                       number \
-                                     } \
-                                   } \
-                                 } \
-                              }\" \
-          } \
-          " https://api.github.com/graphql > data.json 2> /dev/null
-          if $(jq '.data.repository.pullRequests.nodes[]' data.json)
-          then
+          # Check if required variables are set
+          if [ -z "$GITHUB_TOKEN" ] || [ -z "$GITHUB_PROJECT_ORG" ] || [ -z "$GITHUB_PROJECT_NAME" ]; then
+            echo "Error: Required GitHub variables not set"
+            exit 1
+          fi
+          
+          # Query GitHub GraphQL API with error handling
+          GRAPHQL_RESPONSE=$(mktemp)
+          GRAPHQL_HTTP_CODE=$(curl --retry 3 --retry-delay 5 --max-time 30 \
+              --header "authorization: Bearer ${GITHUB_TOKEN}" \
+              --header "Content-Type: application/json" \
+              -X POST \
+              --data "{ \"query\": \"query { repository(name: \\\"${GITHUB_PROJECT_NAME}\\\", owner: \\\"${GITHUB_PROJECT_ORG}\\\") { pullRequests(last: 1, headRefName: \\\"${CI_COMMIT_BRANCH}\\\") { nodes { number } } } }\" }" \
+              --output "$GRAPHQL_RESPONSE" \
+              --write-out "%{http_code}" \
+              --silent \
+              --show-error \
+              https://api.github.com/graphql)
+          
+          echo "GitHub GraphQL API response code: $GRAPHQL_HTTP_CODE"
+          
+          if [ "$GRAPHQL_HTTP_CODE" -eq 200 ]; then
+            echo "Successfully queried GitHub API"
+            # Check if the response contains valid data and if there's a PR
+            if ! jq -e '.data.repository.pullRequests.nodes[0]' "$GRAPHQL_RESPONSE" > /dev/null 2>&1; then
+              echo "Branch ${CI_COMMIT_BRANCH} is not associated with a Pull Request, skipping CI"
               description="GitLab: skipped branch not a Pull Request"
               status="failure"
               return_code=1
+            else
+              echo "Branch ${CI_COMMIT_BRANCH} is associated with a Pull Request, proceeding with CI"
+            fi
+          else
+            echo "Failed to query GitHub GraphQL API. HTTP status: $GRAPHQL_HTTP_CODE"
+            echo "Response body:"
+            cat "$GRAPHQL_RESPONSE"
+            rm -f "$GRAPHQL_RESPONSE"
+            exit 1
           fi
+          
+          rm -f "$GRAPHQL_RESPONSE"
       fi
-      curl --url "https://api.github.com/repos/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
-           --header 'Content-Type: application/json' \
-           --header "authorization: Bearer ${GITHUB_TOKEN}" \
-           --data "{ \"state\": \"${status}\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"${description}\", \"context\": \"ci/gitlab/skipped-is-not-a-pr\" }"
+      
+      # Report status to GitHub with error handling
+      STATUS_RESPONSE=$(mktemp)
+      STATUS_HTTP_CODE=$(curl --retry 3 --retry-delay 5 --max-time 30 \
+          --url "https://api.github.com/repos/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
+          --header 'Content-Type: application/json' \
+          --header "authorization: Bearer ${GITHUB_TOKEN}" \
+          --data "{ \"state\": \"${status}\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"${description}\", \"context\": \"ci/gitlab/skipped-is-not-a-pr\" }" \
+          --output "$STATUS_RESPONSE" \
+          --write-out "%{http_code}" \
+          --silent \
+          --show-error)
+      
+      echo "GitHub Status API response code: $STATUS_HTTP_CODE"
+      
+      if [ "$STATUS_HTTP_CODE" -eq 201 ]; then
+        echo "Successfully reported status to GitHub"
+      else
+        echo "Failed to report status to GitHub. HTTP status: $STATUS_HTTP_CODE"
+        echo "Response body:"
+        cat "$STATUS_RESPONSE"
+        rm -f "$STATUS_RESPONSE"
+        exit 1
+      fi
+      
+      rm -f "$STATUS_RESPONSE"
       exit ${return_code}
   rules:
     - if: $CI_PIPELINE_SOURCE == "web"

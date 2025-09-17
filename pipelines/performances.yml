@@ -156,27 +156,43 @@ stages:
     - |
       for file in ${PERF_ARTIFACT_DIR}/*/${PERF_PROCESSED_FILE}; do
         if [ -f "$file" ]; then
+          # Check if required variables are set
+          if [ -z "$GITHUB_TOKEN" ] || [ -z "$GITHUB_PROJECT_ORG" ] || [ -z "$GITHUB_PROJECT_NAME" ]; then
+            echo "Error: Required GitHub variables not set"
+            exit 1
+          fi
+
           # Send job name as the benchmark name
           BENCHMARK_NAME=$(basename "$(dirname "$file")")
           echo "Sending benchmark results to GitHub for ${BENCHMARK_NAME}..."
           BENCHMARK_DATA=$(base64 -w 0 "$file")
-          RESPONSE=$(curl -X POST \
+          RESPONSE_BODY=$(mktemp)
+          HTTP_CODE=$(curl --retry 3 --retry-delay 5 --retry-connrefused --max-time 30 -X POST \
                --url "https://api.github.com/repos/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}/actions/workflows/benchmark.yml/dispatches" \
                --header "Authorization: token $GITHUB_TOKEN" \
                --header "Accept: application/vnd.github.v3+json" \
+               --header "Content-Type: application/json" \
                --data "{ \"ref\": \"${CI_COMMIT_REF_NAME}\", \"inputs\": { \"benchmark_name\": \"${BENCHMARK_NAME}\", \"benchmark_data\": \"${BENCHMARK_DATA}\" } }" \
+               --output "$RESPONSE_BODY" \
                --write-out "%{http_code}" \
+               --fail \
                --silent \
-               --show-error)
+               --show-error
+               )
 
-          echo "GitHub API response code: $RESPONSE"
-          if [ "$RESPONSE" -eq 204 ]; then
+          echo "GitHub API response code: $HTTP_CODE"
+          if [ "$HTTP_CODE" -eq 204 ]; then
             echo "Successfully triggered GitHub workflow for ${BENCHMARK_NAME}"
           else
-            echo "Failed to trigger GitHub workflow for ${BENCHMARK_NAME}. HTTP status: $RESPONSE"
+            echo "Failed to trigger GitHub workflow for ${BENCHMARK_NAME}. HTTP status: $HTTP_CODE"
+            echo "Response body:"
+            cat "$RESPONSE_BODY"
+            rm -f "$RESPONSE_BODY"
             exit 1
           fi
+          rm -f "$RESPONSE_BODY"
         else
           echo "$file not found, skipping GitHub API integration."
         fi
       done
+
