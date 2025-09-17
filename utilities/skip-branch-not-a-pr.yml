@@ -64,7 +64,7 @@ ignore-branches-not-a-pr:
           if [ "$GRAPHQL_HTTP_CODE" -eq 200 ]; then
             echo "Successfully queried GitHub API"
             # Check if the response contains valid data and if there's a PR
-            if ! jq -e '.data.repository.pullRequests.nodes[0]' "$GRAPHQL_RESPONSE" > /dev/null 2>&1; then
+            if jq -e '(.data.repository.pullRequests.nodes // []) | length == 0' "$GRAPHQL_RESPONSE" > /dev/null 2>&1; then
               echo "Branch ${CI_COMMIT_BRANCH} is not associated with a Pull Request, skipping CI"
               description="GitLab: skipped branch not a Pull Request"
               status="failure"
