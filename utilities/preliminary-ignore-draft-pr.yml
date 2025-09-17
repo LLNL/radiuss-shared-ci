@@ -66,7 +66,7 @@ ignore-draft-pr:
             # Check if the response contains valid data
             if ! jq -e '.data.repository.pullRequests.nodes[0]' "$GRAPHQL_RESPONSE" > /dev/null 2>&1; then
               echo "Warning: No pull request found for branch ${CI_COMMIT_BRANCH}"
-            elif $(jq '.data.repository.pullRequests.nodes[0].isDraft' "$GRAPHQL_RESPONSE"); then
+            elif jq -e '.data.repository.pullRequests.nodes[0].isDraft == true' "$GRAPHQL_RESPONSE" > /dev/null; then
               description="GitLab: skipped draft Pull Request"
               status="failure"
               return_code=1

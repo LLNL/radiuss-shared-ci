@@ -175,7 +175,6 @@ stages:
                --data "{ \"ref\": \"${CI_COMMIT_REF_NAME}\", \"inputs\": { \"benchmark_name\": \"${BENCHMARK_NAME}\", \"benchmark_data\": \"${BENCHMARK_DATA}\" } }" \
                --output "$RESPONSE_BODY" \
                --write-out "%{http_code}" \
-               --fail \
                --silent \
                --show-error
                )
