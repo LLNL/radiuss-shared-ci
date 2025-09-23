@@ -110,12 +110,17 @@ stages:
   artifacts:
     paths:
       - $PERF_ARTIFACT_DIR/
+  variables:
+    GIT_SUBMODULE_STRATEGY: none
 
 .results_reporting:
   stage: perf-reporting
   tags:
     - shell
     - oslic
+  variables:
+    GIT_STRATEGY: none
+    GIT_SUBMODULE_STRATEGY: none
 
 # More elaborate templates for specific use cases
 
