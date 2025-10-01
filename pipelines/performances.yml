@@ -40,6 +40,21 @@ stages:
     - mkdir -p ${PERF_ARTIFACT_DIR}
     - srun ${DANE_PERF_ALLOC} ${JOB_CMD}
 
+.perf_on_matrix:
+  extends: [.perf_job, .custom_perf]
+  stage: perf-runs
+  tags:
+    - shell
+    - matrix
+  rules:
+    - if: '$ON_MATRIX == "OFF"'
+      when: never
+    - when: on_success
+  script:
+    - export PERF_ARTIFACT_DIR=${PERF_ARTIFACT_DIR}/${CI_JOB_NAME}
+    - mkdir -p ${PERF_ARTIFACT_DIR}
+    - srun ${MATRIX_PERF_ALLOC} ${JOB_CMD}
+
 .perf_on_corona:
   extends: [.perf_job, .custom_perf]
   stage: perf-runs
