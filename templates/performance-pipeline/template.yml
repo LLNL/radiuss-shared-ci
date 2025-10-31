@@ -70,7 +70,7 @@ variables:
   PERF_ARTIFACT_DIR: "$[[ inputs.perf_artifact_dir ]]"
   PERF_RESULTS_FILE: "$[[ inputs.perf_results_file ]]"
   PERF_PROCESSED_FILE: "$[[ inputs.perf_processed_file ]]"
-  JOB_CMD: "$[[ inputs.job_cmd ]]"
+  JOB_CMD: "$[[ inputs.job_cmd | expand_vars ]]"
   PERF_PROCESSING_CMD: "$[[ inputs.perf_processing_cmd ]]"
   GITHUB_TOKEN: "$[[ inputs.github_token ]]"
   GITHUB_PROJECT_NAME: "$[[ inputs.github_project_name ]]"
