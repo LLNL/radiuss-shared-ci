@@ -26,6 +26,12 @@ User documentation is located here: [**RADIUSS Shared CI Docs**](https://radiuss
 Add components to your `.gitlab-ci.yml`:
 
 ```yaml
+# You must define stages (components don't define them to allow customization)
+stages:
+  - prerequisites
+  - build-and-test
+  - performance-measurements
+
 include:
   # Base pipeline orchestration
   - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/base-pipeline@v2025.10.0

@@ -52,11 +52,20 @@ variables:
   GITHUB_TOKEN: "$[[ inputs.github_token ]]"
   RADIUSS_SHARED_CI_REF: "$[[ inputs.component_version ]]"
 
-# High level stages for multi-machine pipelines
-stages:
-  - prerequisites
-  - build-and-test
-  - performance-measurements
+##############################################################################
+# IMPORTANT: Stage Definition
+#
+# This component does NOT define stages to allow projects to customize their
+# pipeline stages. Your .gitlab-ci.yml MUST include these required stages:
+#
+#   stages:
+#     - prerequisites      # Required for machine availability checks
+#     - build-and-test     # Required for build-and-test jobs
+#     - performance-measurements  # Required if using performance pipeline
+#     # Add your custom stages here as needed
+#
+# Jobs in this component reference these stage names.
+##############################################################################
 
 ##############################################################################
 # TEMPLATES

@@ -13,6 +13,20 @@
 # MIGRATION: This replaces the customization/gitlab-ci.yml template
 
 ###############################################################################
+# STAGES
+###############################################################################
+# IMPORTANT: You must define stages yourself to allow customization.
+# The following stages are REQUIRED by RADIUSS Shared CI components:
+
+stages:
+  - prerequisites           # Required: machine availability checks
+  - build-and-test          # Required: build and test jobs
+  - performance-measurements # Required: if using performance pipeline
+  # Add your custom stages here:
+  # - custom-stage-1
+  # - custom-stage-2
+
+###############################################################################
 # VARIABLES
 ###############################################################################
 

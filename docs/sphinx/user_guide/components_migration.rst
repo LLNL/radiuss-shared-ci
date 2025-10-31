@@ -36,7 +36,23 @@ The component-based approach provides several advantages over the legacy include
 Migration Steps
 ---------------
 
-Step 1: Update Main Pipeline File
+Step 1: Define Required Stages
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**IMPORTANT:** The base-pipeline component does NOT define stages to allow you to
+add your own custom stages. You must define the required stages in your ``.gitlab-ci.yml``:
+
+.. code-block:: yaml
+
+   # .gitlab-ci.yml
+   stages:
+     - prerequisites           # Required for machine checks
+     - build-and-test          # Required for build/test jobs
+     - performance-measurements # Required if using perf pipeline
+     # Add your custom stages here:
+     # - my-custom-stage
+
+Step 2: Update Main Pipeline File
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **Before (Legacy approach):**
@@ -84,7 +100,7 @@ Step 1: Update Main Pipeline File
        value: "./scripts/build-and-test.sh"
        expand: false
 
-Step 2: Update Machine Pipeline Triggers
+Step 3: Update Machine Pipeline Triggers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **Before (in subscribed-pipelines.yml):**
@@ -119,7 +135,7 @@ Step 2: Update Machine Pipeline Triggers
              github_project_org: $GITHUB_PROJECT_ORG
          - local: '.gitlab/jobs/lassen.yml'
 
-Step 3: Update Custom Jobs (No Changes Required)
+Step 4: Update Custom Jobs (No Changes Required)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Your existing job definitions in ``.gitlab/jobs/<machine>.yml`` continue to work
@@ -133,7 +149,7 @@ without modification. They still extend the same templates:
      variables:
        COMPILER: "gcc"
 
-Step 4: Update Custom Variables (No Changes Required)
+Step 5: Update Custom Variables (No Changes Required)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Your ``.gitlab/custom-jobs-and-variables.yml`` file continues to work as-is:
@@ -168,6 +184,18 @@ Base Pipeline Component
 **Component:** ``base-pipeline``
 
 Provides orchestration templates for multi-machine pipelines.
+
+.. important::
+   This component does NOT define stages. You must define the required stages
+   in your ``.gitlab-ci.yml`` to allow customization:
+
+   .. code-block:: yaml
+
+      stages:
+        - prerequisites
+        - build-and-test
+        - performance-measurements
+        # Add your custom stages here
 
 **Inputs:**
 
