@@ -171,3 +171,47 @@ variables:
   variables:
     GIT_STRATEGY: recursive
     GIT_SUBMODULE_STRATEGY: recursive
+
+# Templates for each machine in top-level pipeline:
+# This allows reducing duplication when defining the machine checks
+# and sub-pipeline trigger jobs.
+.dane:
+  variables:
+    CI_MACHINE: "dane"
+  rules:
+    # Runs except if we explicitly deactivate dane by variable.
+    - if: '$ON_DANE == "OFF"'
+      when: never
+    - when: on_success
+
+.matrix:
+  variables:
+    CI_MACHINE: "matrix"
+  rules:
+    - if: '$ON_MATRIX == "OFF"'
+      when: never
+    - when: on_success
+
+.corona:
+  variables:
+    CI_MACHINE: "corona"
+  rules:
+    - if: '$ON_CORONA == "OFF"'
+      when: never
+    - when: on_success
+
+.tioga:
+  variables:
+    CI_MACHINE: "tioga"
+  rules:
+    - if: '$ON_TIOGA == "OFF"'
+      when: never
+    - when: on_success
+
+.tuolumne:
+  variables:
+    CI_MACHINE: "tuolumne"
+  rules:
+    - if: '$ON_TUOLUMNE == "OFF"'
+      when: never
+    - when: on_success
