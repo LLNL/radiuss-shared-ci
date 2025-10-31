@@ -93,12 +93,20 @@ Step 2: Update Main Pipeline File
          github_project_name: "my-project"
          github_project_org: "LLNL"
 
-     - local: '.gitlab/custom-jobs-and-variables.yml'
+     - local: '.gitlab/custom-variables.yml'
 
    variables:
      JOB_CMD:
        value: "./scripts/build-and-test.sh"
        expand: false
+
+.. note::
+   **File Split:** The legacy ``custom-jobs-and-variables.yml`` has been split into two files:
+
+   * ``.gitlab/custom-variables.yml`` - Variables only (included in parent pipeline)
+   * ``.gitlab/custom-jobs.yml`` - Job templates only (included in child pipelines)
+
+   This prevents duplication and makes it clear where each piece is used.
 
 Step 3: Update Machine Pipeline Triggers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -126,7 +134,7 @@ Step 3: Update Machine Pipeline Triggers
      extends: [.build-and-test]
      trigger:
        include:
-         - local: '.gitlab/custom-jobs-and-variables.yml'
+         - local: '.gitlab/custom-jobs.yml'
          - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/lassen-pipeline@v2025.10.0
            inputs:
              job_cmd: $JOB_CMD
@@ -149,22 +157,33 @@ without modification. They still extend the same templates:
      variables:
        COMPILER: "gcc"
 
-Step 5: Update Custom Variables (No Changes Required)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Step 5: Split Custom Files
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Your ``.gitlab/custom-jobs-and-variables.yml`` file continues to work as-is:
+The legacy ``custom-jobs-and-variables.yml`` should be split into two files:
+
+**Create** ``.gitlab/custom-variables.yml`` (variables only):
 
 .. code-block:: yaml
 
-   # .gitlab/custom-jobs-and-variables.yml (no changes needed)
+   # .gitlab/custom-variables.yml
    variables:
      LASSEN_JOB_ALLOC: "1 -W 30"
      DANE_SHARED_ALLOC: "-N 1 -p pdebug -t 30"
      # ... etc
 
+**Create** ``.gitlab/custom-jobs.yml`` (job templates only):
+
+.. code-block:: yaml
+
+   # .gitlab/custom-jobs.yml
    .custom_job:
      before_script:
        - echo "Setting up environment..."
+
+   .custom_perf:
+     before_script:
+       - echo "Setting up performance environment..."
 
 Complete Example
 ----------------
@@ -172,7 +191,8 @@ Complete Example
 See the ``examples/`` directory in the repository for complete migration examples:
 
 * ``examples/example-gitlab-ci.yml`` - Complete main CI file using components
-* ``examples/example-custom-jobs-and-variables.yml`` - Variable definitions
+* ``examples/example-custom-variables.yml`` - Variable definitions (parent pipeline)
+* ``examples/example-custom-jobs.yml`` - Job templates (child pipelines)
 * ``examples/example-jobs-lassen.yml`` - Machine-specific jobs
 
 Component Reference

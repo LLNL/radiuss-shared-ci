@@ -71,8 +71,8 @@ include:
       github_project_name: $GITHUB_PROJECT_NAME
       github_project_org: $GITHUB_PROJECT_ORG
 
-  # Local files for project-specific configuration
-  - local: '.gitlab/custom-jobs-and-variables.yml'
+  # Local variables (used for component inputs and forwarded to child pipelines)
+  - local: '.gitlab/custom-variables.yml'
 
 ###############################################################################
 # MACHINE PIPELINES
@@ -99,7 +99,7 @@ dane-build-and-test:
     - when: on_success
   trigger:
     include:
-      - local: '.gitlab/custom-jobs-and-variables.yml'
+      - local: '.gitlab/custom-jobs.yml'
       - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/dane-pipeline@v2025.10.0
         inputs:
           job_cmd: $JOB_CMD
@@ -130,7 +130,7 @@ lassen-build-and-test:
     - when: on_success
   trigger:
     include:
-      - local: '.gitlab/custom-jobs-and-variables.yml'
+      - local: '.gitlab/custom-jobs.yml'
       - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/lassen-pipeline@v2025.10.0
         inputs:
           job_cmd: $JOB_CMD
@@ -160,7 +160,7 @@ corona-build-and-test:
     - when: on_success
   trigger:
     include:
-      - local: '.gitlab/custom-jobs-and-variables.yml'
+      - local: '.gitlab/custom-jobs.yml'
       - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/corona-pipeline@v2025.10.0
         inputs:
           job_cmd: $JOB_CMD
@@ -186,7 +186,7 @@ performance-measurements:
     - when: manual
   trigger:
     include:
-      - local: '.gitlab/custom-jobs-and-variables.yml'
+      - local: '.gitlab/custom-jobs.yml'
       - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/performance-pipeline@v2025.10.0
         inputs:
           job_cmd: "./scripts/run-benchmarks.sh"
