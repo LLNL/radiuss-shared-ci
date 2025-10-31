@@ -48,8 +48,8 @@ ignore-draft-pr:
   variables:
     GIT_STRATEGY: none
     GITHUB_TOKEN: "$[[ inputs.github_token ]]"
-    GITHUB_PROJECT_NAME: "$[[ inputs.github_project_name ]]"
-    GITHUB_PROJECT_ORG: "$[[ inputs.github_project_org ]]"
+    GITHUB_PROJECT_NAME: "$[[ inputs.github_project_name | expand_vars ]]"
+    GITHUB_PROJECT_ORG: "$[[ inputs.github_project_org | expand_vars ]]"
   script:
     - |
       # If the current branch is not in the always run pattern
