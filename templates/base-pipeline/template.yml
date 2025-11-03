@@ -18,7 +18,6 @@
 #       inputs:
 #         github_project_name: "my-project"
 #         github_project_org: "LLNL"
-#         component_version: "v2025.10.0"
 
 spec:
   inputs:
@@ -35,11 +34,6 @@ spec:
       description: "GitHub personal access token"
       default: ""
 
-    component_version:
-      type: string
-      description: "Version of radiuss-shared-ci components to use"
-      default: "v2025.10.0"
-
 ---
 # Sets ID tokens for every job using `default:`
 include:
@@ -50,7 +44,6 @@ variables:
   GITHUB_PROJECT_NAME: "$[[ inputs.github_project_name ]]"
   GITHUB_PROJECT_ORG: "$[[ inputs.github_project_org ]]"
   GITHUB_TOKEN: "$[[ inputs.github_token ]]"
-  RADIUSS_SHARED_CI_REF: "$[[ inputs.component_version ]]"
 
 ##############################################################################
 # IMPORTANT: Stage Definition
