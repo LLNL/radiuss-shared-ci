@@ -51,7 +51,7 @@ include:
     file: 'id_tokens.yml'
 
 variables:
-  JOB_CMD: "$[[ inputs.job_cmd ]]"
+  JOB_CMD: "$[[ inputs.job_cmd | expand_vars ]]"
   LASSEN_JOB_ALLOC: "$[[ inputs.job_alloc ]]"
   GITHUB_PROJECT_NAME: "$[[ inputs.github_project_name ]]"
   GITHUB_PROJECT_ORG: "$[[ inputs.github_project_org ]]"

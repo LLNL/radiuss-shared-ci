@@ -62,6 +62,7 @@ include:
     file: 'id_tokens.yml'
 
 variables:
+  JOB_CMD: "$[[ inputs.job_cmd | expand_vars ]]"
   CORONA_SHARED_ALLOC: "$[[ inputs.shared_alloc ]]"
   CORONA_JOB_ALLOC: "$[[ inputs.job_alloc ]]"
   GITHUB_PROJECT_NAME: "$[[ inputs.github_project_name ]]"
@@ -123,12 +124,12 @@ stages:
 .corona_reproducer_job:
   script:
     - |
-      echo -e "flux watch \$(flux batch -o output.stdout.type=kvs ${CORONA_JOB_ALLOC} $[[ inputs.job_cmd | expand_vars ]] )"
+      echo -e "flux watch \$(flux batch -o output.stdout.type=kvs ${CORONA_JOB_ALLOC} ${JOB_CMD} )"
       echo -e "\e[7;32m### End of reproducer\e[0m"
 
 .corona_job_command:
   script:
-    - ${PROXY} flux watch $( echo -e $[[ inputs.job_cmd | expand_vars ]] | xargs ${PROXY} flux batch -o output.stdout.type=kvs ${CORONA_JOB_ALLOC} )
+    - ${PROXY} flux watch $( echo -e ${JOB_CMD} ]] | xargs ${PROXY} flux batch -o output.stdout.type=kvs ${CORONA_JOB_ALLOC} )
 
 .job_on_corona:
   extends: [.custom_job, .on_corona]

@@ -124,12 +124,12 @@ stages:
 .dane_reproducer_job:
   script:
     - |
-      echo -e "srun ${DANE_JOB_ALLOC} $[[ inputs.job_cmd | expand_vars ]]"
+      echo -e "srun ${DANE_JOB_ALLOC} ${JOB_CMD}"
       echo -e "\e[7;32m### End of reproducer\e[0m"
 
 .dane_job_command:
   script:
-    - echo -e $[[ inputs.job_cmd | expand_vars ]] | xargs srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) ${DANE_JOB_ALLOC}
+    - echo -e ${JOB_CMD} | xargs srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) ${DANE_JOB_ALLOC}
 
 .job_on_dane:
   extends: [.custom_job, .on_dane]
