@@ -45,11 +45,6 @@ spec:
       type: string
       description: "GitHub organization name"
 
-    build_root:
-      type: string
-      description: "Root directory for builds"
-      default: "/usr/workspace/${USER}"
-
     llnl_service_user:
       type: string
       description: "LLNL service user account for CI"
@@ -72,7 +67,6 @@ variables:
   DANE_JOB_ALLOC: "$[[ inputs.job_alloc ]]"
   GITHUB_PROJECT_NAME: "$[[ inputs.github_project_name ]]"
   GITHUB_PROJECT_ORG: "$[[ inputs.github_project_org ]]"
-  BUILD_ROOT: "$[[ inputs.build_root ]]"
   LLNL_SERVICE_USER: "$[[ inputs.llnl_service_user ]]"
   ALLOC_NAME: "$[[ inputs.alloc_name ]]"
 
@@ -113,7 +107,7 @@ stages:
       echo -e "\e[7;32m### CI job ${CI_JOB_ID} reproducer on dane (${SYS_TYPE}) \e[0m"
       if [[ -n "${LLNL_SERVICE_USER}" ]]; then echo -e "xsu ${LLNL_SERVICE_USER}"; fi
       echo -e "
-      working_dir=\"${BUILD_ROOT}/${GITHUB_PROJECT_NAME}/${CI_JOB_ID}-\$(date +%s)\" \n
+      working_dir=\"/usr/workspace/\${USER}/${GITHUB_PROJECT_NAME}/${CI_JOB_ID}-\$(date +%s)\" \n
       mkdir -p \${working_dir} && cd \${working_dir} \n
       git clone https://github.com/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}.git --single-branch --depth=1 \n
       cd ${GITHUB_PROJECT_NAME} \n

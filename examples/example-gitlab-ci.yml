@@ -40,7 +40,6 @@ variables:
   # GITHUB_TOKEN should be set as a CI/CD variable in GitLab settings
 
   # Build configuration
-  BUILD_ROOT: ${CI_PROJECT_DIR}
   GIT_SUBMODULE_STRATEGY: recursive
 
   # Job command - use non-expandable variables for flexibility
