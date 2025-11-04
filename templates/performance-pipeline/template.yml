@@ -23,7 +23,6 @@ spec:
     job_cmd:
       type: string
       description: "Command to execute for performance measurements"
-      default: ""
 
     perf_processing_cmd:
       type: string
