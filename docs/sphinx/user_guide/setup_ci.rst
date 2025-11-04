@@ -234,7 +234,7 @@ details can be found in the file itself.
   Parameter                                  Description
  ========================================== ==========================================================================================================================
   ``ALLOC_NAME``                             Name of the shared allocation. Should be unique, our default should be fine.
-  ``<MACHINE>_SHARED_ALLOC``                 Parameters for the shared allocation. You may extend the resource and time.
+  ``<MACHINE>_SHARED_ALLOC``                 Optional: Parameters for the shared allocation. You may extend the resource and time.
   ``<MACHINE>_JOB_ALLOC``                    Parameters for the job allocation. You may extend the resource and time within the scope of the shared allocation.
   ``PROJECT_<MACHINE>_VARIANTS``             Global variants to be added to all the shared specs.
   ``PROJECT_<MACHINE>_DEPS``                 Global dependencies to be added to all the shared specs.

@@ -8,10 +8,15 @@
 # Example .gitlab/custom-variables.yml
 #
 # This file defines project-specific VARIABLES ONLY.
-# It is included in the PARENT pipeline (.gitlab-ci.yml) to provide
+# It should be included in the PARENT pipeline (.gitlab-ci.yml) to provide
 # variables that are passed as component inputs and forwarded to child pipelines.
 #
 # Place this file at .gitlab/custom-variables.yml in your project.
+#
+# Notes:
+# - The values here are sensible defaults, inspired by Umpire production setup.
+# - The <MACHINE>_SHARED_ALLOC is optional. If left empty or removed, the CI
+#   won't share a top level allocation (although this is recommended).
 
 ###############################################################################
 # MACHINE-SPECIFIC ALLOCATION VARIABLES
