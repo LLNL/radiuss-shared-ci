@@ -35,7 +35,6 @@ spec:
     job_alloc:
       type: string
       description: "SLURM srun arguments for individual jobs"
-      default: "-n 1"
 
     github_project_name:
       type: string

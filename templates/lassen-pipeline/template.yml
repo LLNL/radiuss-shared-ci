@@ -29,7 +29,6 @@ spec:
     job_alloc:
       type: string
       description: "LSF lalloc arguments for job resource allocation"
-      default: "1 -W 30"
 
     github_project_name:
       type: string

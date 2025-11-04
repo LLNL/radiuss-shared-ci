@@ -35,7 +35,6 @@ spec:
     job_alloc:
       type: string
       description: "flux batch arguments for individual jobs"
-      default: "-N 1 -t 10m"
 
     github_project_name:
       type: string

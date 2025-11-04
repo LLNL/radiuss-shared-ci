@@ -19,33 +19,29 @@
 
 variables:
   # Dane (SLURM) allocation settings
-  DANE_SHARED_ALLOC: "-N 1 -p pdebug -t 30"
-  DANE_JOB_ALLOC: "-n 1"
-  DANE_PERF_ALLOC: "-N 1 -p pbatch -t 60"
+  DANE_SHARED_ALLOC: "--nodes=1 --exclusive --reservation=ci --time=30"
+  DANE_JOB_ALLOC: "--nodes=1 --reservation=ci"
+  DANE_PERF_ALLOC: "--nodes=1 --exclusive --reservation=ci --time=15"
 
   # Matrix (SLURM) allocation settings
-  MATRIX_SHARED_ALLOC: "-N 1 -p pdebug -t 30"
-  MATRIX_JOB_ALLOC: "-n 1"
-  MATRIX_PERF_ALLOC: "-N 1 -p pbatch -t 60"
+  MATRIX_SHARED_ALLOC: "--nodes=1 --exclusive --partition=pdebug --time=30"
+  MATRIX_JOB_ALLOC: "--nodes=1 --partition=pdebug"
+  MATRIX_PERF_ALLOC: "--nodes=1 --exclusive --partition=pdebug -t 15"
 
   # Corona (flux) allocation settings
-  CORONA_SHARED_ALLOC: "-N 1 -t 30m"
-  CORONA_JOB_ALLOC: "-N 1 -t 10m"
-  CORONA_PERF_ALLOC: "-N 1 -t 60m"
+  CORONA_SHARED_ALLOC: "--nodes=1 --exclusive --time-limit=30m -o per-resource.count=2"
+  CORONA_JOB_ALLOC: "--nodes=1 --begin-time=+5s"
+  CORONA_PERF_ALLOC: "--nodes=1 --exclusive --time-limit=15m"
 
   # Tioga (flux) allocation settings
-  TIOGA_SHARED_ALLOC: "-N 1 -t 30m"
-  TIOGA_JOB_ALLOC: "-N 1 -t 10m"
-  TIOGA_PERF_ALLOC: "-N 1 -t 60m"
+  TIOGA_SHARED_ALLOC: "--nodes=1 --exclusive --time-limit=30m -o per-resource.count=2"
+  TIOGA_JOB_ALLOC: "--nodes=1 --begin-time=+5s"
+  TIOGA_PERF_ALLOC: "--nodes=1 --exclusive --time-limit=15m"
 
   # Tuolumne (flux) allocation settings
-  TUOLUMNE_SHARED_ALLOC: "-N 1 -t 30m"
-  TUOLUMNE_JOB_ALLOC: "-N 1 -t 10m"
-  TUOLUMNE_PERF_ALLOC: "-N 1 -t 60m"
-
-  # Lassen (LSF) allocation settings
-  LASSEN_JOB_ALLOC: "1 -W 30"
-  LASSEN_PERF_ALLOC: "1 -W 60"
+  TUOLUMNE_SHARED_ALLOC: "--nodes=1 --exclusive --time-limit=30m -o per-resource.count=2"
+  TUOLUMNE_JOB_ALLOC: "--nodes=1 --begin-time=+5s"
+  TUOLUMNE_PERF_ALLOC: "--nodes=1 --exclusive --time-limit=15m"
 
   # Allocation name (used for shared allocations)
   ALLOC_NAME: "ALLOC_${CI_PIPELINE_ID}"
