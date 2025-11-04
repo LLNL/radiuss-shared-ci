@@ -244,7 +244,6 @@ Each provides machine-specific CI templates.
 * ``job_cmd`` (required) - Build and test command
 * ``github_project_name`` (required) - GitHub project name
 * ``github_project_org`` (required) - GitHub organization
-* ``build_root`` (optional) - Build directory root
 * ``llnl_service_user`` (optional) - LLNL service account
 
 **LSF-specific (Lassen):**
