@@ -222,7 +222,6 @@ Provides orchestration templates for multi-machine pipelines.
 * ``github_project_name`` (required) - GitHub project name
 * ``github_project_org`` (required) - GitHub organization
 * ``github_token`` (optional) - GitHub API token for status reporting
-* ``component_version`` (optional) - Version of components to use
 
 **Exported Templates:**
 
