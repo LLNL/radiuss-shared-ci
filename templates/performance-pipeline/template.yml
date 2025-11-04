@@ -210,7 +210,7 @@ stages:
   script:
     - |
       for dir in ${PERF_ARTIFACT_DIR}/*/; do
-        if [ -n ${PERF_PROCESSING_CMD} ]; then
+        if [ -n "${PERF_PROCESSING_CMD}" ]; then
           if [ -d "$dir" ]; then
             echo "Processing results in ${dir}"
             cd ${dir}
