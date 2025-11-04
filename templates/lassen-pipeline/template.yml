@@ -13,7 +13,7 @@
 #
 # Usage:
 #   include:
-#     - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/lassen-pipeline@v2025.10.0
+#     - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/lassen-pipeline@v2025.11.0
 #       inputs:
 #         job_cmd: "./scripts/build-and-test.sh"
 #         job_alloc: "1 -W 30"

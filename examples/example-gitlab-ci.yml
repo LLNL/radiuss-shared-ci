@@ -53,14 +53,14 @@ variables:
 
 include:
   # Base pipeline templates and utilities
-  - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/base-pipeline@v2025.10.0
+  - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/base-pipeline@v2025.11.0
     inputs:
       github_project_name: $GITHUB_PROJECT_NAME
       github_project_org: $GITHUB_PROJECT_ORG
       github_token: $GITHUB_TOKEN
 
   # Optional: Draft PR filter
-  - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/utility-draft-pr-filter@v2025.10.0
+  - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/utility-draft-pr-filter@v2025.11.0
     inputs:
       github_token: $GITHUB_TOKEN
       github_project_name: $GITHUB_PROJECT_NAME
@@ -95,7 +95,7 @@ dane-build-and-test:
   trigger:
     include:
       - local: '.gitlab/custom-jobs.yml'
-      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/dane-pipeline@v2025.10.0
+      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/dane-pipeline@v2025.11.0
         inputs:
           job_cmd: $JOB_CMD
           shared_alloc: $DANE_SHARED_ALLOC
@@ -126,7 +126,7 @@ lassen-build-and-test:
   trigger:
     include:
       - local: '.gitlab/custom-jobs.yml'
-      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/lassen-pipeline@v2025.10.0
+      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/lassen-pipeline@v2025.11.0
         inputs:
           job_cmd: $JOB_CMD
           job_alloc: $LASSEN_JOB_ALLOC
@@ -156,7 +156,7 @@ corona-build-and-test:
   trigger:
     include:
       - local: '.gitlab/custom-jobs.yml'
-      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/corona-pipeline@v2025.10.0
+      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/corona-pipeline@v2025.11.0
         inputs:
           job_cmd: $JOB_CMD
           shared_alloc: $CORONA_SHARED_ALLOC
@@ -182,7 +182,7 @@ performance-measurements:
   trigger:
     include:
       - local: '.gitlab/custom-jobs.yml'
-      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/performance-pipeline@v2025.10.0
+      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/performance-pipeline@v2025.11.0
         inputs:
           job_cmd: "./scripts/run-benchmarks.sh"
           github_token: $GITHUB_TOKEN
