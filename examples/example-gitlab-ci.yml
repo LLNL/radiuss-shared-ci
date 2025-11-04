@@ -58,7 +58,6 @@ include:
       github_project_name: $GITHUB_PROJECT_NAME
       github_project_org: $GITHUB_PROJECT_ORG
       github_token: $GITHUB_TOKEN
-      component_version: $RADIUSS_SHARED_CI_REF
 
   # Optional: Draft PR filter
   - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/utility-draft-pr-filter@v2025.10.0
