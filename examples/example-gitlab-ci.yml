@@ -47,9 +47,6 @@ variables:
     value: "./scripts/build-and-test.sh"
     expand: false
 
-  # Component version to use
-  RADIUSS_SHARED_CI_REF: "v2025.10.0"
-
 ###############################################################################
 # INCLUDES
 ###############################################################################
