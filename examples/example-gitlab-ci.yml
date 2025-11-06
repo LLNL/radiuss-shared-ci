@@ -75,23 +75,11 @@ include:
 
 # Dane (SLURM-based)
 dane-up-check:
-  variables:
-    CI_MACHINE: "dane"
-  extends: [.machine-check]
-  rules:
-    - if: '$ON_DANE == "OFF"'
-      when: never
-    - when: on_success
+  extends: [.dane, .machine-check]
 
 dane-build-and-test:
-  variables:
-    CI_MACHINE: "dane"
   needs: [dane-up-check]
-  extends: [.build-and-test]
-  rules:
-    - if: '$ON_DANE == "OFF"'
-      when: never
-    - when: on_success
+  extends: [.dane, .build-and-test]
   trigger:
     include:
       - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/dane-pipeline@v2025.11.0
@@ -106,23 +94,11 @@ dane-build-and-test:
 
 # Corona (flux-based)
 corona-up-check:
-  variables:
-    CI_MACHINE: "corona"
-  extends: [.machine-check]
-  rules:
-    - if: '$ON_CORONA == "OFF"'
-      when: never
-    - when: on_success
+  extends: [.corona, .machine-check]
 
 corona-build-and-test:
-  variables:
-    CI_MACHINE: "corona"
   needs: [corona-up-check]
-  extends: [.build-and-test]
-  rules:
-    - if: '$ON_CORONA == "OFF"'
-      when: never
-    - when: on_success
+  extends: [.corona, .build-and-test]
   trigger:
     include:
       - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/corona-pipeline@v2025.11.0
@@ -143,7 +119,7 @@ corona-build-and-test:
 ###############################################################################
 
 performance-measurements:
-  stage: performance-measurements
+  extends: [.performance-measurements]
   rules:
     # Add conditions for when to run performance tests
     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "develop"'
@@ -151,7 +127,6 @@ performance-measurements:
     - when: manual
   trigger:
     include:
-      - local: '.gitlab/custom-jobs.yml'
       - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/performance-pipeline@v2025.11.0
         inputs:
           job_cmd: "./scripts/run-benchmarks.sh"
@@ -164,4 +139,5 @@ performance-measurements:
           github_project_name: $GITHUB_PROJECT_NAME
           github_project_org: $GITHUB_PROJECT_ORG
       # OPTIONAL - local: '.gitlab/custom-jobs.yml'
+      - local: '.gitlab/custom-jobs.yml'
       - local: '.gitlab/jobs/performances.yml'

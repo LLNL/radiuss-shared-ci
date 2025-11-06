@@ -144,9 +144,16 @@ variables:
 
 # Template for triggering build-and-test child pipelines
 # Projects should extend this for each machine
-# Requires: CI_MACHINE variable to be set
 .build-and-test:
   stage: build-and-test
+  trigger:
+    strategy: depend
+    forward:
+      pipeline_variables: true
+
+# Template for triggering perf measurments child pipelines
+.performance-measurements:
+  stage: performance-measurements
   trigger:
     strategy: depend
     forward:
