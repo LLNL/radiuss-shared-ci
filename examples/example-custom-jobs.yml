@@ -7,9 +7,9 @@
 
 # Example .gitlab/custom-jobs.yml
 #
-# This file defines JOB TEMPLATES ONLY.
-# It is included in CHILD pipelines (via trigger: include:) to provide
-# templates that your jobs can extend.
+# This file defines JOB TEMPLATES ONLY. They are meant to override the default
+# implementation from the child pipelines.
+# This file should be included in CHILD pipelines (via trigger: include:)
 #
 # Place this file at .gitlab/custom-jobs.yml in your project.
 
@@ -18,12 +18,14 @@
 ###############################################################################
 
 # Custom job template - extend this to add project-specific setup
+# Note: this is inspired by the .gitlab/custom-jobs.yml from Umpire.
 .custom_job:
-  before_script:
-    - echo "Setting up build environment..."
-    # Add any project-specific setup here
-    # - module load gcc
-    # - export CC=gcc CXX=g++
+  artifacts:
+    reports:
+      junit: junit.xml
+    name: "${CI_PROJECT_NAME}-${CI_MACHINE}-${CI_JOB_NAME}-${CI_PIPELINE_ID}"
+    paths:
+      - ./*.cmake
 
 # Custom performance job template
 .custom_perf:
@@ -39,9 +41,15 @@
 # This allows you to add project-specific environment variables
 # that should appear in the reproducer output
 
-# Example for Lassen:
-# .lassen_reproducer_vars:
-#   script:
-#     - |
-#       echo -e "export MY_VAR=\"${MY_VAR}\""
-#       echo -e "export ANOTHER_VAR=\"${ANOTHER_VAR}\""
+# Example from Umpire project:
+.reproducer_vars:
+  script:
+    - |
+      echo -e "
+      # Required variables \n
+      export MODULE_LIST=\"${MODULE_LIST}\" \n
+      export SPEC=\"${SPEC//\"/\\\"}\" \n
+      # Allow to set job script for debugging (only this differs from CI) \n
+      export DEBUG_MODE=true \n
+      # Using the CI build cache is optional and requires a token. Set it like so: \n
+      # export REGISTRY_TOKEN=\"<your token here>\" \n"

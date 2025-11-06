@@ -100,6 +100,11 @@ stages:
     # Default: run on success
     - when: on_success
 
+# Custom job template - override this to create project-specific setup
+.custom_job:
+  variable:
+    TEMPLATE_CANNOT_BE_EMPTY: "true"
+
 .tuolumne_reproducer_init:
   script:
     - |

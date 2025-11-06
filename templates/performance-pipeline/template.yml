@@ -108,6 +108,12 @@ stages:
     paths:
       - $PERF_ARTIFACT_DIR/
 
+# Custom job template specific to performance pipeline.
+# Override this to create project-specific setup.
+.custom_perf:
+  variable:
+    TEMPLATE_CANNOT_BE_EMPTY: "true"
+
 .perf_on_dane:
   extends: [.perf_job, .custom_perf]
   stage: perf-runs

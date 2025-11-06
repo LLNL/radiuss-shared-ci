@@ -94,7 +94,6 @@ dane-build-and-test:
     - when: on_success
   trigger:
     include:
-      - local: '.gitlab/custom-jobs.yml'
       - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/dane-pipeline@v2025.11.0
         inputs:
           job_cmd: $JOB_CMD
@@ -102,6 +101,7 @@ dane-build-and-test:
           job_alloc: "--nodes=1 --reservation=ci"
           github_project_name: $GITHUB_PROJECT_NAME
           github_project_org: $GITHUB_PROJECT_ORG
+      # OPTIONAL - local: '.gitlab/custom-jobs.yml'
       - local: '.gitlab/jobs/dane.yml'
 
 # Corona (flux-based)
@@ -125,7 +125,6 @@ corona-build-and-test:
     - when: on_success
   trigger:
     include:
-      - local: '.gitlab/custom-jobs.yml'
       - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/corona-pipeline@v2025.11.0
         inputs:
           job_cmd: $JOB_CMD
@@ -133,6 +132,7 @@ corona-build-and-test:
           job_alloc: "--nodes=1 --begin-time=+5s"
           github_project_name: $GITHUB_PROJECT_NAME
           github_project_org: $GITHUB_PROJECT_ORG
+      # OPTIONAL - local: '.gitlab/custom-jobs.yml'
       - local: '.gitlab/jobs/corona.yml'
 
 # Add similar blocks for: matrix, tioga, tuolumne
@@ -163,4 +163,5 @@ performance-measurements:
           github_token: $GITHUB_TOKEN
           github_project_name: $GITHUB_PROJECT_NAME
           github_project_org: $GITHUB_PROJECT_ORG
+      # OPTIONAL - local: '.gitlab/custom-jobs.yml'
       - local: '.gitlab/jobs/performances.yml'

@@ -169,7 +169,7 @@ Step 5: Split Custom Files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 If you were using the legacy ``custom-jobs-and-variables.yml`` it should be
-split into two files:
+split into two files, which are both optional:
 
 **Create** ``.gitlab/custom-jobs.yml`` (job templates only):
 
@@ -195,13 +195,15 @@ split into two files:
      # ... etc
 
 ..note::
-    These files have different purposes and are used in different parts of the pipeline:
+    These files have different purposes and are used in different parts of the
+    pipeline:
     * ``custom-variables.yml`` is included in the parent pipeline to define
-      variables. This is simply a convenience to gather all allocations information
-      in one place.
+      variables. This is simply a convenience to gather all allocations
+      information in one place.
     * ``custom-jobs.yml`` is included in each child pipeline to populate the
-      customization templates if needed. This prevents duplication across child
-      pipelines.  
+      customization templates if needed. Gathering templates in a file avoids
+      duplication across child pipelines, but the same result could be achieved
+      by defining them directly in each .gitlab/jobs/<machine>.yml file.
 
 Complete Example
 ----------------
@@ -209,8 +211,7 @@ Complete Example
 See the ``examples/`` directory in the repository for complete migration examples:
 
 * ``examples/example-gitlab-ci.yml`` - Complete main CI file using components
-* ``examples/example-custom-variables.yml`` - Variable definitions (parent pipeline)
-* ``examples/example-custom-jobs.yml`` - Job templates (child pipelines)
+* ``examples/example-custom-jobs.yml`` - Optinoal job templates (child pipelines)
 * ``examples/example-jobs-lassen.yml`` - Machine-specific jobs
 
 Component Reference
@@ -282,6 +283,7 @@ Each provides machine-specific CI templates.
 
 **Exported Templates:**
 
+* ``.custom_jobs`` - Customization template for every jobs
 * ``.job_on_<machine>`` - Main job template for the machine
 * ``.on_<machine>`` - Machine-specific rules
 * ``.<machine>_reproducer_init`` - Reproducer initialization
@@ -326,6 +328,7 @@ Provides templates for performance measurements across machines.
 
 **Exported Templates:**
 
+* ``.custom_perf`` - Customization template for every perf jobs
 * ``.perf_on_<machine>`` - Performance job for each machine
 * ``.results_processing`` - Processing job template
 * ``.results_reporting`` - Reporting job template
@@ -357,7 +360,7 @@ Template Not Found in Child Pipeline
 **Error:** ``Job extends template that doesn't exist: .job_on_lassen``
 
 **Solution:** Ensure the machine pipeline component is included in the child pipeline's
-``trigger: include:`` section, not just in the parent pipeline.
+``trigger: include:`` section, not in the parent pipeline.
 
 Legacy Compatibility
 --------------------
@@ -369,7 +372,7 @@ remains available and supported. Projects can continue using this approach if:
 * Not ready to migrate yet
 * Require features not yet available in components
 
-Both approaches will be maintained in parallel for the foreseeable future.
+Both approaches will only be maintained in parallel for this release.
 
 Getting Help
 ------------
