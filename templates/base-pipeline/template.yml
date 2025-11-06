@@ -152,19 +152,6 @@ variables:
     forward:
       pipeline_variables: true
 
-# Template for custom job definitions
-# Projects extend this in their custom-jobs-and-variables.yml
-.custom_job:
-  variables:
-    GIT_STRATEGY: recursive
-    GIT_SUBMODULE_STRATEGY: recursive
-
-# Template for custom performance job definitions
-.custom_perf:
-  variables:
-    GIT_STRATEGY: recursive
-    GIT_SUBMODULE_STRATEGY: recursive
-
 # Templates for each machine in top-level pipeline:
 # This allows reducing duplication when defining the machine checks
 # and sub-pipeline trigger jobs.
