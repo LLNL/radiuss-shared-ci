@@ -115,33 +115,41 @@ Step 3: Update Machine Pipeline Triggers
 
 .. code-block:: yaml
 
-   lassen-build-and-test:
+   dane-build-and-test:
      variables:
-       CI_MACHINE: "lassen"
-     needs: [lassen-up-check]
+       CI_MACHINE: "dane"
+     needs: [dane-up-check]
      extends: [.build-and-test]
-     # .build-and-test was defined in customization/gitlab-ci.yml and
-     # included pipelines/lassen.yml remotely
+     rules:
+       # Runs except if we explicitly deactivate dane by variable.
+       - if: '$ON_DANE == "OFF"'
+         when: never
+       - when: on_success
 
 **After (in .gitlab-ci.yml):**
 
 .. code-block:: yaml
 
-   lassen-build-and-test:
+   dane-build-and-test:
      variables:
-       CI_MACHINE: "lassen"
-     needs: [lassen-up-check]
+       CI_MACHINE: "dane"
+     needs: [dane-up-check]
      extends: [.build-and-test]
+     rules:
+       - if: '$ON_DANE == "OFF"'
+         when: never
+       - when: on_success
      trigger:
        include:
          - local: '.gitlab/custom-jobs.yml'
-         - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/lassen-pipeline@v2025.11.0
+         - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/dane-pipeline@v2025.11.0
            inputs:
              job_cmd: $JOB_CMD
-             job_alloc: $LASSEN_JOB_ALLOC
+             shared_alloc: "--nodes=1 --exclusive --reservation=ci --time=30"
+             job_alloc: "--nodes=1 --reservation=ci"
              github_project_name: $GITHUB_PROJECT_NAME
              github_project_org: $GITHUB_PROJECT_ORG
-         - local: '.gitlab/jobs/lassen.yml'
+         - local: '.gitlab/jobs/dane.yml'
 
 Step 4: Update Custom Jobs (No Changes Required)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -160,17 +168,8 @@ without modification. They still extend the same templates:
 Step 5: Split Custom Files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The legacy ``custom-jobs-and-variables.yml`` should be split into two files:
-
-**Create** ``.gitlab/custom-variables.yml`` (variables only):
-
-.. code-block:: yaml
-
-   # .gitlab/custom-variables.yml
-   variables:
-     LASSEN_JOB_ALLOC: "1 -W 30"
-     DANE_SHARED_ALLOC: "-N 1 -p pdebug -t 30"
-     # ... etc
+If you were using the legacy ``custom-jobs-and-variables.yml`` it should be
+split into two files:
 
 **Create** ``.gitlab/custom-jobs.yml`` (job templates only):
 
@@ -184,6 +183,25 @@ The legacy ``custom-jobs-and-variables.yml`` should be split into two files:
    .custom_perf:
      before_script:
        - echo "Setting up performance environment..."
+
+**Create** ``.gitlab/custom-variables.yml`` (variables only):
+
+.. code-block:: yaml
+
+   # .gitlab/custom-variables.yml
+   variables:
+     LASSEN_JOB_ALLOC: "1 -W 30"
+     DANE_SHARED_ALLOC: "-N 1 -p pdebug -t 30"
+     # ... etc
+
+..note::
+    These files have different purposes and are used in different parts of the pipeline:
+    * ``custom-variables.yml`` is included in the parent pipeline to define
+      variables. This is simply a convenience to gather all allocations information
+      in one place.
+    * ``custom-jobs.yml`` is included in each child pipeline to populate the
+      customization templates if needed. This prevents duplication across child
+      pipelines.  
 
 Complete Example
 ----------------

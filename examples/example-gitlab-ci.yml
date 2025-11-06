@@ -98,41 +98,11 @@ dane-build-and-test:
       - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/dane-pipeline@v2025.11.0
         inputs:
           job_cmd: $JOB_CMD
-          shared_alloc: $DANE_SHARED_ALLOC
-          job_alloc: $DANE_JOB_ALLOC
+          shared_alloc: "--nodes=1 --exclusive --reservation=ci --time=30"
+          job_alloc: "--nodes=1 --reservation=ci"
           github_project_name: $GITHUB_PROJECT_NAME
           github_project_org: $GITHUB_PROJECT_ORG
       - local: '.gitlab/jobs/dane.yml'
-
-# Lassen (LSF-based)
-lassen-up-check:
-  variables:
-    CI_MACHINE: "lassen"
-  extends: [.machine-check]
-  rules:
-    - if: '$ON_LASSEN == "OFF"'
-      when: never
-    - when: on_success
-
-lassen-build-and-test:
-  variables:
-    CI_MACHINE: "lassen"
-  needs: [lassen-up-check]
-  extends: [.build-and-test]
-  rules:
-    - if: '$ON_LASSEN == "OFF"'
-      when: never
-    - when: on_success
-  trigger:
-    include:
-      - local: '.gitlab/custom-jobs.yml'
-      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/lassen-pipeline@v2025.11.0
-        inputs:
-          job_cmd: $JOB_CMD
-          job_alloc: $LASSEN_JOB_ALLOC
-          github_project_name: $GITHUB_PROJECT_NAME
-          github_project_org: $GITHUB_PROJECT_ORG
-      - local: '.gitlab/jobs/lassen.yml'
 
 # Corona (flux-based)
 corona-up-check:
@@ -159,8 +129,8 @@ corona-build-and-test:
       - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/corona-pipeline@v2025.11.0
         inputs:
           job_cmd: $JOB_CMD
-          shared_alloc: $CORONA_SHARED_ALLOC
-          job_alloc: $CORONA_JOB_ALLOC
+          shared_alloc: "--nodes=1 --exclusive --time-limit=30m -o per-resource.count=2"
+          job_alloc: "--nodes=1 --begin-time=+5s"
           github_project_name: $GITHUB_PROJECT_NAME
           github_project_org: $GITHUB_PROJECT_ORG
       - local: '.gitlab/jobs/corona.yml'
@@ -185,6 +155,11 @@ performance-measurements:
       - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/performance-pipeline@v2025.11.0
         inputs:
           job_cmd: "./scripts/run-benchmarks.sh"
+          dane_perf_alloc: "--nodes=1 --exclusive --reservation=ci --time=15"
+          matrix_perf_alloc: "--nodes=1 --exclusive --partition=pdebug --time=15"
+          corona_perf_alloc: "--nodes=1 --exclusive --time-limit=15m"
+          tioga_perf_alloc: "--nodes=1 --exclusive --time-limit=15m"
+          tuolumne_perf_alloc: "--nodes=1 --exclusive --time-limit=15m"
           github_token: $GITHUB_TOKEN
           github_project_name: $GITHUB_PROJECT_NAME
           github_project_org: $GITHUB_PROJECT_ORG

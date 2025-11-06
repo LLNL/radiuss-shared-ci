@@ -24,6 +24,26 @@ spec:
       type: string
       description: "Command to execute for performance measurements"
 
+    dane_job_alloc:
+      type: string
+      description: "SLURM srun arguments for job allocation on Dane"
+
+    matrix_job_alloc:
+      type: string
+      description: "SLURM srun arguments for job allocation on Matrix"
+
+    corona_job_alloc:
+      type: string
+      description: "Flux alloc arguments for job allocation on Corona"
+
+    tioga_job_alloc:
+      type: string
+      description: "Flux alloc arguments for job allocation on Tioga"
+
+    tuolumne_job_alloc:
+      type: string
+      description: "Flux alloc arguments for job allocation on Tuolumne"
+
     perf_processing_cmd:
       type: string
       description: "Command to process performance results"
