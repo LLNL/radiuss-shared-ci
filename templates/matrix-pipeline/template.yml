@@ -102,7 +102,7 @@ stages:
 
 # Custom job template - override this to create project-specific setup
 .custom_job:
-  variable:
+  variables:
     TEMPLATE_CANNOT_BE_EMPTY: "true"
 
 .matrix_reproducer_init:

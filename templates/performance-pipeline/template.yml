@@ -111,7 +111,7 @@ stages:
 # Custom job template specific to performance pipeline.
 # Override this to create project-specific setup.
 .custom_perf:
-  variable:
+  variables:
     TEMPLATE_CANNOT_BE_EMPTY: "true"
 
 .perf_on_dane:
