@@ -24,25 +24,35 @@ spec:
       type: string
       description: "Command to execute for performance measurements"
 
-    dane_job_alloc:
+    dane_perf_alloc:
       type: string
       description: "SLURM srun arguments for job allocation on Dane"
+      default: ""
 
-    matrix_job_alloc:
+    matrix_perf_alloc:
       type: string
       description: "SLURM srun arguments for job allocation on Matrix"
+      default: ""
 
-    corona_job_alloc:
+    corona_perf_alloc:
       type: string
       description: "Flux alloc arguments for job allocation on Corona"
+      default: ""
 
-    tioga_job_alloc:
+    tioga_perf_alloc:
       type: string
       description: "Flux alloc arguments for job allocation on Tioga"
+      default: ""
 
-    tuolumne_job_alloc:
+    tuolumne_perf_alloc:
       type: string
       description: "Flux alloc arguments for job allocation on Tuolumne"
+      default: ""
+
+    lassen_perf_alloc:
+      type: string
+      description: "Lalloc arguments for job allocation on Lassen"
+      default: ""
 
     perf_processing_cmd:
       type: string
@@ -114,95 +124,119 @@ stages:
   variables:
     TEMPLATE_CANNOT_BE_EMPTY: "true"
 
-.perf_on_dane:
-  extends: [.perf_job, .custom_perf]
-  stage: perf-runs
+.on_dane:
   tags:
     - shell
     - dane
   rules:
     - if: '$ON_DANE == "OFF"'
       when: never
+    - if: '$[[ inputs.dane_perf_alloc ]] == ""'
+      when: never
     - when: on_success
-  script:
-    - export PERF_ARTIFACT_DIR=${PERF_ARTIFACT_DIR}/${CI_JOB_NAME}
-    - mkdir -p ${PERF_ARTIFACT_DIR}
-    - srun ${DANE_PERF_ALLOC} ${JOB_CMD}
 
-.perf_on_matrix:
-  extends: [.perf_job, .custom_perf]
-  stage: perf-runs
+.on_matrix:
   tags:
     - shell
     - matrix
   rules:
     - if: '$ON_MATRIX == "OFF"'
       when: never
+    - if: '$[[ inputs.matrix_perf_alloc ]] == ""'
+      when: never
     - when: on_success
-  script:
-    - export PERF_ARTIFACT_DIR=${PERF_ARTIFACT_DIR}/${CI_JOB_NAME}
-    - mkdir -p ${PERF_ARTIFACT_DIR}
-    - srun ${MATRIX_PERF_ALLOC} ${JOB_CMD}
 
-.perf_on_corona:
-  extends: [.perf_job, .custom_perf]
-  stage: perf-runs
+.on_corona:
   tags:
     - shell
     - corona
   rules:
     - if: '$ON_CORONA == "OFF"'
       when: never
+    - if: '$[[ inputs.corona_perf_alloc ]] == ""'
+      when: never
     - when: on_success
-  script:
-    - export PERF_ARTIFACT_DIR=${PERF_ARTIFACT_DIR}/${CI_JOB_NAME}
-    - mkdir -p ${PERF_ARTIFACT_DIR}
-    - srun ${CORONA_PERF_ALLOC} ${JOB_CMD}
 
-.perf_on_tioga:
-  extends: [.perf_job, .custom_perf]
-  stage: perf-runs
+.on_tioga:
   tags:
     - shell
     - tioga
   rules:
     - if: '$ON_TIOGA == "OFF"'
       when: never
+    - if: '$[[ inputs.tioga_perf_alloc ]] == ""'
+      when: never
     - when: on_success
-  script:
-    - export PERF_ARTIFACT_DIR=${PERF_ARTIFACT_DIR}/${CI_JOB_NAME}
-    - mkdir -p ${PERF_ARTIFACT_DIR}
-    - flux run ${TIOGA_PERF_ALLOC} ${JOB_CMD}
 
-.perf_on_tuolumne:
-  extends: [.perf_job, .custom_perf]
-  stage: perf-runs
+.on_tuolumne:
   tags:
     - shell
     - tuolumne
   rules:
     - if: '$ON_TUOLUMNE == "OFF"'
       when: never
+    - if: '$[[ inputs.tuolumne_perf_alloc ]] == ""'
+      when: never
     - when: on_success
-  script:
-    - export PERF_ARTIFACT_DIR=${PERF_ARTIFACT_DIR}/${CI_JOB_NAME}
-    - mkdir -p ${PERF_ARTIFACT_DIR}
-    - flux run ${TUOLUMNE_PERF_ALLOC} ${JOB_CMD}
 
-.perf_on_lassen:
-  extends: [.perf_job, .custom_perf]
-  stage: perf-runs
+.on_lassen:
   tags:
     - shell
     - lassen
   rules:
     - if: '$ON_LASSEN == "OFF"'
       when: never
+    - if: '$[[ inputs.lassen_perf_alloc ]] == ""'
+      when: never
     - when: on_success
+
+.perf_on_dane:
+  extends: [.perf_job, .on_dane, .custom_perf]
+  stage: perf-runs
   script:
     - export PERF_ARTIFACT_DIR=${PERF_ARTIFACT_DIR}/${CI_JOB_NAME}
     - mkdir -p ${PERF_ARTIFACT_DIR}
-    - lalloc ${LASSEN_PERF_ALLOC} ${JOB_CMD}
+    - srun $[[ inputs.dane_perf_alloc ]] ${JOB_CMD}
+
+.perf_on_matrix:
+  extends: [.perf_job, .on_matrix, .custom_perf]
+  stage: perf-runs
+  script:
+    - export PERF_ARTIFACT_DIR=${PERF_ARTIFACT_DIR}/${CI_JOB_NAME}
+    - mkdir -p ${PERF_ARTIFACT_DIR}
+    - srun $[[ inputs.matrix_perf_alloc ]] ${JOB_CMD}
+
+.perf_on_corona:
+  extends: [.perf_job, .on_corona, .custom_perf]
+  stage: perf-runs
+  script:
+    - export PERF_ARTIFACT_DIR=${PERF_ARTIFACT_DIR}/${CI_JOB_NAME}
+    - mkdir -p ${PERF_ARTIFACT_DIR}
+    - srun $[[ inputs.corona_perf_alloc ]] ${JOB_CMD}
+
+.perf_on_tioga:
+  extends: [.perf_job, .on_tioga, .custom_perf]
+  stage: perf-runs
+  script:
+    - export PERF_ARTIFACT_DIR=${PERF_ARTIFACT_DIR}/${CI_JOB_NAME}
+    - mkdir -p ${PERF_ARTIFACT_DIR}
+    - flux run $[[ inputs.tioga_perf_alloc ]] ${JOB_CMD}
+
+.perf_on_tuolumne:
+  extends: [.perf_job, .on_tuolumne, .custom_perf]
+  stage: perf-runs
+  script:
+    - export PERF_ARTIFACT_DIR=${PERF_ARTIFACT_DIR}/${CI_JOB_NAME}
+    - mkdir -p ${PERF_ARTIFACT_DIR}
+    - flux run $[[ inputs.tuolumne_perf_alloc ]] ${JOB_CMD}
+
+.perf_on_lassen:
+  extends: [.perf_job, .on_lassen, .custom_perf]
+  stage: perf-runs
+  script:
+    - export PERF_ARTIFACT_DIR=${PERF_ARTIFACT_DIR}/${CI_JOB_NAME}
+    - mkdir -p ${PERF_ARTIFACT_DIR}
+    - lalloc $[[ inputs.lassen_perf_alloc ]] ${JOB_CMD}
 
 ##############################################################################
 # PROCESSING AND REPORTING TEMPLATES
