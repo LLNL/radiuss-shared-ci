@@ -95,6 +95,10 @@ stages:
     - if: '$ON_TUOLUMNE == "OFF"'
       when: never
     - when: on_success
+  timeout: 1h
+  variables:
+    RUNNER_SCRIPT_TIMEOUT: 55m
+    RUNNER_AFTER_SCRIPT_TIMEOUT: 5m
   script:
     - export PERF_ARTIFACT_DIR=${PERF_ARTIFACT_DIR}/${CI_JOB_NAME}
     - mkdir -p ${PERF_ARTIFACT_DIR}
