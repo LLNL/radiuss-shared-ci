@@ -173,8 +173,6 @@ to your project. They are described in the following table:
   ``LLNL_SERVICE_USER``                      Project specific Service User Account used in CI (optional but recommeded)
   ``CUSTOM_CI_BUILD_DIR``                    If not using a service user, where to locate the CI working directories (prevent exceeding your disk quota)
   ``GIT_SUBMODULES_STRATEGY``                Controls strategy for the clone performed by GitLab. Consider ``recursive`` if you have submodules, otherwise comment it.
-  ``BUILD_ROOT``                             Location (path) where the projects should be built. We provide a sensible default.
-  ``SHARED_CI_REF``                          The reference (branch, tag) you would like to use in RADIUSS Shared CI repository
   ``GITHUB_PROJECT_NAME``                    The Project name on GitHub, used to send status updates
   ``GITHUB_PROJECT_ORG``                     The Project organization on GitHub, used to send status updates
   ``JOB_CMD``                                The command that runs the build and test script. Lets you name and store that script however you like.
@@ -236,7 +234,7 @@ details can be found in the file itself.
   Parameter                                  Description
  ========================================== ==========================================================================================================================
   ``ALLOC_NAME``                             Name of the shared allocation. Should be unique, our default should be fine.
-  ``<MACHINE>_SHARED_ALLOC``                 Parameters for the shared allocation. You may extend the resource and time.
+  ``<MACHINE>_SHARED_ALLOC``                 Optional: Parameters for the shared allocation. You may extend the resource and time.
   ``<MACHINE>_JOB_ALLOC``                    Parameters for the job allocation. You may extend the resource and time within the scope of the shared allocation.
   ``PROJECT_<MACHINE>_VARIANTS``             Global variants to be added to all the shared specs.
   ``PROJECT_<MACHINE>_DEPS``                 Global dependencies to be added to all the shared specs.
