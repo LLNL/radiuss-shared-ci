@@ -194,7 +194,7 @@ split into two files, which are both optional:
      DANE_SHARED_ALLOC: "-N 1 -p pdebug -t 30"
      # ... etc
 
-..note::
+.. note::
     These files have different purposes and are used in different parts of the
     pipeline:
     * ``custom-variables.yml`` is included in the parent pipeline to define
@@ -269,13 +269,7 @@ Each provides machine-specific CI templates.
 
 * ``job_alloc`` - LSF allocation arguments (e.g., "1 -W 30")
 
-**SLURM-specific (Dane, Matrix):**
-
-* ``shared_alloc`` - Shared allocation args or "OFF"
-* ``job_alloc`` - Per-job allocation args
-* ``alloc_name`` - Name for shared allocation
-
-**flux-specific (Corona, Tioga, Tuolumne):**
+**SLURM/ Flux-specific (Dane, Matrix, Corona, Tioga, Tuolumne):**
 
 * ``shared_alloc`` - Shared allocation args or "OFF"
 * ``job_alloc`` - Per-job allocation args
@@ -320,8 +314,11 @@ Provides templates for performance measurements across machines.
 **Inputs:**
 
 * ``job_cmd`` - Performance measurement command
+* ``<machine>_perf_alloc`` (optional) - Per job allocation args, specify for the machine(s) you want to use
 * ``perf_processing_cmd`` - Results processing command
 * ``perf_artifact_dir`` (optional) - Artifacts directory
+* ``perf_results_file`` (optional) - Name of raw results file
+* ``perf_processed_file`` (optional) - Name of processed results file
 * ``github_token`` (optional) - For GitHub reporting
 * ``github_project_name`` (optional)
 * ``github_project_org`` (optional)

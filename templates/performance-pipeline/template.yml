@@ -17,6 +17,7 @@
 #       inputs:
 #         job_cmd: "./scripts/run-benchmarks.sh"
 #         perf_processing_cmd: "./scripts/convert-to-gh-benchmark.py"
+#         <machine>_perf_alloc: <machine job allocation args>
 
 spec:
   inputs:
