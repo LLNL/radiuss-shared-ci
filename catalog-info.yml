@@ -29,10 +29,6 @@ spec:
       description: >
         Tuolumne specific CI pipeline component that runs build and test jobs.
         Uses flux scheduler with shared allocation optimization.
-    corona-pipeline:
-      description: >
-        Corona specific CI pipeline component that runs build and test jobs.
-        Uses flux scheduler with shared allocation optimization.
     dane-pipeline:
       description: >
         Dane specific CI pipeline component that runs build and test jobs.
