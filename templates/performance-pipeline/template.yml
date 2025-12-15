@@ -13,7 +13,7 @@
 #
 # Usage:
 #   include:
-#     - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/performance-pipeline@v2025.11.0
+#     - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/performance-pipeline@v2025.12.0
 #       inputs:
 #         job_cmd: "./scripts/run-benchmarks.sh"
 #         perf_processing_cmd: "./scripts/convert-to-gh-benchmark.py"
