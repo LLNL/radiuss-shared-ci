@@ -1,0 +1,204 @@
+---
+##############################################################################
+# Copyright (c) 2022-25, Lawrence Livermore National Security, LLC and RADIUSS
+# project contributors. See the COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: (MIT)
+##############################################################################
+
+# GitLab CI Component: Base Pipeline
+#
+# This component provides templates and utilities for orchestrating
+# multi-machine CI pipelines with child pipeline triggers, machine
+# availability checks, and GitHub status reporting.
+#
+# Usage:
+#   include:
+#     - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/base-pipeline@v2025.12.0
+#       inputs:
+#         github_project_name: "my-project"
+#         github_project_org: "LLNL"
+
+spec:
+  inputs:
+    github_project_name:
+      type: string
+      description: "GitHub project name for status reporting"
+
+    github_project_org:
+      type: string
+      description: "GitHub organization name"
+
+    github_token:
+      type: string
+      description: "GitHub personal access token"
+      default: ""
+
+---
+# Sets ID tokens for every job using `default:`
+include:
+  - project: 'lc-templates/id_tokens'
+    file: 'id_tokens.yml'
+
+variables:
+  GITHUB_PROJECT_NAME: "$[[ inputs.github_project_name ]]"
+  GITHUB_PROJECT_ORG: "$[[ inputs.github_project_org ]]"
+  GITHUB_TOKEN: "$[[ inputs.github_token ]]"
+
+##############################################################################
+# IMPORTANT: Stage Definition
+#
+# This component does NOT define stages to allow projects to customize their
+# pipeline stages. Your .gitlab-ci.yml MUST include these required stages:
+#
+#   stages:
+#     - prerequisites      # Required for machine availability checks
+#     - build-and-test     # Required for build-and-test jobs
+#     - performance-measurements  # Required if using performance pipeline
+#     # Add your custom stages here as needed
+#
+# Jobs in this component reference these stage names.
+##############################################################################
+
+##############################################################################
+# TEMPLATES
+
+# Template to check if a machine is available
+# Projects should extend this for each machine
+.machine-check:
+  stage: prerequisites
+  tags: [shell, oslic]
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - |
+      # Check if required variables are set for machine checking
+      if [ -z "$CI_MACHINE" ]; then
+        echo -e "\e[31mError: CI_MACHINE variable not set\e[0m"
+        exit 1
+      fi
+
+      # Check if lorenz status file exists
+      LORENZ_STATUS_FILE="/usr/global/tools/lorenz/data/loginnodeStatus"
+      if [ ! -f "$LORENZ_STATUS_FILE" ]; then
+        echo -e "\e[31mError: Lorenz status file not found: $LORENZ_STATUS_FILE\e[0m"
+        exit 1
+      fi
+
+      echo "Checking availability of machine: ${CI_MACHINE}"
+
+      # Query machine status with error handling
+      NODES_UP=$(jq -r ".[\"${CI_MACHINE}\"].total_nodes_up // \"null\"" "$LORENZ_STATUS_FILE" 2>/dev/null)
+      JQ_EXIT_CODE=$?
+
+      if [ $JQ_EXIT_CODE -ne 0 ]; then
+        echo -e "\e[31mError: Failed to parse lorenz status file\e[0m"
+        echo "File content sample:"
+        head -n 5 "$LORENZ_STATUS_FILE" 2>/dev/null || echo "Cannot read file"
+        exit 1
+      fi
+
+      if [ "$NODES_UP" = "null" ]; then
+        echo -e "\e[31mError: Machine ${CI_MACHINE} not found in status file\e[0m"
+        echo "Available machines in status file:"
+        jq -r 'keys[]' "$LORENZ_STATUS_FILE" 2>/dev/null | head -10 || echo "Cannot list machines"
+        exit 1
+      fi
+
+      # Check if machine is available - report to GitHub
+      if [ "$NODES_UP" -eq 0 ]; then
+        echo -e "\e[31mMachine ${CI_MACHINE} is down (${NODES_UP} nodes up)\e[0m"
+
+        # Report machine unavailability to GitHub
+        if [ -n "$[[ inputs.github_token ]]" ] && [ -n "$[[ inputs.github_project_org ]]" ] && [ -n "$[[ inputs.github_project_name ]]" ]; then
+          STATUS_RESPONSE=$(mktemp)
+          STATUS_HTTP_CODE=$(curl --retry 3 --retry-delay 5 --max-time 30 \
+              --url "https://api.github.com/repos/$[[ inputs.github_project_org ]]/$[[ inputs.github_project_name ]]/statuses/${CI_COMMIT_SHA}" \
+              --header 'Content-Type: application/json' \
+              --header "authorization: Bearer $[[ inputs.github_token ]]" \
+              --data "{ \"state\": \"failure\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab: ${CI_MACHINE} down (0 nodes)\", \"context\": \"ci/gitlab/${CI_MACHINE}\" }" \
+              --output "$STATUS_RESPONSE" \
+              --write-out "%{http_code}" \
+              --silent \
+              --show-error)
+
+          echo "GitHub Status API response code: $STATUS_HTTP_CODE"
+
+          if [ "$STATUS_HTTP_CODE" -eq 201 ]; then
+            echo "Successfully reported machine down status to GitHub"
+          else
+            echo "Warning: Failed to report status to GitHub. HTTP status: $STATUS_HTTP_CODE"
+            echo "Response body:"
+            cat "$STATUS_RESPONSE"
+          fi
+
+          rm -f "$STATUS_RESPONSE"
+        else
+          echo "Warning: GitHub reporting variables not set, skipping GitHub status update"
+        fi
+
+        exit 1
+      else
+        echo -e "\e[32m${CI_MACHINE} is available (${NODES_UP} nodes up)\e[0m"
+      fi
+
+# Template for triggering build-and-test child pipelines
+# Projects should extend this for each machine
+.build-and-test:
+  stage: build-and-test
+  trigger:
+    strategy: depend
+    forward:
+      pipeline_variables: true
+
+# Template for triggering perf measurments child pipelines
+.performance-measurements:
+  stage: performance-measurements
+  trigger:
+    strategy: depend
+    forward:
+      pipeline_variables: true
+
+# Templates for each machine in top-level pipeline:
+# This allows reducing duplication when defining the machine checks
+# and sub-pipeline trigger jobs.
+.dane:
+  variables:
+    CI_MACHINE: "dane"
+  rules:
+    # Runs except if we explicitly deactivate dane by variable.
+    - if: '$ON_DANE == "OFF"'
+      when: never
+    - when: on_success
+
+.matrix:
+  variables:
+    CI_MACHINE: "matrix"
+  rules:
+    - if: '$ON_MATRIX == "OFF"'
+      when: never
+    - when: on_success
+
+.corona:
+  variables:
+    CI_MACHINE: "corona"
+  rules:
+    - if: '$ON_CORONA == "OFF"'
+      when: never
+    - when: on_success
+
+.tioga:
+  variables:
+    CI_MACHINE: "tioga"
+  rules:
+    - if: '$ON_TIOGA == "OFF"'
+      when: never
+    - when: on_success
+
+.tuolumne:
+  variables:
+    CI_MACHINE: "tuolumne"
+  rules:
+    - if: '$ON_TUOLUMNE == "OFF"'
+      when: never
+    - when: on_success

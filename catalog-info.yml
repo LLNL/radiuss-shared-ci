@@ -1,0 +1,47 @@
+---
+# GitLab CI/CD Catalog metadata for RADIUSS Shared CI
+spec:
+  inputs:
+    # This catalog provides reusable components for RADIUSS projects
+    # See README.md for usage examples
+  components:
+    utility-draft-pr-filter:
+      description: >
+        Filters draft pull requests to skip CI execution until PR is marked ready.
+        Requires GitHub integration with GITHUB_TOKEN.
+    utility-branch-skip:
+      description: >
+        Skips CI execution on branches that are not associated with pull requests.
+        Requires GitHub integration with GITHUB_TOKEN.
+    base-pipeline:
+      description: >
+        Main pipeline setup component that orchestrates machine-specific child pipelines,
+        handles GitHub status reporting, and manages multi-machine CI execution.
+    corona-pipeline:
+      description: >
+        Corona specific CI pipeline component that runs build and test jobs.
+        Uses flux scheduler with shared allocation optimization.
+    tioga-pipeline:
+      description: >
+        Tioga specific CI pipeline component that runs build and test jobs.
+        Uses flux scheduler with shared allocation optimization.
+    tuolumne-pipeline:
+      description: >
+        Tuolumne specific CI pipeline component that runs build and test jobs.
+        Uses flux scheduler with shared allocation optimization.
+    dane-pipeline:
+      description: >
+        Dane specific CI pipeline component that runs build and test jobs.
+        Uses SLURM scheduler with shared allocation optimization.
+    matrix-pipeline:
+      description: >
+        Matrix specific CI pipeline component that runs build and test jobs.
+        Uses SLURM scheduler with shared allocation optimization.
+    lassen-pipeline:
+      description: >
+        Lassen specific CI pipeline component that runs build and test jobs.
+        Uses LSF scheduler.
+    performance-pipeline:
+      description: >
+        Performance measurement pipeline for running and tracking performance tests
+        across LLNL supercomputers.

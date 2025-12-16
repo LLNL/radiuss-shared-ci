@@ -1,0 +1,174 @@
+---
+##############################################################################
+# Copyright (c) 2022-25, Lawrence Livermore National Security, LLC and RADIUSS
+# project contributors. See the COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: (MIT)
+##############################################################################
+
+# GitLab CI Component: Matrix Pipeline
+#
+# This component provides CI pipeline templates for running jobs on the
+# Matrix supercomputer using the SLURM scheduler with shared allocation support.
+#
+# Usage:
+#   include:
+#     - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/matrix-pipeline@v2025.12.0
+#       inputs:
+#         job_cmd: "./scripts/build-and-test.sh"
+#         shared_alloc: "-N 1 -p pdebug -t 30"
+#         job_alloc: "-n 1"
+#         github_project_name: "my-project"
+#         github_project_org: "LLNL"
+
+spec:
+  inputs:
+    job_cmd:
+      type: string
+      description: "Command to execute for build and test"
+
+    shared_alloc:
+      type: string
+      description: "SLURM salloc arguments for shared allocation (or OFF to disable)"
+      default: ""
+
+    job_alloc:
+      type: string
+      description: "SLURM srun arguments for individual jobs"
+
+    github_project_name:
+      type: string
+      description: "GitHub project name for status reporting"
+
+    github_project_org:
+      type: string
+      description: "GitHub organization name"
+
+    llnl_service_user:
+      type: string
+      description: "LLNL service user account for CI"
+      default: ""
+
+    alloc_name:
+      type: string
+      description: "Name for shared resource allocation"
+      default: "ALLOC_${CI_PIPELINE_ID}"
+
+---
+# Sets ID tokens for every job using `default:`
+include:
+  - project: 'lc-templates/id_tokens'
+    file: 'id_tokens.yml'
+
+variables:
+  JOB_CMD: "$[[ inputs.job_cmd | expand_vars ]]"
+  MATRIX_SHARED_ALLOC: "$[[ inputs.shared_alloc ]]"
+  MATRIX_JOB_ALLOC: "$[[ inputs.job_alloc ]]"
+  GITHUB_PROJECT_NAME: "$[[ inputs.github_project_name ]]"
+  GITHUB_PROJECT_ORG: "$[[ inputs.github_project_org ]]"
+  LLNL_SERVICE_USER: "$[[ inputs.llnl_service_user ]]"
+  ALLOC_NAME: "$[[ inputs.alloc_name ]]"
+
+stages:
+  - is-machine-up
+  - allocate-resources
+  - jobs-stage-1
+  - jobs-stage-2
+  - jobs-stage-3
+  - release-resources
+
+##############################################################################
+# UTILITIES
+
+.on_matrix:
+  tags:
+    - shell
+    - matrix
+  rules:
+    # Runs except if we explicitly deactivate matrix by variable
+    - if: '$ON_MATRIX == "OFF"'
+      when: never
+    # Advanced jobs can only run on main, develop or if ALL_TARGETS is ON
+    - if: '$ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH != "main" && $CI_COMMIT_BRANCH != "develop" && $ALL_TARGETS != "ON"'
+      when: never
+    # Do not allocate resource if the required variable is set to OFF
+    - if: '$CI_JOB_NAME =~ /resources/ && $MATRIX_SHARED_ALLOC == "OFF"'
+      when: never
+    # We should always release resources allocated in the pipeline
+    - if: '$CI_JOB_NAME =~ /release_resources/'
+      when: always
+    # Default: run on success
+    - when: on_success
+
+# Custom job template - override this to create project-specific setup
+.custom_job:
+  variables:
+    TEMPLATE_CANNOT_BE_EMPTY: "true"
+
+.matrix_reproducer_init:
+  script:
+    - |
+      echo -e "\e[7;32m### CI job ${CI_JOB_ID} reproducer on matrix (${SYS_TYPE}) \e[0m"
+      if [[ -n "${LLNL_SERVICE_USER}" ]]; then echo -e "xsu ${LLNL_SERVICE_USER}"; fi
+      echo -e "
+      working_dir=\"/usr/workspace/\${USER}/${GITHUB_PROJECT_NAME}/${CI_JOB_ID}-\$(date +%s)\" \n
+      mkdir -p \${working_dir} && cd \${working_dir} \n
+      git clone https://github.com/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}.git --single-branch --depth=1 \n
+      cd ${GITHUB_PROJECT_NAME} \n
+      git fetch origin --depth=1 ${CI_COMMIT_SHA} \n
+      git checkout ${CI_COMMIT_SHA} \n
+      git submodule update --init --recursive \n"
+
+.matrix_reproducer_vars:
+  script:
+    - |
+      echo -e "# Define project specific variables here if any."
+      #echo -e "export <CUSTOM_VAR>=\"\${<CUSTOM_VAR>}\""
+
+.matrix_reproducer_job:
+  script:
+    - |
+      echo -e "srun ${MATRIX_JOB_ALLOC} ${JOB_CMD}"
+      echo -e "\e[7;32m### End of reproducer\e[0m"
+
+.matrix_job_command:
+  script:
+    - echo -e ${JOB_CMD} | xargs srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) ${MATRIX_JOB_ALLOC}
+
+.job_on_matrix:
+  extends: [.custom_job, .on_matrix]
+  stage: jobs-stage-1
+  script:
+    # Allocation information
+    - echo -e "### Allocation name is ${ALLOC_NAME}"
+    - export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
+    - echo -e "### Job ID is ${JOBID}"
+    # Print a reproducer
+    - !reference [.matrix_reproducer_init, script]
+    - !reference [.matrix_reproducer_vars, script]
+    - !reference [.matrix_reproducer_job, script]
+    # The actual launch command
+    - !reference [.matrix_job_command, script]
+
+##############################################################################
+# RESOURCE MANAGEMENT JOBS
+
+# In pre-build phase, allocate a node for builds
+allocate_resources:
+  variables:
+    GIT_STRATEGY: none
+  extends: .on_matrix
+  stage: allocate-resources
+  script:
+    - salloc ${MATRIX_SHARED_ALLOC} --no-shell --job-name=${ALLOC_NAME}
+
+# In post-build phase, deallocate resources
+# This runs even on failure using the rule in .on_matrix
+release_resources:
+  variables:
+    GIT_STRATEGY: none
+  extends: .on_matrix
+  stage: release-resources
+  script:
+    - export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
+    - ([[ -n "${JOBID}" ]] && scancel ${JOBID} || exit 0)

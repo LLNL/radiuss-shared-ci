@@ -1,0 +1,144 @@
+###############################################################################
+# Copyright (c) 2022-25, Lawrence Livermore National Security, LLC and RADIUSS
+# project contributors. See the COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: (MIT)
+###############################################################################
+
+# Example .gitlab-ci.yml for consuming projects using GitLab CI Components
+#
+# This file demonstrates how to use the RADIUSS Shared CI components instead
+# of the legacy include-based approach.
+#
+# MIGRATION: This replaces the customization/gitlab-ci.yml template
+
+###############################################################################
+# STAGES
+###############################################################################
+# IMPORTANT: You must define stages yourself to allow customization.
+# The following stages are REQUIRED by RADIUSS Shared CI components:
+
+stages:
+  - prerequisites           # Required: machine availability checks
+  - build-and-test          # Required: build and test jobs
+  - performance-measurements # Required: if using performance pipeline
+  # Add your custom stages here:
+  # - custom-stage-1
+  # - custom-stage-2
+
+###############################################################################
+# VARIABLES
+###############################################################################
+
+variables:
+  # Service user configuration
+  LLNL_SERVICE_USER: ""  # Set to your service user if using one
+
+  # GitHub integration (required for status reporting)
+  GITHUB_PROJECT_NAME: "my-project"
+  GITHUB_PROJECT_ORG: "LLNL"
+  # GITHUB_TOKEN should be set as a CI/CD variable in GitLab settings
+
+  # Build configuration
+  GIT_SUBMODULE_STRATEGY: recursive
+
+  # Job command - use non-expandable variables for flexibility
+  JOB_CMD:
+    value: "./scripts/build-and-test.sh"
+    expand: false
+
+###############################################################################
+# INCLUDES
+###############################################################################
+
+include:
+  # Base pipeline templates and utilities
+  - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/base-pipeline@v2025.12.0
+    inputs:
+      github_project_name: $GITHUB_PROJECT_NAME
+      github_project_org: $GITHUB_PROJECT_ORG
+      github_token: $GITHUB_TOKEN
+
+  # Optional: Draft PR filter
+  - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/utility-draft-pr-filter@v2025.12.0
+    inputs:
+      github_token: $GITHUB_TOKEN
+      github_project_name: $GITHUB_PROJECT_NAME
+      github_project_org: $GITHUB_PROJECT_ORG
+
+  # Local variables (used for component inputs and forwarded to child pipelines)
+  - local: '.gitlab/custom-variables.yml'
+
+###############################################################################
+# MACHINE PIPELINES
+###############################################################################
+
+# Dane (SLURM-based)
+dane-up-check:
+  extends: [.dane, .machine-check]
+
+dane-build-and-test:
+  needs: [dane-up-check]
+  extends: [.dane, .build-and-test]
+  trigger:
+    include:
+      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/dane-pipeline@v2025.12.0
+        inputs:
+          job_cmd: $JOB_CMD
+          shared_alloc: "--nodes=1 --exclusive --reservation=ci --time=30"
+          job_alloc: "--nodes=1 --reservation=ci"
+          github_project_name: $GITHUB_PROJECT_NAME
+          github_project_org: $GITHUB_PROJECT_ORG
+      # OPTIONAL - local: '.gitlab/custom-jobs.yml'
+      - local: '.gitlab/jobs/dane.yml'
+
+# Corona (flux-based)
+corona-up-check:
+  extends: [.corona, .machine-check]
+
+corona-build-and-test:
+  needs: [corona-up-check]
+  extends: [.corona, .build-and-test]
+  trigger:
+    include:
+      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/corona-pipeline@v2025.12.0
+        inputs:
+          job_cmd: $JOB_CMD
+          shared_alloc: "--nodes=1 --exclusive --time-limit=30m -o per-resource.count=2"
+          job_alloc: "--nodes=1 --begin-time=+5s"
+          github_project_name: $GITHUB_PROJECT_NAME
+          github_project_org: $GITHUB_PROJECT_ORG
+      # OPTIONAL - local: '.gitlab/custom-jobs.yml'
+      - local: '.gitlab/jobs/corona.yml'
+
+# Add similar blocks for: matrix, tioga, tuolumne
+# (See full template for all machines)
+
+###############################################################################
+# PERFORMANCE PIPELINE (Optional)
+###############################################################################
+
+performance-measurements:
+  extends: [.performance-measurements]
+  rules:
+    # Add conditions for when to run performance tests
+    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "develop"'
+      when: on_success
+    - when: manual
+  trigger:
+    include:
+      - component: $CI_SERVER_FQDN/radiuss/radiuss-shared-ci/performance-pipeline@v2025.12.0
+        inputs:
+          job_cmd: "./scripts/run-benchmarks.sh"
+          dane_perf_alloc: "--nodes=1 --exclusive --reservation=ci --time=15"
+          matrix_perf_alloc: "--nodes=1 --exclusive --partition=pdebug --time=15"
+          corona_perf_alloc: "--nodes=1 --exclusive --time-limit=15m"
+          tioga_perf_alloc: "--nodes=1 --exclusive --time-limit=15m"
+          tuolumne_perf_alloc: "--nodes=1 --exclusive --time-limit=15m"
+          # No perf alloc information for lassen: the perf jobs will not run on lassen.
+          github_token: $GITHUB_TOKEN
+          github_project_name: $GITHUB_PROJECT_NAME
+          github_project_org: $GITHUB_PROJECT_ORG
+      # OPTIONAL - local: '.gitlab/custom-jobs.yml'
+      - local: '.gitlab/custom-jobs.yml'
+      - local: '.gitlab/jobs/performances.yml'
