@@ -49,7 +49,7 @@ copyright = u'2021-25, Adrien M. Bernede'
 author = u'Adrien M. Bernede'
 
 # The full version, including alpha/beta/rc tags
-release = u'2025.06.0'
+release = u'2025.12.0'
 
 
 # List of patterns, relative to source directory, that match files and

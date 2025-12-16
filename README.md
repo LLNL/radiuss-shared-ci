@@ -79,7 +79,7 @@ conduct, and the process for submitting pull requests to us.
 
 ## Versioning
 
-version: v2025.06.0
+version: v2025.12.0
 
 When a new version of RADIUSS Shared CI is released, we use the current year and month to set the version number,
 followed by a "minor" index which we increase in case we need a hotfix.
