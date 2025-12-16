@@ -6,6 +6,46 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2025.12.1 - 2025-12-16 ]
+
+Major Migration: GitLab CI Components Architecture (v2025.12.0).
+
+Key Transformation:
+The repository has been completely restructured from a traditional include-based CI configuration to GitLab CI Components (requires GitLab 17.0+), representing a fundamental modernization of the CI infrastructure.
+
+What's New:
+
+1. GitLab CI Components Catalog (47 commits)
+- Added catalog-info.yml defining 9 reusable components
+- Creates a browsable CI/CD catalog in GitLab's interface
+- Versioned components with type-safe inputs
+
+2. Component Templates Added (~2,580 lines of new code)
+- Base Pipeline (templates/base-pipeline/) - Main orchestration component
+- Machine-Specific Pipelines (7 components):
+  - corona-pipeline, tioga-pipeline, tuolumne-pipeline (Flux scheduler)
+  - dane-pipeline, matrix-pipeline (SLURM scheduler)
+  - lassen-pipeline (LSF scheduler)
+- Performance Pipeline (templates/performance-pipeline/) - 338 lines
+- Utility Components:
+  - utility-draft-pr-filter - Skip CI on draft PRs
+  - utility-branch-skip - Skip CI on non-PR branches
+
+3. Documentation & Examples
+- New migration guide: docs/sphinx/user_guide/components_migration.rst (380 lines)
+- Example configurations:
+  - examples/example-gitlab-ci.yml - Complete component usage
+  - examples/example-custom-jobs.yml - Custom job definitions
+  - examples/example-jobs-lassen.yml - Machine-specific examples
+
+Benefits of the New Architecture:
+
+- Better versioning - @v2025.12.0 syntax instead of ref:
+- Type safety - Validated component inputs
+- Cleaner syntax - component: instead of include: project:
+- No duplication - Reusable, parameterized templates
+- Discoverable - Browse components in GitLab CI/CD Catalog
+
 ## [v2025.09.1 - 2025-10-01 ]
 
 - Improved handling of curl commands errors.
