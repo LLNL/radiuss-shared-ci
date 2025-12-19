@@ -132,7 +132,7 @@ stages:
   rules:
     - if: '$ON_DANE == "OFF"'
       when: never
-    - if: '$[[ inputs.dane_perf_alloc ]] == ""'
+    - if: '"$[[ inputs.dane_perf_alloc ]]" == ""'
       when: never
     - when: on_success
 
@@ -143,7 +143,7 @@ stages:
   rules:
     - if: '$ON_MATRIX == "OFF"'
       when: never
-    - if: '$[[ inputs.matrix_perf_alloc ]] == ""'
+    - if: '"$[[ inputs.matrix_perf_alloc ]]" == ""'
       when: never
     - when: on_success
 
@@ -154,7 +154,7 @@ stages:
   rules:
     - if: '$ON_CORONA == "OFF"'
       when: never
-    - if: '$[[ inputs.corona_perf_alloc ]] == ""'
+    - if: '"$[[ inputs.corona_perf_alloc ]]" == ""'
       when: never
     - when: on_success
 
@@ -165,7 +165,7 @@ stages:
   rules:
     - if: '$ON_TIOGA == "OFF"'
       when: never
-    - if: '$[[ inputs.tioga_perf_alloc ]] == ""'
+    - if: '"$[[ inputs.tioga_perf_alloc ]]" == ""'
       when: never
     - when: on_success
 
@@ -176,7 +176,7 @@ stages:
   rules:
     - if: '$ON_TUOLUMNE == "OFF"'
       when: never
-    - if: '$[[ inputs.tuolumne_perf_alloc ]] == ""'
+    - if: '"$[[ inputs.tuolumne_perf_alloc ]]" == ""'
       when: never
     - when: on_success
 
@@ -187,7 +187,7 @@ stages:
   rules:
     - if: '$ON_LASSEN == "OFF"'
       when: never
-    - if: '$[[ inputs.lassen_perf_alloc ]] == ""'
+    - if: '"$[[ inputs.lassen_perf_alloc ]]" == ""'
       when: never
     - when: on_success
 
