@@ -38,7 +38,11 @@ stages:
   script:
     - export PERF_ARTIFACT_DIR=${PERF_ARTIFACT_DIR}/${CI_JOB_NAME}
     - mkdir -p ${PERF_ARTIFACT_DIR}
-    - srun ${DANE_PERF_ALLOC} ${JOB_CMD}
+    - srun --job-name=${CI_JOB_NAME}_${CI_JOB_ID}_perf ${DANE_PERF_ALLOC} ${JOB_CMD}
+  after_script:
+    - |
+      echo "Cancelling srun job if still running..."
+      scancel --name=${CI_JOB_NAME}_${CI_JOB_ID}_perf 2>/dev/null || true
 
 .perf_on_matrix:
   extends: [.perf_job, .custom_perf]
@@ -53,7 +57,11 @@ stages:
   script:
     - export PERF_ARTIFACT_DIR=${PERF_ARTIFACT_DIR}/${CI_JOB_NAME}
     - mkdir -p ${PERF_ARTIFACT_DIR}
-    - srun ${MATRIX_PERF_ALLOC} ${JOB_CMD}
+    - srun --job-name=${CI_JOB_NAME}_${CI_JOB_ID}_perf ${MATRIX_PERF_ALLOC} ${JOB_CMD}
+  after_script:
+    - |
+      echo "Cancelling srun job if still running..."
+      scancel --name=${CI_JOB_NAME}_${CI_JOB_ID}_perf 2>/dev/null || true
 
 .perf_on_corona:
   extends: [.perf_job, .custom_perf]
@@ -68,7 +76,11 @@ stages:
   script:
     - export PERF_ARTIFACT_DIR=${PERF_ARTIFACT_DIR}/${CI_JOB_NAME}
     - mkdir -p ${PERF_ARTIFACT_DIR}
-    - srun ${CORONA_PERF_ALLOC} ${JOB_CMD}
+    - srun --job-name=${CI_JOB_NAME}_${CI_JOB_ID}_perf ${CORONA_PERF_ALLOC} ${JOB_CMD}
+  after_script:
+    - |
+      echo "Cancelling srun job if still running..."
+      scancel --name=${CI_JOB_NAME}_${CI_JOB_ID}_perf 2>/dev/null || true
 
 .perf_on_tioga:
   extends: [.perf_job, .custom_perf]
@@ -83,7 +95,11 @@ stages:
   script:
     - export PERF_ARTIFACT_DIR=${PERF_ARTIFACT_DIR}/${CI_JOB_NAME}
     - mkdir -p ${PERF_ARTIFACT_DIR}
-    - flux run ${TIOGA_PERF_ALLOC} ${JOB_CMD}
+    - flux run --job-name=${CI_JOB_NAME}_${CI_JOB_ID}_perf ${TIOGA_PERF_ALLOC} ${JOB_CMD}
+  after_script:
+    - |
+      echo "Cancelling flux job if still running..."
+      flux cancel $(flux jobs --filter=pending,running --name=${CI_JOB_NAME}_${CI_JOB_ID}_perf --no-header -o {id}) 2>/dev/null || true
 
 .perf_on_tuolumne:
   extends: [.perf_job, .custom_perf]
@@ -98,7 +114,11 @@ stages:
   script:
     - export PERF_ARTIFACT_DIR=${PERF_ARTIFACT_DIR}/${CI_JOB_NAME}
     - mkdir -p ${PERF_ARTIFACT_DIR}
-    - flux run ${TUOLUMNE_PERF_ALLOC} ${JOB_CMD}
+    - flux run --job-name=${CI_JOB_NAME}_${CI_JOB_ID}_perf ${TUOLUMNE_PERF_ALLOC} ${JOB_CMD}
+  after_script:
+    - |
+      echo "Cancelling flux job if still running..."
+      flux cancel $(flux jobs --filter=pending,running --name=${CI_JOB_NAME}_${CI_JOB_ID}_perf --no-header -o {id}) 2>/dev/null || true
 
 .perf_on_lassen:
   extends: [.perf_job, .custom_perf]
