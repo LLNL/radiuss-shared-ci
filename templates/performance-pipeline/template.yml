@@ -37,7 +37,7 @@ spec:
 
     corona_perf_alloc:
       type: string
-      description: "Flux alloc arguments for job allocation on Corona"
+      description: "SLURM batch arguments for job allocation on Corona"
       default: ""
 
     tioga_perf_alloc:
