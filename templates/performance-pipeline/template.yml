@@ -27,12 +27,12 @@ spec:
 
     dane_perf_alloc:
       type: string
-      description: "SLURM srun arguments for job allocation on Dane"
+      description: "SLURM batch arguments for job allocation on Dane"
       default: ""
 
     matrix_perf_alloc:
       type: string
-      description: "SLURM srun arguments for job allocation on Matrix"
+      description: "SLURM batch arguments for job allocation on Matrix"
       default: ""
 
     corona_perf_alloc:
@@ -42,12 +42,12 @@ spec:
 
     tioga_perf_alloc:
       type: string
-      description: "Flux alloc arguments for job allocation on Tioga"
+      description: "Flux batch arguments for job allocation on Tioga"
       default: ""
 
     tuolumne_perf_alloc:
       type: string
-      description: "Flux alloc arguments for job allocation on Tuolumne"
+      description: "Flux batch arguments for job allocation on Tuolumne"
       default: ""
 
     lassen_perf_alloc:
