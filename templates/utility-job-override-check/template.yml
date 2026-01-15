@@ -185,7 +185,7 @@ check-job-overrides:
         machine_name="${machine_file%.yml}"
 
         # Check if local overrides exist for this machine
-        if [ ! -f "../$LOCAL_JOBS_PATH/$machine_file" ]; then
+        if [ ! -f "$CI_PROJECT_DIR/$LOCAL_JOBS_PATH/$machine_file" ]; then
           continue
         fi
 
@@ -202,7 +202,7 @@ check-job-overrides:
         fi
 
         # Extract job names from local overrides
-        if ! local_jobs=$(grep "^[a-zA-Z0-9_-]*:" "../$LOCAL_JOBS_PATH/$machine_file" 2>/dev/null | sed 's/:.*//' | grep -v "^\."); then
+        if ! local_jobs=$(grep "^[a-zA-Z0-9_-]*:" "$CI_PROJECT_DIR/$LOCAL_JOBS_PATH/$machine_file" 2>/dev/null | sed 's/:.*//' | grep -v "^\."); then
           local_jobs=""
         fi
 
