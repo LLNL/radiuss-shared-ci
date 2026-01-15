@@ -47,6 +47,13 @@ spec:
       default: "dane.yml matrix.yml corona.yml tioga.yml tuolumne.yml lassen.yml"
 
 ---
+
+variables:
+  SUBMODULE_PATH: "$[[ inputs.submodule_path ]]"
+  SHARED_JOBS_PATH: "$[[ inputs.shared_jobs_path ]]"
+  LOCAL_JOBS_PATH: "$[[ inputs.local_jobs_path ]]"
+  MACHINE_FILES: "$[[ inputs.machine_files ]]"
+
 # Job override check
 check-job-overrides:
   stage: .pre
@@ -57,11 +64,6 @@ check-job-overrides:
   script:
     - |
       set -e
-
-      SUBMODULE_PATH="${[[ inputs.submodule_path ]]}"
-      SHARED_JOBS_PATH="${[[ inputs.shared_jobs_path ]]}"
-      LOCAL_JOBS_PATH="${[[ inputs.local_jobs_path ]]}"
-      MACHINE_FILES="${[[ inputs.machine_files ]]}"
 
       echo ""
       echo "=========================================="
