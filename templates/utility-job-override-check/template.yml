@@ -222,8 +222,9 @@ check-job-overrides:
 
         for job in $common_jobs; do
           # Extract SPEC for this job from base and current commits
-          old_spec=$(git show $base_submodule:$SHARED_JOBS_PATH/$machine_file 2>/dev/null | awk "/^${job}:/,/^[^ ]/" | grep "SPEC:" | sed 's/^[[:space:]]*//' || true)
-          new_spec=$(git show $current_submodule:$SHARED_JOBS_PATH/$machine_file 2>/dev/null | awk "/^${job}:/,/^[^ ]/" | grep "SPEC:" | sed 's/^[[:space:]]*//' || true)
+          # awk: Start at job line, skip it, print indented lines until next non-indented line
+          old_spec=$(git show $base_submodule:$SHARED_JOBS_PATH/$machine_file 2>/dev/null | awk "/^${job}:/{found=1; next} found{if (/^[^ ]/) exit; print}" | grep "SPEC:" | sed 's/^[[:space:]]*//' || true)
+          new_spec=$(git show $current_submodule:$SHARED_JOBS_PATH/$machine_file 2>/dev/null | awk "/^${job}:/{found=1; next} found{if (/^[^ ]/) exit; print}" | grep "SPEC:" | sed 's/^[[:space:]]*//' || true)
 
           if [ "$old_spec" != "$new_spec" ] && [ -n "$old_spec" ] && [ -n "$new_spec" ]; then
             modified_jobs="$modified_jobs $job"
