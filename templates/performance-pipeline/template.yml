@@ -299,7 +299,7 @@ stages:
       for file in ${PERF_ARTIFACT_DIR}/*/${PERF_PROCESSED_FILE}; do
         if [ -f "$file" ]; then
           # Check if required variables are set
-          if [ -z "$GITHUB_TOKEN" ] || [ -z "$GITHUB_PROJECT_ORG" ] || [ -z "$GITHUB_PROJECT_NAME" ]; then
+          if [ -z "$GITHUB_WORKFLOW_TOKEN" ] || [ -z "$GITHUB_PROJECT_ORG" ] || [ -z "$GITHUB_PROJECT_NAME" ]; then
             echo "Error: Required GitHub variables not set"
             exit 1
           fi
@@ -311,7 +311,7 @@ stages:
           RESPONSE_BODY=$(mktemp)
           HTTP_CODE=$(curl --retry 3 --retry-delay 5 --retry-connrefused --max-time 30 -X POST \
                --url "https://api.github.com/repos/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}/actions/workflows/benchmark.yml/dispatches" \
-               --header "Authorization: token $GITHUB_TOKEN" \
+               --header "Authorization: token $GITHUB_WORKFLOW_TOKEN" \
                --header "Accept: application/vnd.github.v3+json" \
                --header "Content-Type: application/json" \
                --data "{ \"ref\": \"${CI_COMMIT_REF_NAME}\", \"inputs\": { \"benchmark_name\": \"${BENCHMARK_NAME}\", \"benchmark_data\": \"${BENCHMARK_DATA}\" } }" \
